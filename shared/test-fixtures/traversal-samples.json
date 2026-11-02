@@ -1,0 +1,41 @@
+{
+  "category": "path_traversal",
+  "samples": [
+    {
+      "id": "trav-01",
+      "name": "Standard Dot-Dot-Slash",
+      "target": "path",
+      "payload": "/static/../../../../etc/passwd",
+      "expected_category": "path_traversal",
+      "expected_severity": "critical",
+      "expected_action": "block"
+    },
+    {
+      "id": "trav-02",
+      "name": "URL Encoded Traversal",
+      "target": "query",
+      "payload": "file=%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fshadow",
+      "expected_category": "path_traversal",
+      "expected_severity": "critical",
+      "expected_action": "block"
+    },
+    {
+      "id": "trav-03",
+      "name": "Windows Backslash Traversal",
+      "target": "path",
+      "payload": "/downloads/..\\..\\..\\windows\\win.ini",
+      "expected_category": "path_traversal",
+      "expected_severity": "high",
+      "expected_action": "block"
+    },
+    {
+      "id": "trav-04",
+      "name": "Null Byte Injection with Traversal",
+      "target": "query",
+      "payload": "doc=../../secret.pdf%00.jpg",
+      "expected_category": "path_traversal",
+      "expected_severity": "high",
+      "expected_action": "block"
+    }
+  ]
+}

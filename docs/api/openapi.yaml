@@ -1,0 +1,218 @@
+openapi: 3.1.0
+info:
+  title: SentinelGrid Central Control Plane API
+  version: 1.0.0
+  description: REST API for SentinelGrid multi-tenant security operations, connector ingestion, and policy distribution.
+
+servers:
+  - url: https://api.sentinelgrid.io/v1
+    description: Production Cloud API
+  - url: http://localhost:8000/v1
+    description: Local Development Server
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user and obtain JWT tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+                  refresh_token: { type: string }
+                  token_type: { type: string, example: bearer }
+
+  /organizations:
+    get:
+      summary: List organizations for authenticated user
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: List of organizations
+    post:
+      summary: Create a new organization
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, slug]
+              properties:
+                name: { type: string }
+                slug: { type: string }
+      responses:
+        '201':
+          description: Organization created
+
+  /websites:
+    get:
+      summary: List websites within the active organization
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: query
+          name: organization_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: List of websites
+    post:
+      summary: Register a new website for protection
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [organization_id, name, domain]
+              properties:
+                organization_id: { type: string, format: uuid }
+                name: { type: string }
+                domain: { type: string }
+                environment: { type: string, enum: [production, staging, development] }
+      responses:
+        '201':
+          description: Website registered
+
+  /connectors/{connector_id}/keys:
+    post:
+      summary: Generate API keys for a connector instance
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: connector_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Key generated with plaintext secret returned once
+
+  /events/batch:
+    post:
+      summary: Ingest a batch of sanitized security events from connector
+      security: [{ ConnectorKeyAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [connector_id, batch_id, events]
+              properties:
+                connector_id: { type: string, format: uuid }
+                batch_id: { type: string, format: uuid }
+                events:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SecurityEvent'
+      responses:
+        '202':
+          description: Batch accepted for asynchronous queuing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted_count: { type: integer }
+                  batch_id: { type: string, format: uuid }
+                  status: { type: string, example: queued }
+
+  /websites/{website_id}/policy:
+    get:
+      summary: Retrieve the current digitally signed policy for a website
+      security: [{ ConnectorKeyAuth: [] }, { BearerAuth: [] }]
+      parameters:
+        - in: path
+          name: website_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: if_none_match_version
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Current signed policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedPolicy'
+        '304':
+          description: Policy not modified since if_none_match_version
+
+  /incidents:
+    get:
+      summary: Query security incidents
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - in: query
+          name: website_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: status
+          schema: { type: string, enum: [open, investigating, mitigated, resolved, false_positive] }
+      responses:
+        '200':
+          description: List of incidents
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ConnectorKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Sentinel-Key
+
+  schemas:
+    SecurityEvent:
+      type: object
+      required: [event_id, timestamp, client, request, detection, action_taken]
+      properties:
+        event_id: { type: string, format: uuid }
+        timestamp: { type: string, format: date-time }
+        client:
+          type: object
+          properties:
+            ip_address: { type: string }
+            user_agent: { type: string }
+        request:
+          type: object
+          properties:
+            method: { type: string }
+            path: { type: string }
+        detection:
+          type: object
+          properties:
+            risk_score: { type: number }
+            matched_rules: { type: array, items: { type: object } }
+        action_taken: { type: string, enum: [allow, monitor, challenge, block] }
+
+    SignedPolicy:
+      type: object
+      required: [policy_id, version, issued_at, signature, policy]
+      properties:
+        policy_id: { type: string, format: uuid }
+        version: { type: integer }
+        issued_at: { type: string, format: date-time }
+        signature: { type: string }
+        signature_algorithm: { type: string }
+        policy: { type: object }

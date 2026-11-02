@@ -1,0 +1,50 @@
+{
+  "category": "sqli",
+  "samples": [
+    {
+      "id": "sqli-01",
+      "name": "Classic Tautology Auth Bypass",
+      "target": "query",
+      "payload": "' OR '1'='1",
+      "expected_category": "sqli",
+      "expected_severity": "critical",
+      "expected_action": "block"
+    },
+    {
+      "id": "sqli-02",
+      "name": "Union Based Data Extraction",
+      "target": "query",
+      "payload": "1 UNION SELECT username, password FROM users-- -",
+      "expected_category": "sqli",
+      "expected_severity": "critical",
+      "expected_action": "block"
+    },
+    {
+      "id": "sqli-03",
+      "name": "Time-based Blind Delay",
+      "target": "query",
+      "payload": "'; WAITFOR DELAY '0:0:5'--",
+      "expected_category": "sqli",
+      "expected_severity": "high",
+      "expected_action": "block"
+    },
+    {
+      "id": "sqli-04",
+      "name": "Postgres Sleep Function",
+      "target": "body",
+      "payload": "{\"query\": \"test' OR pg_sleep(5)--\"}",
+      "expected_category": "sqli",
+      "expected_severity": "high",
+      "expected_action": "block"
+    },
+    {
+      "id": "sqli-05",
+      "name": "Inline Comment Obfuscation",
+      "target": "path",
+      "payload": "/api/users/1/**/UN/**/ION/**/SEL/**/ECT/**/null,schema_name/**/FROM/**/information_schema.schemata",
+      "expected_category": "sqli",
+      "expected_severity": "critical",
+      "expected_action": "block"
+    }
+  ]
+}

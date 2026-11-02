@@ -1,0 +1,77 @@
+# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+.env
+*.env
+pip-log.txt
+
+# ── Node.js / Next.js ────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── Secrets & Keys ───────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+secrets/
+vault-data/
+
+# ── Database ─────────────────────────────────────────────────────────────────
+*.sql.bak
+pgdata/
+redis-data/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ── OS & Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── Test & Coverage ──────────────────────────────────────────────────────────
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+coverage.xml
+*.lcov
+
+# ── ML / Data ────────────────────────────────────────────────────────────────
+*.pkl
+*.joblib
+*.h5
+*.onnx
+models/weights/
+
+# ── Build artifacts ──────────────────────────────────────────────────────────
+*.wasm

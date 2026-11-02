@@ -1,0 +1,50 @@
+{
+  "category": "xss",
+  "samples": [
+    {
+      "id": "xss-01",
+      "name": "Standard Script Tag Injection",
+      "target": "query",
+      "payload": "<script>alert(document.cookie)</script>",
+      "expected_category": "xss",
+      "expected_severity": "high",
+      "expected_action": "block"
+    },
+    {
+      "id": "xss-02",
+      "name": "Img Tag Error Handler",
+      "target": "body",
+      "payload": "<img src=x onerror=alert(1)>",
+      "expected_category": "xss",
+      "expected_severity": "high",
+      "expected_action": "block"
+    },
+    {
+      "id": "xss-03",
+      "name": "Javascript URI Scheme",
+      "target": "query",
+      "payload": "javascript:eval('alert(\"SG_XSS\")')",
+      "expected_category": "xss",
+      "expected_severity": "high",
+      "expected_action": "block"
+    },
+    {
+      "id": "xss-04",
+      "name": "SVG Animate Event Vector",
+      "target": "body",
+      "payload": "<svg><animatetransform onbegin=alert(1)>",
+      "expected_category": "xss",
+      "expected_severity": "medium",
+      "expected_action": "block"
+    },
+    {
+      "id": "xss-05",
+      "name": "Body OnLoad Execution",
+      "target": "query",
+      "payload": "<body onload=alert('XSS')>",
+      "expected_category": "xss",
+      "expected_severity": "high",
+      "expected_action": "block"
+    }
+  ]
+}

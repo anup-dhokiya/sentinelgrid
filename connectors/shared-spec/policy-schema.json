@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SentinelGridSecurityPolicy",
+  "description": "Standardized schema for digitally signed security policies distributed from SentinelGrid control plane to connectors.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy_id",
+    "website_id",
+    "organization_id",
+    "version",
+    "issued_at",
+    "expires_at",
+    "signature",
+    "signature_algorithm",
+    "policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0.0"]
+    },
+    "policy_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "website_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature_algorithm": {
+      "type": "string",
+      "enum": ["HMAC-SHA256", "Ed25519"]
+    },
+    "signature": {
+      "type": "string",
+      "description": "Cryptographic signature over the canonical JSON serialization of the policy payload."
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "mode",
+        "action_thresholds",
+        "waf_rules",
+        "rate_limiting",
+        "ip_lists",
+        "reporting"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["monitor_only", "active_protection", "lockdown"],
+          "description": "Global operating mode for this website."
+        },
+        "action_thresholds": {
+          "type": "object",
+          "required": ["monitor", "challenge", "block"],
+          "properties": {
+            "monitor": { "type": "number", "default": 30.0 },
+            "challenge": { "type": "number", "default": 50.0 },
+            "block": { "type": "number", "default": 75.0 }
+          }
+        },
+        "scoring_weights": {
+          "type": "object",
+          "properties": {
+            "signature_weight": { "type": "number", "default": 0.35 },
+            "behavior_weight": { "type": "number", "default": 0.20 },
+            "reputation_weight": { "type": "number", "default": 0.15 },
+            "frequency_weight": { "type": "number", "default": 0.15 },
+            "context_weight": { "type": "number", "default": 0.15 }
+          }
+        },
+        "waf_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule_id", "category", "enabled", "action"],
+            "properties": {
+              "rule_id": { "type": "string" },
+              "category": { "type": "string" },
+              "enabled": { "type": "boolean" },
+              "action": {
+                "type": "string",
+                "enum": ["allow", "monitor", "challenge", "block"]
+              },
+              "risk_contribution": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "path_exclusions": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "rate_limiting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["route_pattern", "window_seconds", "max_requests", "action"],
+            "properties": {
+              "route_pattern": { "type": "string" },
+              "window_seconds": { "type": "integer", "minimum": 1 },
+              "max_requests": { "type": "integer", "minimum": 1 },
+              "action": { "type": "string", "enum": ["monitor", "challenge", "block"] }
+            }
+          }
+        },
+        "ip_lists": {
+          "type": "object",
+          "properties": {
+            "allowlist": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "blocklist": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "challengelist": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "reporting": {
+          "type": "object",
+          "required": ["ingest_endpoint", "flush_interval_seconds", "max_batch_size"],
+          "properties": {
+            "ingest_endpoint": { "type": "string", "format": "uri" },
+            "flush_interval_seconds": { "type": "integer", "minimum": 1, "default": 5 },
+            "max_batch_size": { "type": "integer", "minimum": 1, "default": 100 },
+            "buffer_capacity": { "type": "integer", "minimum": 100, "default": 5000 },
+            "include_allowed_traffic_sample_rate": { "type": "number", "minimum": 0.0, "maximum": 1.0, "default": 0.05 }
+          }
+        }
+      }
+    }
+  }
+}
