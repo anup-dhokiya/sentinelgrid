@@ -62,12 +62,26 @@ class SecurityBrain:
         ),
         ThreatSignature(
             rule_id="SSRF-CLOUD-IMDS-AWS",
-            name="AWS/Cloud IMDSv1 Metadata Exfiltration Probe",
+            name="AWS/Cloud IMDSv1/v2 Metadata Exfiltration Probe (Dotted, Hex, Decimal, IPv6)",
             category="Server-Side Request Forgery",
             owasp_id="A10:Server-Side Request Forgery",
             severity="CRITICAL",
             score=98.0,
-            pattern=re.compile(r"(?:169\.254\.169\.254|latest/meta-data|instance-identity/document)", re.IGNORECASE)
+            pattern=re.compile(
+                r"(?:"
+                r"169\.254\.169\.254"
+                r"|\b0xa9\.0xfe\.0xa9\.0xfe\b"
+                r"|\b0xa9fea9fe\b"
+                r"|\b2852039166\b"
+                r"|\b0251\.0376\.0251\.0376\b"
+                r"|\b025177524776\b"
+                r"|\[?fd00:ec2::254\]?"
+                r"|::ffff:(?:169\.254\.169\.254|a9fe:a9fe)"
+                r"|latest/(?:meta-data|user-data|dynamic/instance-identity|api/token)"
+                r"|instance-identity/document"
+                r")",
+                re.IGNORECASE
+            )
         ),
         ThreatSignature(
             rule_id="SSRF-CLOUD-METADATA-GCP-AZURE",
@@ -76,7 +90,36 @@ class SecurityBrain:
             owasp_id="A10:Server-Side Request Forgery",
             severity="CRITICAL",
             score=98.0,
-            pattern=re.compile(r"(?:metadata\.google\.internal|computeMetadata/v1|metadata\.azure\.com/metadata/instance)", re.IGNORECASE)
+            pattern=re.compile(
+                r"(?:"
+                r"metadata\.google\.internal"
+                r"|metadata\.goog\b"
+                r"|computeMetadata/(?:v1|v1beta1)"
+                r"|metadata\.azure\.com(?:/metadata/instance)?"
+                r"|metadata/instance\b"
+                r"|100\.100\.100\.200"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="SSTI-TEMPLATE-INJECTION",
+            name="Server-Side Template Injection Probe (Jinja2, Twig, Freemarker, SpEL, ERB)",
+            category="Server-Side Template Injection",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=96.0,
+            pattern=re.compile(
+                r"(?:"
+                r"(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*(?:[a-zA-Z0-9_\'\"]+\s*[\*\+\-\/]\s*[a-zA-Z0-9_\'\"]+|T\s*\([A-Za-z0-9_.]+\)|new\s+[A-Za-z0-9_.]+\s*\().*?(?:\}\}|%\}|\}|%>)"
+                r"|(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*.*?(?:context|request|session|application|global|__class__|class|__mro__|mro|__globals__|globals|__subclasses__|subclasses|getRuntime|ProcessBuilder|exec|eval|system|config|lipsum|cycler).*?(?:\}\}|%\}|\}|%>)"
+                r"|\{%\s*(?:import|include|set|with|exec|from|raw)\b.*?%\}"
+                r"|<[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^>]*>"
+                r"|\[[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^\]]*\]"
+                r"|<%\s*(?:system|exec|%x|IO\.read|File\.read|require|java\.)\b.*?%>"
+                r")",
+                re.IGNORECASE
+            )
         )
     ]
 
@@ -188,6 +231,72 @@ class SecurityBrain:
             score=98.0,
             pattern=re.compile(r"\b(?:nc|ncat|netcat)\b.*?(?:-e|-c|/bin/(?:sh|bash))", re.IGNORECASE)
         ),
+        ThreatSignature(
+            rule_id="RCE-ENCODED-PIPE-EXEC",
+            name="Encoded Command Pipe Execution (base64 -d | sh, curl | sh)",
+            category="Remote Code Execution",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=98.0,
+            pattern=re.compile(
+                r"(?:"
+                r"\|\s*base64\s+(?:-d|--decode)\s*\|\s*(?:/bin/)?(?:ba|z|da)?sh\b"
+                r"|base64\s+(?:-d|--decode)\s*<<<"
+                r"|echo\s+[A-Za-z0-9+/=]{8,}\s*\|\s*(?:base64\s+(?:-d|--decode)|openssl\s+enc\s+-d)\s*\|\s*(?:/bin/)?(?:ba|z|da)?sh\b"
+                r"|(?:curl|wget)\s+[^|;&\n]+\|\s*(?:/bin/)?(?:ba|z|da)?sh\b"
+                r"|bash\s+-c\s+[\"'].*?base64.*?[\"']"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="RCE-SCRIPTING-ONE-LINER",
+            name="Scripting Language Inline Execution (Python/Perl/Ruby one-liners)",
+            category="Remote Code Execution",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=97.0,
+            pattern=re.compile(
+                r"\b(?:python[23]?|perl|ruby|php)\b(?:\s+-[a-zA-Z0-9_-]+)*\s+-(?:c|e|r)\s+[\"'].*?[\"']",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="RCE-POWERSHELL-PAYLOAD",
+            name="PowerShell Web Download Cradle & Execution Probe",
+            category="Remote Code Execution",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=98.0,
+            pattern=re.compile(
+                r"(?:"
+                r"(?:\bpowershell(?:\.exe)?\b.*?(?:Invoke-WebRequest|iwr\b|Invoke-RestMethod|irm\b|DownloadString|DownloadFile|Net\.WebClient|Start-BitsTransfer|-enc\b|-encodedcommand\b|-executionpolicy\s+bypass|-w(?:indowstyle)?\s+hidden|-nop(?:rofile)?))"
+                r"|(?:\b(?:IEX|Invoke-Expression)\s*\(?\s*(?:New-Object\s+Net\.WebClient|Invoke-WebRequest|iwr\b|Invoke-RestMethod|irm\b))"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+
+        # Server-Side Template Injection (SSTI)
+        ThreatSignature(
+            rule_id="SSTI-TEMPLATE-INJECTION",
+            name="Server-Side Template Injection Probe (Jinja2, Twig, Freemarker, SpEL, ERB)",
+            category="Server-Side Template Injection",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=96.0,
+            pattern=re.compile(
+                r"(?:"
+                r"(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*(?:[a-zA-Z0-9_\'\"]+\s*[\*\+\-\/]\s*[a-zA-Z0-9_\'\"]+|T\s*\([A-Za-z0-9_.]+\)|new\s+[A-Za-z0-9_.]+\s*\().*?(?:\}\}|%\}|\}|%>)"
+                r"|(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*.*?(?:context|request|session|application|global|__class__|class|__mro__|mro|__globals__|globals|__subclasses__|subclasses|getRuntime|ProcessBuilder|exec|eval|system|config|lipsum|cycler).*?(?:\}\}|%\}|\}|%>)"
+                r"|\{%\s*(?:import|include|set|with|exec|from|raw)\b.*?%\}"
+                r"|<[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^>]*>"
+                r"|\[[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^\]]*\]"
+                r"|<%\s*(?:system|exec|%x|IO\.read|File\.read|require|java\.)\b.*?%>"
+                r")",
+                re.IGNORECASE
+            )
+        ),
 
         # Cross-Site Scripting (XSS)
         ThreatSignature(
@@ -248,7 +357,7 @@ class SecurityBrain:
             owasp_id="A08:Software and Data Integrity Failures",
             severity="CRITICAL",
             score=90.0,
-            pattern=re.compile(r"(?:rO0AB[A-Za-z0-9+/=]{10,}|aced0005)", re.IGNORECASE)
+            pattern=re.compile(r"(?:rO0AB[A-Za-z0-9+/=]{2,}|aced0005|\\xac\\xed\\x00\\x05)", re.IGNORECASE)
         ),
         ThreatSignature(
             rule_id="DESERIALIZATION-PHP-OBJECT",
@@ -257,19 +366,37 @@ class SecurityBrain:
             owasp_id="A08:Software and Data Integrity Failures",
             severity="HIGH",
             score=88.0,
-            pattern=re.compile(r"\bO:\d+:\s*\"[^\"]+\":\d+:\s*\{", re.IGNORECASE)
+            pattern=re.compile(r"\b[OC]:\+?\d+:\s*\"[^\"]+\":\+?\d+:\s*\{", re.IGNORECASE)
         )
     ]
 
     # 4. Header & Scanner Signatures
     SCANNER_SIGNATURE = ThreatSignature(
         rule_id="SCANNER-KNOWN-TOOL-SIGNATURE",
-        name="Known Automated Attack Scanner Identified (SqlMap, Nikto, Acunetix, ZAP)",
+        name="Known Automated Attack Scanner Identified (SqlMap, Nikto, Acunetix, ZAP, Nuclei, FFUF, Gobuster, Feroxbuster, Qualys)",
         category="Malicious Automation",
         owasp_id="A07:Identification and Authentication Failures",
         severity="CRITICAL",
         score=99.0,
-        pattern=re.compile(r"(?:sqlmap|nikto|acunetix|w3af|openvas|zaproxy|dirbuster|gobuster)", re.IGNORECASE)
+        pattern=re.compile(
+            r"(?:"
+            r"sqlmap"
+            r"|nikto"
+            r"|acunetix"
+            r"|w3af"
+            r"|openvas"
+            r"|zaproxy"
+            r"|\bzap(?:/[0-9]|\b)"
+            r"|owasp[_\s\-]?zap"
+            r"|dirbuster"
+            r"|gobuster"
+            r"|nuclei"
+            r"|ffuf"
+            r"|feroxbuster"
+            r"|qualys"
+            r")",
+            re.IGNORECASE
+        )
     )
 
     @classmethod
