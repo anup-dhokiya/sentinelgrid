@@ -41,8 +41,13 @@ vault-data/
 
 # ── Database ─────────────────────────────────────────────────────────────────
 *.sql.bak
+*.db
+*.db-shm
+*.db-wal
 pgdata/
 redis-data/
+backups/
+scratch/
 
 # ── Logs ─────────────────────────────────────────────────────────────────────
 *.log
@@ -75,3 +80,4 @@ models/weights/
 
 # ── Build artifacts ──────────────────────────────────────────────────────────
 *.wasm
+references/coreruleset/

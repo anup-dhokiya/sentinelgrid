@@ -31,11 +31,6 @@ app.include_router(policies_router)
 app.include_router(console_router)
 app.include_router(auth_router)
 
-# Mount Web Console frontend static build
-static_dir = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public")
-if os.path.exists(static_dir):
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-
 
 @app.get("/health", tags=["Health"])
 async def health_check():
@@ -44,3 +39,9 @@ async def health_check():
         "service": "sentinelgrid-management-api",
         "version": "1.0.0"
     }
+
+
+# Mount Web Console frontend static build
+static_dir = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public")
+if os.path.exists(static_dir):
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")

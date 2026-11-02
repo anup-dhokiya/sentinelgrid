@@ -7,7 +7,7 @@ import hashlib
 from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 from app.core.database import get_db_connection
 
@@ -15,12 +15,12 @@ router = APIRouter(prefix="/v1/auth", tags=["Authentication"])
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 
 class SignupRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     full_name: str
 

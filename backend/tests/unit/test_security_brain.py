@@ -108,21 +108,27 @@ class TestSecurityBrainComprehensive(unittest.TestCase):
     def test_legitimate_traffic_passes(self):
         """Verifies normal, legitimate API calls are allowed and not falsely blocked."""
         clean_requests = [
-            {"path": "/api/v1/tours/search", "query": "location=Kyoto&days=5", "body": ""},
-            {"path": "/api/v1/users/profile", "query": "", "body": json.dumps({"name": "Alice Smith", "email": "alice@example.com"})},
-            {"path": "/products/artisan-vase-102", "query": "currency=USD", "body": ""}
+            {"path": "/api/v1/tours/search", "query": "location=Kyoto&days=5", "body": "", "headers": {}},
+            {"path": "/api/v1/users/profile", "query": "", "body": json.dumps({"name": "Alice Smith", "email": "alice@example.com"}), "headers": {}},
+            {"path": "/products/artisan-vase-102", "query": "currency=USD", "body": "", "headers": {}},
+            {"path": "/api/v1/items", "query": "id=123", "body": "", "headers": {}},
+            {"path": "/api/v1/catalog", "query": "filter=active AND sort=asc", "body": "", "headers": {}},
+            {"path": "/api/v1/cart", "query": "user_id=456", "body": "", "headers": {"cookie": "session=xyz123; cat=books"}}
         ]
 
         for req in clean_requests:
+            headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/120.0.0.0 Safari/537.36"}
+            headers.update(req.get("headers", {}))
             res = SecurityBrain.evaluate(
                 path=req["path"],
                 method="GET",
                 query=req["query"],
                 body=req["body"],
-                headers={"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/120.0.0.0 Safari/537.36"}
+                headers=headers
             )
-            self.assertEqual(res["action"], "ALLOW", f"Legitimate request falsely blocked: {req['path']}")
-            self.assertEqual(res["risk_score"], 5.0)
+            self.assertEqual(res["action"], "ALLOW", f"Legitimate request falsely blocked: {req['path']} query={req['query']}")
+            self.assertEqual(res["risk_score"], 0.0, f"Expected 0.0 risk score for clean request: {req}")
+            self.assertTrue(res["is_clean"])
 
 
 if __name__ == "__main__":
