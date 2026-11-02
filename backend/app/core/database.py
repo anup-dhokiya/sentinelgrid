@@ -26,6 +26,15 @@ def init_database():
     conn = get_db_connection()
     with conn:
         conn.executescript("""
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            email TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            full_name TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'analyst',
+            created_at TEXT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS websites (
             id TEXT PRIMARY KEY,
             domain TEXT NOT NULL UNIQUE,
@@ -81,6 +90,9 @@ def init_database():
         if cur.fetchone()[0] == 0:
             now = datetime.now(timezone.utc).isoformat()
             conn.executescript(f"""
+            INSERT INTO users (id, email, password_hash, full_name, role, created_at) VALUES
+            ('usr-admin', 'anupdhokiya0@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'Anup Dhokiya', 'admin', '{now}');
+
             INSERT INTO websites (id, domain, name, created_at, status, risk_score) VALUES
             ('site-1', 'api.artisan-travel.com', 'Artisan Travel & Goods API', '{now}', 'active', 28.4),
             ('site-2', 'shop.wellness-pure.io', 'Wellness Pure E-Commerce', '{now}', 'active', 64.2);

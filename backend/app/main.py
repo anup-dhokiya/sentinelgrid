@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api.v1.policies import router as policies_router
 from app.api.v1.console import router as console_router
+from app.api.v1.auth import router as auth_router
 import os
 
 app = FastAPI(
@@ -28,6 +29,7 @@ app.add_middleware(
 # Register routers
 app.include_router(policies_router)
 app.include_router(console_router)
+app.include_router(auth_router)
 
 # Mount Web Console frontend static build
 static_dir = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public")
