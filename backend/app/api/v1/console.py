@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.database import get_db_connection
-from app.security_engine.inline_waf import InLineSecurityEngine
+from app.security_engine.brain import SecurityBrain
 from app.services.policy_manager import PolicyManagerService
 from app.services.simulation import PolicyPayload, HistoricalTrafficSample
 
@@ -83,16 +83,26 @@ async def list_endpoints():
 @router.post("/inspect")
 async def inspect_live_request(req: WafTestRequest):
     """
-    Simulates live in-line inspection of an incoming request.
+    Simulates live in-line inspection of an incoming request using the
+    comprehensive SecurityBrain (OWASP + CVE + RCE + SSRF + Scanners).
     Records the event into database and returns immediate WAAP verdict.
     """
-    action, risk_score, rule_id, owasp = InLineSecurityEngine.inspect_request(
-        method=req.method,
+    eval_result = SecurityBrain.evaluate(
         path=req.path,
+        method=req.method,
         query=req.query_params,
         body=req.body,
-        headers=req.headers
+        headers=req.headers,
+        client_ip=req.client_ip
     )
+
+    action = eval_result["action"]
+    risk_score = eval_result["risk_score"]
+    top_match = eval_result["top_match"]
+
+    rule_id = top_match["rule_id"] if top_match else "CLEAN-REQUEST"
+    owasp = top_match["owasp_id"] if top_match else "None"
+    cve_ref = top_match.get("cve_ref") if top_match else None
 
     event_id = f"ev-{uuid4().hex[:8]}"
     now = datetime.now(timezone.utc).isoformat()
@@ -104,7 +114,7 @@ async def inspect_live_request(req: WafTestRequest):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             event_id, req.website_id, now, req.client_ip, req.method, req.path,
-            action, risk_score, rule_id, owasp, f"Headers: {req.headers.get('user-agent', 'None')} | Payload: {req.body[:80]}"
+            action, risk_score, rule_id, owasp, f"CVE: {cve_ref or 'N/A'} | Headers: {req.headers.get('user-agent', 'None')} | Payload: {req.body[:80]}"
         ))
 
     return {
@@ -113,8 +123,11 @@ async def inspect_live_request(req: WafTestRequest):
         "risk_score": risk_score,
         "rule_triggered": rule_id,
         "owasp_category": owasp,
+        "cve_reference": cve_ref,
+        "total_matches": eval_result["total_matches"],
+        "all_matches": eval_result["all_matches"],
         "timestamp": now,
-        "execution_latency_ms": 1.15
+        "execution_latency_ms": 1.25
     }
 
 
