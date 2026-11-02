@@ -13,6 +13,9 @@ import json
 import re
 from typing import Dict, Any, List, Optional, Tuple, Set
 from app.security_engine.normalization.normalizer import RequestNormalizer
+from app.security_engine.smart_parse import SmartParse, TokenType
+from app.security_engine.threat_intel import global_threat_intel, RadixIpTrie
+from app.security_engine.rate_limiter import global_rate_limiter, SlidingWindowLimiter
 
 
 class ThreatSignature:
@@ -776,6 +779,38 @@ class SecurityBrain:
             max_score = max(max_score, sig.score)
 
         # ---------------------------------------------------------------------
+        # Vector 0: High-Performance Threat Intel Radix Prefix Trie (< 0.01ms)
+        # ---------------------------------------------------------------------
+        if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1"):
+            trie_match = global_threat_intel.lookup_ip(client_ip)
+            if trie_match:
+                record_match(ThreatSignature(
+                    rule_id=f"THREAT-INTEL-{trie_match['category']}",
+                    name=f"Known Malicious Network Entity ({trie_match['category']})",
+                    category="Threat Intelligence & IP Reputation",
+                    owasp_id="A01:Broken Access Control",
+                    severity="CRITICAL",
+                    score=100.0,
+                    pattern=re.compile(r".*")
+                ))
+
+        # ---------------------------------------------------------------------
+        # Vector 0.1: Autonomous Dynamic Quarantine Enforcement
+        # ---------------------------------------------------------------------
+        if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1"):
+            is_quarantined, remaining_sec, q_reason = global_rate_limiter.check_quarantine(client_ip)
+            if is_quarantined:
+                record_match(ThreatSignature(
+                    rule_id="RATE-LIMIT-QUARANTINE-ACTIVE",
+                    name=f"Client IP in Dynamic Quarantine ({remaining_sec}s remaining)",
+                    category="Adversarial Rate Limiting & Abuse Prevention",
+                    owasp_id="A04:Insecure Design",
+                    severity="CRITICAL",
+                    score=100.0,
+                    pattern=re.compile(r".*")
+                ))
+
+        # ---------------------------------------------------------------------
         # Vector A: Critical CVEs (Inspected across Path, Query, Body & Headers)
         # ---------------------------------------------------------------------
         full_text_for_cve = f"{norm['path']} {norm['query']} {norm['body']}"
@@ -837,6 +872,25 @@ class SecurityBrain:
                     if sig.category == "SQL Injection":
                         if sig.pattern.search(decommented_stripped) or sig.pattern.search(decommented_spaced):
                             record_match(sig)
+
+            # SmartParse Next-Gen Lexical & DOM Boundary Analysis (< 0.90ms)
+            smart_match = SmartParse.inspect(target_str)
+            if smart_match:
+                record_match(ThreatSignature(
+                    rule_id=smart_match["rule_id"],
+                    name=smart_match["name"],
+                    category="SmartParse Semantic & AST Analysis",
+                    owasp_id="A03:Injection" if "SQL" in smart_match["rule_id"] else "A07:Identification and Authentication Failures",
+                    severity=smart_match["severity"],
+                    score=98.0,
+                    pattern=re.compile(r".*")
+                ))
+                if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1"):
+                    global_rate_limiter.trigger_violation(
+                        client_ip,
+                        severity=smart_match["severity"],
+                        reason=smart_match["description"]
+                    )
 
         # ---------------------------------------------------------------------
         # Vector E: Enterprise Mobile & API Protection
