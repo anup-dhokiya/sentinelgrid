@@ -8,8 +8,10 @@ Target-aware inspection engine covering:
 Zero false-positive architecture with context-separated inspection for paths, headers, parameters, and payloads.
 """
 
+import base64
+import json
 import re
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Set
 from app.security_engine.normalization.normalizer import RequestNormalizer
 
 
@@ -399,6 +401,347 @@ class SecurityBrain:
         )
     )
 
+    # 5. Mobile Bot & Hooking Framework Detection
+    MOBILE_HOOKING_FRIDA = ThreatSignature(
+        rule_id="MOBILE-HOOKING-FRAMEWORK-FRIDA",
+        name="Frida Dynamic Instrumentation & Hooking Framework Detected",
+        category="Mobile Hooking & Reverse Engineering",
+        owasp_id="M08:Code Tampering",
+        severity="CRITICAL",
+        score=96.0,
+        pattern=re.compile(
+            r"(?:"
+            r"\bx-frida-agent\b"
+            r"|\bfrida-server\b"
+            r"|\blibfrida(?:\.so)?\b"
+            r"|\bfrida:rpc\b"
+            r"|\bfrida-gadget\b"
+            r"|\bfrida-agent\b"
+            r")",
+            re.IGNORECASE
+        )
+    )
+
+    MOBILE_HOOKING_XPOSED = ThreatSignature(
+        rule_id="MOBILE-HOOKING-FRAMEWORK-XPOSED",
+        name="Xposed / Substrate Instrumentation Hooking Framework Detected",
+        category="Mobile Hooking & Reverse Engineering",
+        owasp_id="M08:Code Tampering",
+        severity="CRITICAL",
+        score=96.0,
+        pattern=re.compile(
+            r"(?:"
+            r"\bx-xposed-module\b"
+            r"|\bde\.robv\.android\.xposed\b"
+            r"|\bcydiasubstrate\b"
+            r"|\bedxposed\b"
+            r"|\bxposedbridge\b"
+            r")",
+            re.IGNORECASE
+        )
+    )
+
+    MOBILE_EMULATOR_FINGERPRINT = ThreatSignature(
+        rule_id="MOBILE-EMULATOR-FINGERPRINT",
+        name="Android / iOS Emulator Environment Fingerprint Detected",
+        category="Mobile Bot & Automated Client",
+        owasp_id="M09:Reverse Engineering",
+        severity="HIGH",
+        score=88.0,
+        pattern=re.compile(
+            r"(?:"
+            r"\bsdk_gphone\w*"
+            r"|\bvbox86p\b"
+            r"|\bgenymotion\b"
+            r"|\bnox(?:player)?\b"
+            r"|\bbluestacks\w*"
+            r"|\bgoldfish\b"
+            r"|\branchu\b"
+            r")",
+            re.IGNORECASE
+        )
+    )
+
+    # 6. Mobile JWT Integrity & Tamper Protection
+    JWT_ALG_NONE_BYPASS = ThreatSignature(
+        rule_id="JWT-ALG-NONE-BYPASS",
+        name="JWT 'alg': 'none' Signature Bypass or Missing Signature Detected",
+        category="Broken Authentication",
+        owasp_id="A07:Identification and Authentication Failures",
+        severity="CRITICAL",
+        score=98.0,
+        pattern=re.compile(r"['\"]?alg['\"]?\s*:\s*['\"]none['\"]", re.IGNORECASE)
+    )
+
+    JWT_MALFORMED_OR_INJECTION = ThreatSignature(
+        rule_id="JWT-MALFORMED-OR-INJECTION",
+        name="SQLi / Command Injection / Null Bytes Injected in JWT Payload",
+        category="Broken Authentication & Injection",
+        owasp_id="A03:Injection",
+        severity="CRITICAL",
+        score=96.0,
+        pattern=re.compile(r"(?:\x00|%00|\\0|\\x00)", re.IGNORECASE)
+    )
+
+    # 7. GraphQL Security for Mobile APIs
+    GRAPHQL_DEPTH_EXHAUSTION = ThreatSignature(
+        rule_id="GRAPHQL-DEPTH-EXHAUSTION",
+        name="GraphQL Recursive Query Depth Resource Exhaustion (> 6 levels)",
+        category="API Denial of Service",
+        owasp_id="API4:2023 Unrestricted Resource Consumption",
+        severity="HIGH",
+        score=90.0,
+        pattern=re.compile(r"\{[^{}]*\{[^{}]*\{[^{}]*\{[^{}]*\{[^{}]*\{[^{}]*\{")
+    )
+
+    GRAPHQL_INTROSPECTION_ABUSE = ThreatSignature(
+        rule_id="GRAPHQL-INTROSPECTION-ABUSE",
+        name="GraphQL Schema / Type Introspection Probing on Production Endpoint",
+        category="Information Disclosure",
+        owasp_id="API8:2023 Security Misconfiguration",
+        severity="HIGH",
+        score=86.0,
+        pattern=re.compile(r"(?:\b__schema\b|\b__type\b)", re.IGNORECASE)
+    )
+
+    # 8. Mobile Attestation & BOLA / IDOR Defense
+    MOBILE_ATTESTATION_BYPASS = ThreatSignature(
+        rule_id="MOBILE-ATTESTATION-BYPASS",
+        name="Invalid, Null, or Spoofed Mobile App Attestation Header",
+        category="Mobile Attestation Bypass",
+        owasp_id="M01:Improper Platform Usage",
+        severity="CRITICAL",
+        score=94.0,
+        pattern=re.compile(r"^(?:null|none|nil|undefined|mock.*|fake.*|test.*|bypass|0|false)$", re.IGNORECASE)
+    )
+
+    MOBILE_BOLA_IDOR_TRAVERSAL = ThreatSignature(
+        rule_id="MOBILE-BOLA-IDOR-TRAVERSAL",
+        name="BOLA / IDOR Root Tenant or Entity Traversal Attempt",
+        category="Broken Object Level Authorization",
+        owasp_id="API1:2023 Broken Object Level Authorization",
+        severity="CRITICAL",
+        score=96.0,
+        pattern=re.compile(
+            r"(?:"
+            r"\.\./admin\b"
+            r"|\.\.%2fadmin\b"
+            r"|\.\./root\b"
+            r"|\b00000000-0000-0000-0000-000000000000\b"
+            r")",
+            re.IGNORECASE
+        )
+    )
+
+    @staticmethod
+    def _extract_jwt_tokens(raw_headers: Dict[str, str], norm_headers: Dict[str, str], query_params: List[Tuple[str, str]], body: str) -> List[str]:
+        candidates: List[str] = []
+        all_headers: Dict[str, str] = {}
+        for k, v in raw_headers.items():
+            all_headers[k.lower()] = v
+        all_headers.update(norm_headers)
+
+        # 1. Authorization header
+        auth = all_headers.get("authorization", "")
+        if auth:
+            if auth.lower().startswith("bearer "):
+                candidates.append(auth[7:].strip())
+            elif "." in auth:
+                candidates.append(auth.strip())
+
+        # 2. Cookie header
+        cookie_header = all_headers.get("cookie", "")
+        if cookie_header:
+            for item in cookie_header.split(";"):
+                item = item.strip()
+                if "=" in item:
+                    _, c_val = item.split("=", 1)
+                    c_val = c_val.strip()
+                    if "." in c_val:
+                        candidates.append(c_val)
+
+        # 3. Dedicated token headers
+        for h_k in ["x-access-token", "x-auth-token", "jwt", "token", "x-jwt-token"]:
+            if h_k in all_headers and "." in all_headers[h_k]:
+                candidates.append(all_headers[h_k].strip())
+
+        # 4. Query params
+        for p_k, p_v in query_params:
+            if ("token" in p_k.lower() or "jwt" in p_k.lower()) and "." in p_v:
+                candidates.append(p_v.strip())
+
+        # 5. Body
+        if body:
+            try:
+                data = json.loads(body)
+                if isinstance(data, dict):
+                    for b_k, b_v in data.items():
+                        if isinstance(b_v, str) and "." in b_v and ("token" in b_k.lower() or "jwt" in b_k.lower() or b_v.startswith("eyJ")):
+                            candidates.append(b_v.strip())
+            except Exception:
+                pass
+
+            for match in re.findall(r"\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]*)?\b", body):
+                candidates.append(match)
+
+        return list(dict.fromkeys(candidates))
+
+    @classmethod
+    def _inspect_jwt(cls, token: str) -> Tuple[bool, bool]:
+        """
+        Evaluates candidate JWT string.
+        Returns: (has_alg_none_or_missing_sig, has_injection_or_null_bytes)
+        """
+        has_alg_none = False
+        has_injection = False
+
+        # Raw token check for null bytes
+        if any(nb in token for nb in ["\x00", "%00", "\\x00", "\\0"]):
+            has_injection = True
+
+        # Check for injection in raw token
+        if re.search(r"(?:'\s*(?:or|and)\b|--|;\s*(?:drop|cat|rm|ls)|\||\$\()", token, re.IGNORECASE):
+            has_injection = True
+
+        segments = token.split(".")
+        if len(segments) not in (2, 3):
+            return has_alg_none, has_injection
+
+        # Segment 0: Header
+        hdr_seg = segments[0]
+        pad = len(hdr_seg) % 4
+        if pad != 0:
+            hdr_seg += "=" * (4 - pad)
+
+        hdr_json = None
+        try:
+            hdr_bytes = base64.urlsafe_b64decode(hdr_seg)
+            if b"\x00" in hdr_bytes:
+                has_injection = True
+            hdr_json = json.loads(hdr_bytes.decode("utf-8", errors="ignore"))
+        except Exception:
+            pass
+
+        if isinstance(hdr_json, dict):
+            alg = str(hdr_json.get("alg", "")).strip().lower()
+            if alg == "none":
+                has_alg_none = True
+
+            # Missing signature segment (2 segments or 3rd segment empty)
+            if len(segments) == 2 or (len(segments) == 3 and not segments[2]):
+                has_alg_none = True
+
+        # Segment 1: Payload
+        payload_seg = segments[1]
+        pad = len(payload_seg) % 4
+        if pad != 0:
+            payload_seg += "=" * (4 - pad)
+
+        try:
+            payload_bytes = base64.urlsafe_b64decode(payload_seg)
+            if b"\x00" in payload_bytes or b"\\x00" in payload_bytes or b"\\0" in payload_bytes or b"\\u0000" in payload_bytes:
+                has_injection = True
+
+            payload_str = payload_bytes.decode("utf-8", errors="replace")
+            if any(nb in payload_str for nb in ["\x00", "%00", "\\x00", "\\0", "\\u0000", "\u0000"]):
+                has_injection = True
+
+            try:
+                p_obj = json.loads(payload_str)
+                def check_null(o: Any) -> bool:
+                    if isinstance(o, str) and ("\x00" in o or "\\u0000" in o):
+                        return True
+                    if isinstance(o, dict):
+                        return any(check_null(k) or check_null(v) for k, v in o.items())
+                    if isinstance(o, list):
+                        return any(check_null(x) for x in o)
+                    return False
+                if check_null(p_obj):
+                    has_injection = True
+            except Exception:
+                pass
+
+            # Check payload signatures against decoded payload string
+            for sig in cls.PAYLOAD_SIGNATURES:
+                if sig.pattern.search(payload_str):
+                    has_injection = True
+                    break
+
+            if not has_injection:
+                sqli_pattern = re.compile(
+                    r"(?:'\s*(?:OR|AND)\b|UNION\s+(?:ALL\s+)?SELECT\b|;\s*DROP\s+TABLE|--|\bSLEEP\s*\(|'\s*=\s*')",
+                    re.IGNORECASE
+                )
+                rce_pattern = re.compile(
+                    r"(?:(?:;|\||&&)\s*(?:cat\s+|/bin/|whoami|id\b|ls\s+|rm\s+|curl\s+|wget\s+|bash\b|sh\b)|\$\([^)]+\)|`[^`]+`)",
+                    re.IGNORECASE
+                )
+                if sqli_pattern.search(payload_str) or rce_pattern.search(payload_str):
+                    has_injection = True
+        except Exception:
+            pass
+
+        return has_alg_none, has_injection
+
+    @staticmethod
+    def _calculate_graphql_depth(query_str: str) -> int:
+        max_depth = 0
+        current_depth = 0
+        in_string = False
+        escape = False
+        in_comment = False
+
+        for char in query_str:
+            if in_comment:
+                if char == "\n":
+                    in_comment = False
+                continue
+            if in_string:
+                if escape:
+                    escape = False
+                elif char == "\\":
+                    escape = True
+                elif char == '"':
+                    in_string = False
+                continue
+            if char == "#":
+                in_comment = True
+                continue
+            if char == '"':
+                in_string = True
+                continue
+            if char == "{":
+                current_depth += 1
+                if current_depth > max_depth:
+                    max_depth = current_depth
+            elif char == "}":
+                if current_depth > 0:
+                    current_depth -= 1
+
+        return max_depth
+
+    @classmethod
+    def _extract_graphql_queries(cls, body: str, query_params: List[Tuple[str, str]]) -> List[str]:
+        queries: List[str] = []
+        for p_k, p_v in query_params:
+            if p_k.lower() == "query" and "{" in p_v:
+                queries.append(p_v)
+
+        if body and "{" in body:
+            try:
+                data = json.loads(body)
+                if isinstance(data, dict) and "query" in data and isinstance(data["query"], str):
+                    queries.append(data["query"])
+                elif isinstance(data, list):
+                    for item in data:
+                        if isinstance(item, dict) and "query" in item and isinstance(item["query"], str):
+                            queries.append(item["query"])
+            except Exception:
+                if any(body.strip().startswith(prefix) for prefix in ("{", "query", "mutation")):
+                    queries.append(body)
+
+        return queries
+
     @classmethod
     def evaluate(
         cls,
@@ -495,6 +838,127 @@ class SecurityBrain:
                         if sig.pattern.search(decommented_stripped) or sig.pattern.search(decommented_spaced):
                             record_match(sig)
 
+        # ---------------------------------------------------------------------
+        # Vector E: Enterprise Mobile & API Protection
+        # ---------------------------------------------------------------------
+        all_header_items = list(norm["headers"].items()) + [(k.lower(), v) for k, v in headers.items()]
+
+        # E.1 Mobile Hooking Frameworks (Frida & Xposed)
+        frida_xposed_haystack = f"{norm['path']} {norm['query']} {norm['body']}"
+        for h_k, h_v in all_header_items:
+            frida_xposed_haystack += f" {h_k}: {h_v}"
+
+        if cls.MOBILE_HOOKING_FRIDA.pattern.search(frida_xposed_haystack):
+            record_match(cls.MOBILE_HOOKING_FRIDA)
+
+        if cls.MOBILE_HOOKING_XPOSED.pattern.search(frida_xposed_haystack):
+            record_match(cls.MOBILE_HOOKING_XPOSED)
+
+        # E.2 Mobile Emulator Fingerprints
+        emulator_haystack = norm["headers"].get("user-agent", "")
+        for h_k, h_v in all_header_items:
+            if any(term in h_k for term in ["device", "fingerprint", "emulator", "model", "hardware"]):
+                emulator_haystack += f" {h_v}"
+        if norm["body"]:
+            emulator_haystack += f" {norm['body']}"
+
+        if cls.MOBILE_EMULATOR_FINGERPRINT.pattern.search(emulator_haystack):
+            record_match(cls.MOBILE_EMULATOR_FINGERPRINT)
+
+        # E.3 Mobile JWT Integrity & Tamper Protection
+        jwt_candidates = cls._extract_jwt_tokens(headers, norm["headers"], norm["query_params"], body)
+        for cand in jwt_candidates:
+            has_alg_none, has_injection = cls._inspect_jwt(cand)
+            if has_alg_none:
+                record_match(cls.JWT_ALG_NONE_BYPASS)
+            if has_injection:
+                record_match(cls.JWT_MALFORMED_OR_INJECTION)
+
+        # Also direct pattern check for 'alg': 'none' / 'alg': 'None' in query or body
+        if cls.JWT_ALG_NONE_BYPASS.pattern.search(norm["query"]) or cls.JWT_ALG_NONE_BYPASS.pattern.search(norm["body"]):
+            record_match(cls.JWT_ALG_NONE_BYPASS)
+
+        # Direct null byte check in raw headers or raw body if Authorization or JWT is present
+        if any("bearer " in str(v).lower() for v in headers.values()):
+            for v in headers.values():
+                if any(nb in str(v) for nb in ["\x00", "%00", "\\x00", "\\0"]):
+                    record_match(cls.JWT_MALFORMED_OR_INJECTION)
+
+        # E.4 GraphQL Security (Depth Exhaustion & Introspection)
+        gql_queries = cls._extract_graphql_queries(body, norm["query_params"])
+        for gql in gql_queries:
+            if cls._calculate_graphql_depth(gql) > 6:
+                record_match(cls.GRAPHQL_DEPTH_EXHAUSTION)
+            if cls.GRAPHQL_INTROSPECTION_ABUSE.pattern.search(gql):
+                record_match(cls.GRAPHQL_INTROSPECTION_ABUSE)
+
+        # Also inspect query string & body for introspection probing if targeting GraphQL
+        if cls.GRAPHQL_INTROSPECTION_ABUSE.pattern.search(norm["query"]) or cls.GRAPHQL_INTROSPECTION_ABUSE.pattern.search(norm["body"]):
+            if "{" in norm["query"] or "{" in norm["body"] or "graphql" in norm["path"].lower():
+                record_match(cls.GRAPHQL_INTROSPECTION_ABUSE)
+
+        # E.5 Mobile Attestation Bypass
+        for h_k, h_v in all_header_items:
+            if re.match(r"^(?:x-app-check|x-attestation-token|x-attestation|x-device-token|x-app-attest|x-play-integrity|x-safety-net|x-safetynet|x-firebase-appcheck)$", h_k):
+                clean_v = str(h_v).strip().lower()
+                if clean_v in ("null", "none", "nil", "undefined", "mock", "test", "fake", "bypass", "0", "false") or clean_v.startswith("mock") or clean_v.startswith("fake") or clean_v.startswith("test"):
+                    record_match(cls.MOBILE_ATTESTATION_BYPASS)
+
+        # E.6 Mobile BOLA / IDOR Defense
+        entity_keys = {
+            "tenant_id", "tenant", "org_id", "org", "organization_id",
+            "user_id", "user", "account_id", "account", "customer_id",
+            "profile_id", "entity_id", "id", "doc_id", "client_id"
+        }
+        # Nil UUID check across path, query, or body
+        if "00000000-0000-0000-0000-000000000000" in norm["path"] or "00000000-0000-0000-0000-000000000000" in norm["query"] or "00000000-0000-0000-0000-000000000000" in norm["body"]:
+            record_match(cls.MOBILE_BOLA_IDOR_TRAVERSAL)
+
+        # Entity path traversal check (../admin, ..%2fadmin, ../root)
+        if re.search(r"(?:\.\./admin|\.\.%2fadmin|\.\./root|\.\.%2froot)\b", norm["path"], re.IGNORECASE):
+            record_match(cls.MOBILE_BOLA_IDOR_TRAVERSAL)
+
+        # Entity path with null / None
+        if re.search(r"/(?:tenants|users|accounts|organizations|orgs|customers|entities|profiles)/(?:null|none)\b", norm["path"], re.IGNORECASE):
+            record_match(cls.MOBILE_BOLA_IDOR_TRAVERSAL)
+
+        # Query parameter traversal and null ID check
+        for p_k, p_v in norm["query_params"]:
+            pk_lower = p_k.lower().strip()
+            if pk_lower in entity_keys or pk_lower.endswith("_id"):
+                pv_lower = p_v.lower().strip()
+                if pv_lower in ("null", "none", "nil", "00000000-0000-0000-0000-000000000000") or "../admin" in pv_lower or "../root" in pv_lower:
+                    record_match(cls.MOBILE_BOLA_IDOR_TRAVERSAL)
+
+        # JSON body entity traversal and null ID check
+        if body:
+            try:
+                b_json = json.loads(body)
+                def check_json_bola(obj: Any) -> bool:
+                    if isinstance(obj, dict):
+                        for k, v in obj.items():
+                            k_lower = k.lower().strip()
+                            if k_lower in entity_keys or k_lower.endswith("_id"):
+                                if v is None:
+                                    return True
+                                if isinstance(v, str):
+                                    vl = v.lower().strip()
+                                    if vl in ("null", "none", "nil", "00000000-0000-0000-0000-000000000000") or "../admin" in vl or "../root" in vl:
+                                        return True
+                            if isinstance(v, (dict, list)):
+                                if check_json_bola(v):
+                                    return True
+                    elif isinstance(obj, list):
+                        for item in obj:
+                            if check_json_bola(item):
+                                return True
+                    return False
+
+                if check_json_bola(b_json):
+                    record_match(cls.MOBILE_BOLA_IDOR_TRAVERSAL)
+            except Exception:
+                pass
+
         # Deduplicate matches by rule_id
         unique_matches: List[Dict[str, Any]] = []
         seen_rules = set()
@@ -502,6 +966,9 @@ class SecurityBrain:
             if m["rule_id"] not in seen_rules:
                 seen_rules.add(m["rule_id"])
                 unique_matches.append(m)
+
+        # Sort matches so the highest severity threat is top_match
+        unique_matches.sort(key=lambda m: m["score"], reverse=True)
 
         # ---------------------------------------------------------------------
         # Verdict & Composite Action Evaluation
