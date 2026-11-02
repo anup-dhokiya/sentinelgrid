@@ -5,11 +5,14 @@ Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.api.v1.policies import router as policies_router
+from app.api.v1.console import router as console_router
+import os
 
 app = FastAPI(
-    title="SentinelGrid Management & Control Plane API",
-    description="Central control plane for policy signing, simulation, API discovery, and multi-tenant telemetry.",
+    title="SentinelGrid WAAP Management & Control Plane",
+    description="Central control plane with in-line inspection, policy simulation, and web console.",
     version="1.0.0"
 )
 
@@ -24,6 +27,12 @@ app.add_middleware(
 
 # Register routers
 app.include_router(policies_router)
+app.include_router(console_router)
+
+# Mount Web Console frontend static build
+static_dir = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public")
+if os.path.exists(static_dir):
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
 
 @app.get("/health", tags=["Health"])
