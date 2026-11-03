@@ -22,6 +22,12 @@ class SlidingWindowLimiter:
         self._windows: List[Dict[str, Tuple[float, int, int]]] = [{} for _ in range(shards)]
         self._quarantine: Dict[str, Tuple[float, int, str]] = {}  # ip -> (expires_at, level, reason)
         self._q_lock = threading.Lock()
+        self._whitelist: set = {
+            "127.0.0.1",
+            "localhost",
+            "::1",
+            "192.168.122.1"
+        }
 
     def _get_shard(self, key: str) -> int:
         return hash(key) % self.shards
@@ -41,11 +47,39 @@ class SlidingWindowLimiter:
         except ValueError:
             return clean_ip
 
+    def is_whitelisted(self, ip_str: str) -> bool:
+        """Checks if IP is explicitly whitelisted from rate limiting and dynamic quarantine."""
+        if not ip_str:
+            return False
+        canon_ip = self._canonicalize_ip(ip_str)
+        return canon_ip in self._whitelist or ip_str in self._whitelist
+
+    def whitelist_ip(self, ip_str: str):
+        """Adds an IP or CIDR to the permanent whitelist and removes any active quarantine."""
+        canon_ip = self._canonicalize_ip(ip_str)
+        self._whitelist.add(canon_ip)
+        self.unban(canon_ip)
+
+    def unban(self, ip_str: str):
+        """Immediately unbans and purges IP from dynamic quarantine."""
+        canon_ip = self._canonicalize_ip(ip_str)
+        with self._q_lock:
+            self._quarantine.pop(canon_ip, None)
+            self._quarantine.pop(ip_str, None)
+
+    def clear_all_quarantine(self):
+        """Purges all active IP quarantines."""
+        with self._q_lock:
+            self._quarantine.clear()
+
     def check_quarantine(self, ip_str: str) -> Tuple[bool, Optional[int], Optional[str]]:
         """
         Fast check: Returns (is_quarantined, remaining_seconds, reason).
         Checks if client IP is currently serving an active quarantine penalty.
         """
+        if self.is_whitelisted(ip_str):
+            return False, None, None
+
         canon_ip = self._canonicalize_ip(ip_str)
         now = time.monotonic()
         with self._q_lock:
@@ -64,6 +98,9 @@ class SlidingWindowLimiter:
         - Level 2: 1 hour (3600s)
         - Level 3: 24 hours (86400s)
         """
+        if self.is_whitelisted(ip_str):
+            return 0
+
         canon_ip = self._canonicalize_ip(ip_str)
         now = time.monotonic()
         with self._q_lock:
@@ -93,6 +130,15 @@ class SlidingWindowLimiter:
         Returns RFC 6585 header metrics and pass/drop verdict.
         """
         canon_id = self._canonicalize_ip(identifier)
+        if self.is_whitelisted(identifier) or self.is_whitelisted(canon_id):
+            return {
+                "allowed": True,
+                "current_count": 0,
+                "limit": limit,
+                "remaining": limit,
+                "reset_after": 60,
+                "retry_after": 0
+            }
         shard_idx = self._get_shard(canon_id)
         now = time.monotonic()
 
