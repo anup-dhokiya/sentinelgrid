@@ -621,6 +621,37 @@ async def inspect_live_request(req: WafTestRequest):
     }
 
 
+class EventIngestRequest(BaseModel):
+    event_id: str
+    website_id: str
+    client_ip: str
+    method: str
+    path: str
+    rule_triggered: str
+    owasp_category: str
+    cve_reference: Optional[str] = "N/A"
+    risk_score: float
+    action: str
+    latency_ms: float
+    timestamp: float
+
+
+@router.post("/events/ingest")
+async def ingest_event(ev: EventIngestRequest):
+    now_iso = datetime.fromtimestamp(ev.timestamp, timezone.utc).isoformat()
+    conn = get_db_connection()
+    with conn:
+        conn.execute("""
+        INSERT OR REPLACE INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            ev.event_id, ev.website_id, now_iso, ev.client_ip, ev.method, ev.path,
+            ev.action, ev.risk_score, ev.rule_triggered, ev.owasp_category,
+            f"Edge Intercept | Latency: {ev.latency_ms}ms | CVE: {ev.cve_reference or 'N/A'}"
+        ))
+    return {"status": "ingested", "event_id": ev.event_id}
+
+
 # -----------------------------------------------------------------------------
 # Security Events SIEM Export & Live Analytics
 # -----------------------------------------------------------------------------
