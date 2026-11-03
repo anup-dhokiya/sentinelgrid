@@ -79,10 +79,11 @@ class SecurityBrain:
                 r"|\b0xa9\.0xfe\.0xa9\.0xfe\b"
                 r"|\b0xa9fea9fe\b"
                 r"|\b2852039166\b"
+                r"|\b2130706433\b"
                 r"|\b0251\.0376\.0251\.0376\b"
                 r"|\b025177524776\b"
                 r"|\[?fd00:ec2::254\]?"
-                r"|::ffff:(?:169\.254\.169\.254|a9fe:a9fe)"
+                r"|\[?::ffff:(?:169\.254\.169\.254|a9fe:a9fe)\]?"
                 r"|latest/(?:meta-data|user-data|dynamic/instance-identity|api/token)"
                 r"|instance-identity/document"
                 r")",
@@ -786,6 +787,47 @@ class SecurityBrain:
         )
     )
 
+    # 9. Modern Web & API Threat Extensions
+    NOSQL_OPERATOR_INJECTION = ThreatSignature(
+        rule_id="NOSQL-OPERATOR-INJECTION",
+        name="NoSQL Database Operator Injection ($where, $gt, $ne, $regex)",
+        category="NoSQL Injection",
+        owasp_id="A03:Injection",
+        severity="CRITICAL",
+        score=96.0,
+        pattern=re.compile(r"(?:\"?\$where\"?\s*:|\"?\$gt\"?\s*:|\"?\$ne\"?\s*:|\"?\$regex\"?\s*:|\"?\$nin\"?\s*:|\"?\$exists\"?\s*:|\"?\$all\"?\s*:|\$where\b|\$gt\b|\$ne\b)", re.IGNORECASE)
+    )
+
+    GRAPHQL_ALIAS_AMPLIFICATION = ThreatSignature(
+        rule_id="GRAPHQL-ALIAS-AMPLIFICATION",
+        name="GraphQL Multi-Alias Query Amplification Batching (>8 Aliases)",
+        category="API Denial of Service",
+        owasp_id="API4:2023 Unrestricted Resource Consumption",
+        severity="HIGH",
+        score=88.0,
+        pattern=re.compile(r"(?:\b[a-zA-Z0-9_-]+\s*:\s*[a-zA-Z0-9_-]+\s*\(.*?\)[\s\S]*?){8,}")
+    )
+
+    HTTP_REQUEST_SMUGGLING = ThreatSignature(
+        rule_id="HTTP-REQUEST-SMUGGLING-TE-CL",
+        name="HTTP Request Smuggling Desync Probe (Conflicting TE and CL / Chunked Evasion)",
+        category="HTTP Protocol Exploitation",
+        owasp_id="A05:Security Misconfiguration",
+        severity="CRITICAL",
+        score=98.0,
+        pattern=re.compile(r"(?:0\r?\n\r?\n(?:GET|POST|HEAD|PUT|DELETE)\b|transfer-encoding.*content-length)", re.IGNORECASE)
+    )
+
+    JWT_KID_TRAVERSAL = ThreatSignature(
+        rule_id="JWT-KID-TRAVERSAL-OR-SQLI",
+        name="JWT Header 'kid' Directory Traversal or SQL Injection",
+        category="Broken Authentication",
+        owasp_id="A07:Identification and Authentication Failures",
+        severity="CRITICAL",
+        score=98.0,
+        pattern=re.compile(r"['\"]?kid['\"]?\s*:\s*['\"](?:\.\./|/|'|\"|;|\|)", re.IGNORECASE)
+    )
+
     @staticmethod
     def _extract_jwt_tokens(raw_headers: Dict[str, str], norm_headers: Dict[str, str], query_params: List[Tuple[str, str]], body: str) -> List[str]:
         candidates: List[str] = []
@@ -883,6 +925,11 @@ class SecurityBrain:
             # Missing signature segment (2 segments or 3rd segment empty)
             if len(segments) == 2 or (len(segments) == 3 and not segments[2]):
                 has_alg_none = True
+
+            # JWT Key ID (kid) Header Traversal or Injection
+            kid = str(hdr_json.get("kid", ""))
+            if any(p in kid for p in ("..", "/", ";", "'", '"', "|", "`", "$")):
+                has_injection = True
 
         # Segment 1: Payload
         payload_seg = segments[1]
@@ -1066,8 +1113,25 @@ class SecurityBrain:
         full_text_for_cve = f"{norm['path']} {norm['query']} {norm['body']}"
         for h_k, h_v in norm["headers"].items():
             full_text_for_cve += f" {h_k}: {h_v}"
+        full_text_lower = full_text_for_cve.lower()
+
+        cve_canaries = {
+            "CVE-2021-44228-LOG4J": ("${", "jndi"),
+            "CVE-2022-22965-SPRING4SHELL": ("classloader", "class.module"),
+            "SSRF-CLOUD-IMDS-AWS": ("169.254", "0xa9", "2852039166", "2130706433", "0251", "fd00", "latest", "meta-data", "instance-identity"),
+            "SSRF-CLOUD-METADATA-GCP-AZURE": ("metadata.google", "metadata.goog", "computemetadata", "metadata.azure", "wireserver", "168.63", "192.0.0.192", "100.100.100.200", "rebind", "rbndr", "nip.io"),
+            "CVE-2024-4577-PHP-CGI-RCE": ("php-cgi", "auto_prepend_file", "cgi-bin"),
+            "CVE-2017-5638-STRUTS2-OGNL": ("#_memberaccess", "ognl", "%{"),
+            "CVE-2022-42889-TEXT4SHELL": ("${script:", "${dns:", "${url:"),
+            "CVE-2020-14882-WEBLOGIC-CONSOLE-RCE": ("console.portal", "mbeantype"),
+            "CVE-2022-1388-F5-BIGIP-AUTH-BYPASS": ("/mgmt/tm/util/bash",),
+            "WERKZEUG-DEBUGGER-CONSOLE": ("__debugger__", "console?__debugger__")
+        }
 
         for sig in cls.CVE_SIGNATURES:
+            canaries = cve_canaries.get(sig.rule_id)
+            if canaries and not any(c in full_text_lower for c in canaries):
+                continue
             if sig.pattern.search(full_text_for_cve):
                 record_match(sig)
 
@@ -1182,19 +1246,26 @@ class SecurityBrain:
         if cls.JWT_ALG_NONE_BYPASS.pattern.search(norm["query"]) or cls.JWT_ALG_NONE_BYPASS.pattern.search(norm["body"]):
             record_match(cls.JWT_ALG_NONE_BYPASS)
 
+        # Direct kid injection search in raw headers
+        for v in headers.values():
+            if cls.JWT_KID_TRAVERSAL.pattern.search(str(v)):
+                record_match(cls.JWT_KID_TRAVERSAL)
+
         # Direct null byte check in raw headers or raw body if Authorization or JWT is present
         if any("bearer " in str(v).lower() for v in headers.values()):
             for v in headers.values():
                 if any(nb in str(v) for nb in ["\x00", "%00", "\\x00", "\\0"]):
                     record_match(cls.JWT_MALFORMED_OR_INJECTION)
 
-        # E.4 GraphQL Security (Depth Exhaustion & Introspection)
+        # E.4 GraphQL Security (Depth Exhaustion, Introspection & Multi-Alias Batching)
         gql_queries = cls._extract_graphql_queries(body, norm["query_params"])
         for gql in gql_queries:
             if cls._calculate_graphql_depth(gql) > 6:
                 record_match(cls.GRAPHQL_DEPTH_EXHAUSTION)
             if cls.GRAPHQL_INTROSPECTION_ABUSE.pattern.search(gql):
                 record_match(cls.GRAPHQL_INTROSPECTION_ABUSE)
+            if len(re.findall(r"\b[a-zA-Z0-9_-]+\s*:\s*[a-zA-Z0-9_-]+\s*\(", gql)) >= 8:
+                record_match(cls.GRAPHQL_ALIAS_AMPLIFICATION)
 
         # Also inspect query string & body for introspection probing if targeting GraphQL
         if cls.GRAPHQL_INTROSPECTION_ABUSE.pattern.search(norm["query"]) or cls.GRAPHQL_INTROSPECTION_ABUSE.pattern.search(norm["body"]):
@@ -1262,6 +1333,16 @@ class SecurityBrain:
                     record_match(cls.MOBILE_BOLA_IDOR_TRAVERSAL)
             except Exception:
                 pass
+
+        # E.7 NoSQL Operator Injection ($where, $gt, $ne, $regex, $nin, etc.)
+        nosql_target = f"{norm['query']} {norm['body']}"
+        if cls.NOSQL_OPERATOR_INJECTION.pattern.search(nosql_target):
+            record_match(cls.NOSQL_OPERATOR_INJECTION)
+
+        # E.8 HTTP Request Smuggling Probe (Conflicting TE and CL or Chunked Pipeline injection)
+        hdr_keys_lower = [k.lower() for k in headers.keys()]
+        if ("transfer-encoding" in hdr_keys_lower and "content-length" in hdr_keys_lower) or re.search(r"0\r?\n\r?\n(?:GET|POST|HEAD|PUT|DELETE)\b", body):
+            record_match(cls.HTTP_REQUEST_SMUGGLING)
 
         # Deduplicate matches by rule_id
         unique_matches: List[Dict[str, Any]] = []

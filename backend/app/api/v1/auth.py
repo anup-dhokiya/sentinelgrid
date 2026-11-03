@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, status, Header, Depends
 from pydantic import BaseModel
 
-from app.core.database import get_db_connection
+from app.core.database import get_db_connection, get_db
 
 router = APIRouter(prefix="/v1/auth", tags=["Authentication"])
 
@@ -61,12 +61,12 @@ def create_session(user_id: str) -> str:
     token = f"sg_session_{secrets.token_hex(24)}"
     now = datetime.now(timezone.utc)
     expires = now + timedelta(days=7)
-    conn = get_db_connection()
-    with conn:
-        conn.execute(
-            "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
-            (token, user_id, now.isoformat(), expires.isoformat())
-        )
+    with get_db() as conn:
+        with conn:
+            conn.execute(
+                "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+                (token, user_id, now.isoformat(), expires.isoformat())
+            )
     return token
 
 
@@ -74,9 +74,8 @@ def verify_session(token: str) -> Optional[Dict[str, Any]]:
     """Validates session token expiration and returns user record if active."""
     if not token:
         return None
-    conn = get_db_connection()
     now_iso = datetime.now(timezone.utc).isoformat()
-    with conn:
+    with get_db() as conn:
         row = conn.execute("""
             SELECT u.id, u.email, u.full_name, u.role, s.expires_at
             FROM sessions s
@@ -90,8 +89,7 @@ def verify_session(token: str) -> Optional[Dict[str, Any]]:
 
 @router.post("/login")
 async def login(req: LoginRequest):
-    conn = get_db_connection()
-    with conn:
+    with get_db() as conn:
         row = conn.execute(
             "SELECT id, email, password_hash, full_name, role FROM users WHERE email = ?",
             (req.email.lower().strip(),)
@@ -137,13 +135,13 @@ async def signup(req: SignupRequest):
     user_id = f"usr-{uuid4().hex[:8]}"
     now = datetime.now(timezone.utc).isoformat()
 
-    conn = get_db_connection()
     try:
-        with conn:
-            conn.execute(
-                "INSERT INTO users (id, email, password_hash, full_name, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                (user_id, req.email.lower().strip(), pwd_hash, req.full_name.strip(), role_clean, now)
-            )
+        with get_db() as conn:
+            with conn:
+                conn.execute(
+                    "INSERT INTO users (id, email, password_hash, full_name, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                    (user_id, req.email.lower().strip(), pwd_hash, req.full_name.strip(), role_clean, now)
+                )
     except Exception as e:
         if "UNIQUE constraint failed" in str(e):
             raise HTTPException(
@@ -193,7 +191,7 @@ async def logout(authorization: Optional[str] = Header(None)):
     """Revokes session token from database."""
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split("Bearer ", 1)[1].strip()
-        conn = get_db_connection()
-        with conn:
-            conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        with get_db() as conn:
+            with conn:
+                conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
     return {"status": "logged_out", "message": "Session invalidated successfully."}

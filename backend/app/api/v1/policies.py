@@ -78,7 +78,7 @@ async def deploy_policy(candidate_policy: PolicyPayload, force: bool = False):
     return signed_envelope
 
 
-from app.core.database import get_db_connection
+from app.core.database import get_db_connection, get_db
 from app.core.crypto import AsymmetricPolicySigner
 import json
 from uuid import uuid4
@@ -98,9 +98,9 @@ async def rollback_policy(request: RollbackRequest):
         return restored
 
     # Fallback to persistent SQLite policy history
-    conn = get_db_connection()
-    with conn:
-        site = conn.execute(
+    with get_db() as conn:
+        with conn:
+            site = conn.execute(
             "SELECT id FROM websites WHERE id = ? OR domain = ?", 
             (request.website_id, request.website_id)
         ).fetchone()

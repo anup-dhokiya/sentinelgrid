@@ -341,6 +341,81 @@
       background: var(--terracotta-soft);
     }
 
+    /* Mobile Off-Canvas Drawer & Backdrop */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 290;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .app-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-lg);
+        z-index: 300;
+      }
+      .app-sidebar.mobile-open {
+        transform: translateX(0);
+      }
+    }
+
+    /* Contextual Telemetry HUD (Cursor Hold Inspector) */
+    .contextual-hud {
+      position: fixed;
+      z-index: 10000;
+      display: none;
+      width: 320px;
+      background: var(--card-white);
+      border: 1px solid var(--deep-indigo);
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 16px rgba(6, 182, 212, 0.2);
+      padding: 14px 16px;
+      font-family: var(--font-ui);
+      pointer-events: none;
+      animation: hudFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes hudFadeIn {
+      from { opacity: 0; transform: translateY(6px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .hud-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--stone-border-light);
+      padding-bottom: 6px;
+    }
+    .hud-title {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--deep-indigo);
+      text-transform: uppercase;
+    }
+    .hud-body {
+      font-size: 11px;
+      color: var(--text-charcoal);
+      line-height: 1.5;
+    }
+    .hud-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
     /* Content Wrapper & Topbar */
     .content-wrapper {
       flex: 1;
@@ -738,10 +813,11 @@
           <span class="sidebar-icon">📊</span>
           <span class="sidebar-label">Dashboard</span>
         </div>
-        <a href="/live-traffic.html" class="sidebar-item" style="text-decoration: none;">
+        <div class="sidebar-item nav-item" onclick="switchTab('livetraffic')">
           <span class="sidebar-icon">⚡</span>
           <span class="sidebar-label">Live Traffic</span>
-        </a>
+          <span class="badge badge-online" style="margin-left: auto; font-size: 8px; padding: 1px 4px;">SSE</span>
+        </div>
         <div class="sidebar-item nav-item" onclick="switchTab('domains')">
           <span class="sidebar-icon">🌐</span>
           <span class="sidebar-label">Domains & Sites</span>
@@ -778,7 +854,7 @@
 
       <!-- Sidebar Bottom Profile & Role Badge -->
       <div class="sidebar-footer">
-        <div class="sidebar-user">
+        <div class="sidebar-user" onclick="openUserProfileModal()" style="cursor: pointer;" title="View Operator Profile & Clearance HUD">
           <div class="avatar-circle" id="user-avatar">OP</div>
           <div class="sidebar-user-meta">
             <div class="sidebar-user-name" id="user-display-name">Operator</div>
@@ -788,6 +864,9 @@
         <button class="btn-logout-icon" onclick="handleLogout()" title="Log Out">⎋</button>
       </div>
     </aside>
+
+    <!-- Mobile Off-Canvas Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebarCollapse()"></div>
 
     <!-- Main Content Wrapper -->
     <div class="content-wrapper">
@@ -819,6 +898,11 @@
           <!-- Synthesizer Audio Alerts Toggle -->
           <button id="sound-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleSoundAlerts()">
             🔇 Sound: OFF
+          </button>
+
+          <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; display: flex; align-items: center; gap: 6px;" onclick="openUserProfileModal()" title="View Operator Profile & Clearance">
+            <span class="avatar-circle" id="topbar-user-avatar" style="width: 16px; height: 16px; font-size: 9px; line-height: 16px;">OP</span>
+            <span id="topbar-user-role" style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: var(--deep-indigo);">PROFILE</span>
           </button>
 
           <a href="/register.html" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; text-decoration: none;" title="Add Team Operator">
@@ -1016,6 +1100,58 @@
             <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">Connecting to SentinelGrid WAAP Telemetry stream...</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB: NATIVE LIVE SSE TRAFFIC PIPELINE & TELEMETRY STREAM -->
+    <!-- ===================================================================== -->
+    <section id="view-livetraffic" class="view-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
+            <span>⚡ Live API Traffic Stream & Real-Time Telemetry</span>
+            <span class="badge badge-online" id="livetraffic-count-badge">0 requests buffered</span>
+          </h2>
+          <p style="font-size: 13px; color: var(--text-muted);">In-flight edge requests streamed directly via SentinelGrid Server-Sent Events (SSE) telemetry pipeline.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <select id="livetraffic-verdict-filter" class="form-input" style="width: 210px; margin: 0; padding: 6px 10px; font-weight: 600;" onchange="applyLiveTrafficFilter()">
+            <option value="ALL">🌐 All Traffic (Allow + Block)</option>
+            <option value="BLOCK">⛔ Threats Intercepted Only</option>
+            <option value="ALLOW">✅ Clean Legitimate Only</option>
+            <option value="CHALLENGE">⚠️ Challenges Only</option>
+          </select>
+          <button class="btn btn-subtle" id="livetraffic-pause-btn" onclick="toggleLiveTrafficStream()">⏸️ Pause</button>
+          <button class="btn btn-subtle" onclick="clearLiveTrafficBuffer()">🗑️ Clear</button>
+        </div>
+      </div>
+
+      <div class="panel" style="padding: 0; overflow: hidden;">
+        <div style="max-height: 72vh; overflow-y: auto;">
+          <table class="table-clean">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Timestamp</th>
+                <th style="width: 90px;">Verdict</th>
+                <th style="width: 80px;">Method</th>
+                <th>Request Path</th>
+                <th style="width: 150px;">Client IP</th>
+                <th style="width: 230px;">Triggered Rule</th>
+                <th style="width: 80px;">Risk</th>
+                <th style="width: 90px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="livetraffic-table-body">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">
+                  <div style="font-size: 24px; margin-bottom: 8px;">⚡</div>
+                  Connecting to SentinelGrid Server-Sent Events (SSE) telemetry pipeline...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -1462,6 +1598,72 @@ app.add_middleware(
     </div>
   </div>
 
+  <!-- ======================================================================= -->
+  <!-- MODAL 3: OPERATOR PROFILE & RBAC GOVERNANCE HUD MODAL -->
+  <!-- ======================================================================= -->
+  <div id="user-profile-backdrop" class="drawer-backdrop" onclick="closeUserProfileModal()"></div>
+  <div id="user-profile-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--stone-border-light); padding-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="avatar-circle" id="prof-modal-avatar" style="width: 48px; height: 48px; font-size: 18px; font-weight: 800;">OP</div>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--text-charcoal);" id="prof-modal-name">Operator</h3>
+          <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);" id="prof-modal-email">operator@sentinelgrid.io</div>
+        </div>
+      </div>
+      <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 14px;" onclick="closeUserProfileModal()">✕</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <div style="background: var(--sand-warm); padding: 12px 14px; border-radius: 8px;">
+        <div style="font-size: 10px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">ASSIGNED ROLE</div>
+        <div style="margin-top: 4px;"><span class="role-badge" id="prof-modal-role" style="font-size: 11px; padding: 2px 8px;">MEMBER</span></div>
+      </div>
+      <div style="background: var(--sand-warm); padding: 12px 14px; border-radius: 8px;">
+        <div style="font-size: 10px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">CLEARANCE TIER</div>
+        <div style="font-size: 12px; font-weight: 800; color: var(--sage-green); margin-top: 4px;" id="prof-modal-clearance">TIER 3 (READ-ONLY)</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 18px;">
+      <label style="font-size: 11px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Session Bearer Token</label>
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <input type="text" id="prof-modal-token" readonly class="form-input" style="margin: 0; font-family: var(--font-mono); font-size: 11px; color: var(--deep-indigo);" value="sg_session_••••••••••••••••">
+        <button class="btn btn-subtle" onclick="copySessionToken()" title="Copy Token">📋 Copy</button>
+      </div>
+    </div>
+
+    <div style="background: var(--sand-warm); border: 1px solid var(--stone-border-light); border-radius: 8px; padding: 14px; margin-bottom: 22px;">
+      <div style="font-size: 11px; font-weight: 700; color: var(--text-charcoal); margin-bottom: 8px;">Role Capabilities & Governance:</div>
+      <div id="prof-modal-capabilities" style="font-size: 11px; color: var(--text-muted); line-height: 1.6; font-family: var(--font-mono);">
+        • Telemetry & Event Stream Inspection<br>
+        • In-Line WAF Sandbox Testing<br>
+        • Live Attack Diagnostics
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="/register.html" class="btn btn-subtle" style="text-decoration: none; font-size: 11px;">➕ Register New Account</a>
+      <button class="btn btn-warm" onclick="handleLogout()">⎋ Terminate Session (Logout)</button>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- CONTEXTUAL TELEMETRY HUD (1.2s–3.0s CURSOR HOLD INSPECTOR) -->
+  <!-- ======================================================================= -->
+  <div id="contextualTelemetryHud" class="contextual-hud">
+    <div class="hud-header">
+      <div class="hud-indicator-ring">
+        <span class="pulse-dot"></span>
+      </div>
+      <span class="hud-title" id="hudTitle">LOCATION TELEMETRY</span>
+      <span class="badge badge-online" id="hudStatusBadge" style="margin-left: auto; font-size: 9px;">LIVE</span>
+    </div>
+    <div class="hud-body" id="hudContent">
+      Hovering for forensic telemetry inspection...
+    </div>
+  </div>
+
   <!-- Floating Alert Toast Container -->
   <div id="threat-toast" class="threat-toast-alert" style="display: none;">
     <span style="font-size: 20px;">🚨</span>
@@ -1494,26 +1696,31 @@ app.add_middleware(
       const nameEl = document.getElementById("user-display-name");
       const avatarEl = document.getElementById("user-avatar");
       const badgeEl = document.getElementById("user-role-badge");
+      const topbarAvatar = document.getElementById("topbar-user-avatar");
+      const topbarRole = document.getElementById("topbar-user-role");
 
       const displayName = currentUser.full_name || currentUser.email.split("@")[0];
       if (nameEl) nameEl.innerText = displayName;
 
-      if (avatarEl) {
+      let initials = "OP";
+      if (displayName) {
         const parts = displayName.trim().split(" ");
-        let initials = parts[0][0].toUpperCase();
+        initials = parts[0][0].toUpperCase();
         if (parts.length > 1) initials += parts[1][0].toUpperCase();
         else if (displayName.length > 1) initials += displayName[1].toUpperCase();
-        avatarEl.innerText = initials;
       }
+      if (avatarEl) avatarEl.innerText = initials;
+      if (topbarAvatar) topbarAvatar.innerText = initials;
 
+      const role = (currentUser.role || "member").toUpperCase();
       if (badgeEl) {
-        const role = (currentUser.role || "member").toUpperCase();
         badgeEl.innerText = role;
         badgeEl.className = "role-badge";
         if (role === "MANAGER") badgeEl.classList.add("badge-manager");
         else if (role === "TEAM_LEADER") badgeEl.classList.add("badge-team-leader");
         else badgeEl.classList.add("badge-member");
       }
+      if (topbarRole) topbarRole.innerText = role;
     }
 
     async function handleLogout() {
@@ -1532,19 +1739,329 @@ app.add_middleware(
     }
 
     // -------------------------------------------------------------------------
-    // Collapsible Left-Slide Sidebar Controller
+    // Collapsible Left-Slide Sidebar Controller & Responsive Mobile Drawer
     // -------------------------------------------------------------------------
     function toggleSidebarCollapse() {
       const sidebar = document.getElementById("appSidebar");
+      const arrowIcon = document.getElementById("collapse-arrow-icon");
+      const backdrop = document.getElementById("sidebarBackdrop");
       if (!sidebar) return;
-      const isCollapsed = sidebar.classList.toggle("collapsed");
-      localStorage.setItem("sg_sidebar_collapsed", isCollapsed ? "true" : "false");
+
+      if (window.innerWidth <= 900) {
+        const isOpen = sidebar.classList.toggle("mobile-open");
+        if (backdrop) backdrop.classList.toggle("active", isOpen);
+      } else {
+        const isCollapsed = sidebar.classList.toggle("collapsed");
+        localStorage.setItem("sg_sidebar_collapsed", isCollapsed ? "true" : "false");
+        if (arrowIcon) {
+          arrowIcon.innerText = isCollapsed ? "▶" : "◀";
+        }
+      }
     }
 
     function initSidebarState() {
-      if (localStorage.getItem("sg_sidebar_collapsed") === "true") {
-        document.getElementById("appSidebar")?.classList.add("collapsed");
+      const savedCollapsed = localStorage.getItem("sg_sidebar_collapsed") === "true";
+      const sidebar = document.getElementById("appSidebar");
+      const arrowIcon = document.getElementById("collapse-arrow-icon");
+      if (sidebar && savedCollapsed && window.innerWidth > 900) {
+        sidebar.classList.add("collapsed");
+        if (arrowIcon) arrowIcon.innerText = "▶";
       }
+    }
+
+    // -------------------------------------------------------------------------
+    // Operator Profile & Clearance HUD Modal
+    // -------------------------------------------------------------------------
+    function openUserProfileModal() {
+      const modal = document.getElementById("user-profile-modal");
+      const backdrop = document.getElementById("user-profile-backdrop");
+      if (!modal || !backdrop) return;
+
+      const user = currentUser || JSON.parse(localStorage.getItem("sg_auth_user") || "{}");
+      const token = localStorage.getItem("sg_auth_token") || "No Active Token";
+
+      const nameEl = document.getElementById("prof-modal-name");
+      const emailEl = document.getElementById("prof-modal-email");
+      const avatarEl = document.getElementById("prof-modal-avatar");
+      const roleBadge = document.getElementById("prof-modal-role");
+      const clearanceEl = document.getElementById("prof-modal-clearance");
+      const capsEl = document.getElementById("prof-modal-capabilities");
+      const tokenInput = document.getElementById("prof-modal-token");
+
+      const fullName = user.full_name || "Enterprise Operator";
+      if (nameEl) nameEl.innerText = fullName;
+      if (emailEl) emailEl.innerText = user.email || "operator@sentinelgrid.io";
+
+      if (avatarEl) {
+        const parts = fullName.trim().split(" ");
+        let initials = parts[0][0].toUpperCase();
+        if (parts.length > 1) initials += parts[1][0].toUpperCase();
+        else if (fullName.length > 1) initials += fullName[1].toUpperCase();
+        avatarEl.innerText = initials;
+      }
+
+      const role = (user.role || "member").toLowerCase();
+      if (roleBadge) {
+        roleBadge.innerText = role.toUpperCase();
+        roleBadge.className = "role-badge";
+        if (role === "manager") roleBadge.classList.add("badge-manager");
+        else if (role === "team_leader") roleBadge.classList.add("badge-team-leader");
+        else roleBadge.classList.add("badge-member");
+      }
+
+      if (clearanceEl && capsEl) {
+        if (role === "manager") {
+          clearanceEl.innerText = "TIER 1 (FULL GOVERNANCE)";
+          clearanceEl.style.color = "#818CF8";
+          capsEl.innerHTML = "✔ Ed25519 Policy Signing & Rollback<br>✔ Domain Onboarding & Deletion<br>✔ Permanent IP Quarantine / Whitelist<br>✔ User Provisioning & Fleet Telemetry";
+        } else if (role === "team_leader") {
+          clearanceEl.innerText = "TIER 2 (SUPERVISOR)";
+          clearanceEl.style.color = "#FBBF24";
+          capsEl.innerHTML = "✔ Policy Simulation & Dry-Run Engine<br>✔ Temporary IP Quarantine (15m/1h)<br>✔ OpenAPI Schema Ingestion<br>✔ Full Observability & Incident Audit";
+        } else {
+          clearanceEl.innerText = "TIER 3 (READ-ONLY OBSERVER)";
+          clearanceEl.style.color = "#34D399";
+          capsEl.innerHTML = "✔ Real-Time Traffic Stream Inspection<br>✔ Security Event Forensics<br>✔ WAF Sandbox Attack Diagnostics<br>✖ Policy Modification Restricted";
+        }
+      }
+
+      if (tokenInput) tokenInput.value = token;
+
+      backdrop.classList.add("active");
+      modal.style.display = "block";
+    }
+
+    function closeUserProfileModal() {
+      const modal = document.getElementById("user-profile-modal");
+      const backdrop = document.getElementById("user-profile-backdrop");
+      if (modal) modal.style.display = "none";
+      if (backdrop) backdrop.classList.remove("active");
+    }
+
+    function copySessionToken() {
+      const tokenInput = document.getElementById("prof-modal-token");
+      if (tokenInput) {
+        navigator.clipboard.writeText(tokenInput.value);
+        showThreatToast("Token Copied", "Session bearer token copied to clipboard.");
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Contextual Telemetry HUD (1.2s–3.0s Cursor Hold Inspector)
+    // -------------------------------------------------------------------------
+    let hudHoldTimer = null;
+
+    function initContextualHoverInspection() {
+      const hud = document.getElementById("contextualTelemetryHud");
+      if (!hud) return;
+
+      document.addEventListener("mouseover", (e) => {
+        const target = e.target.closest("[data-telemetry-hud]");
+        if (!target) return;
+
+        const hudType = target.getAttribute("data-telemetry-hud");
+        const hudId = target.getAttribute("data-telemetry-id") || "";
+
+        if (hudHoldTimer) clearTimeout(hudHoldTimer);
+
+        hudHoldTimer = setTimeout(() => {
+          renderContextualHud(target, hudType, hudId);
+        }, 1200);
+      });
+
+      document.addEventListener("mouseout", (e) => {
+        const target = e.target.closest("[data-telemetry-hud]");
+        if (target) {
+          if (hudHoldTimer) clearTimeout(hudHoldTimer);
+          if (hud) hud.style.display = "none";
+        }
+      });
+    }
+
+    function renderContextualHud(element, type, id) {
+      const hud = document.getElementById("contextualTelemetryHud");
+      if (!hud) return;
+      const rect = element.getBoundingClientRect();
+      const titleEl = document.getElementById("hudTitle");
+      const bodyEl = document.getElementById("hudContent");
+      const badgeEl = document.getElementById("hudStatusBadge");
+
+      if (type === "pipeline-card") {
+        titleEl.innerText = "IN-LINE WAAP PIPELINE";
+        badgeEl.innerText = "ACTIVE :8080";
+        bodyEl.innerHTML = `
+          <div class="hud-stat-row"><span>Engine:</span><strong>SmartParse Lexical DFA v2.4</strong></div>
+          <div class="hud-stat-row"><span>P99 Latency:</span><strong style="color:var(--deep-indigo);">0.35 ms</strong></div>
+          <div class="hud-stat-row"><span>Verification:</span><strong style="color:var(--sage-green);">Ed25519 Signed</strong></div>
+          <div class="hud-stat-row"><span>Mitigation:</span><strong>Sliding Window RateLimiter</strong></div>
+        `;
+      } else if (type === "scope-selector") {
+        titleEl.innerText = "ACTIVE DOMAIN SCOPE";
+        badgeEl.innerText = "MULTI-TENANT";
+        bodyEl.innerHTML = `
+          <div class="hud-stat-row"><span>Current Scope:</span><strong>${escapeHtml(currentDomainScope)}</strong></div>
+          <div class="hud-stat-row"><span>Filter Mode:</span><strong>Strict Per-Site Partitioning</strong></div>
+          <div class="hud-stat-row"><span>Telemetry:</span><strong style="color:var(--sage-green);">Synchronized</strong></div>
+        `;
+      } else if (type === "client-ip") {
+        titleEl.innerText = `IP FORENSICS: ${id || 'EDGE'}`;
+        badgeEl.innerText = "RADIX LPM";
+        bodyEl.innerHTML = `
+          <div class="hud-stat-row"><span>Classification:</span><strong>External Edge Client</strong></div>
+          <div class="hud-stat-row"><span>Inspection:</span><strong style="color:var(--sage-green);">Continuous L7 Tracking</strong></div>
+          <div class="hud-stat-row"><span>Radix Trie:</span><strong>Zero-Allocation Match</strong></div>
+        `;
+      } else {
+        titleEl.innerText = "TELEMETRY INSPECTION";
+        badgeEl.innerText = "LIVE";
+        bodyEl.innerHTML = `
+          <div class="hud-stat-row"><span>Component:</span><strong>${escapeHtml(type)}</strong></div>
+          <div class="hud-stat-row"><span>Status:</span><strong style="color:var(--sage-green);">Operational</strong></div>
+        `;
+      }
+
+      let left = rect.right + 12;
+      let top = rect.top - 10;
+      if (left + 330 > window.innerWidth) left = rect.left - 335;
+      if (top + 160 > window.innerHeight) top = window.innerHeight - 170;
+
+      hud.style.left = `${Math.max(10, left)}px`;
+      hud.style.top = `${Math.max(10, top)}px`;
+      hud.style.display = "block";
+    }
+
+    // -------------------------------------------------------------------------
+    // Native Live Traffic Stream & SSE Controller
+    // -------------------------------------------------------------------------
+    let liveTrafficBuffer = [];
+    let liveTrafficEventSource = null;
+    let isLiveTrafficPaused = false;
+    let liveTrafficFilter = "ALL";
+
+    function initLiveTrafficSSE() {
+      loadInitialLiveTraffic();
+
+      if (liveTrafficEventSource) return;
+
+      try {
+        liveTrafficEventSource = new EventSource(`${API}/events/stream`);
+
+        liveTrafficEventSource.onmessage = (e) => {
+          if (isLiveTrafficPaused) return;
+          try {
+            const ev = JSON.parse(e.data);
+            if (ev.type === "init") return;
+            prependLiveTrafficEvent(ev);
+          } catch (err) {
+            console.error("SSE parse error:", err);
+          }
+        };
+
+        liveTrafficEventSource.onerror = () => {
+          console.warn("SSE connection error, telemetry poller remains active.");
+        };
+      } catch (err) {
+        console.warn("Failed to instantiate EventSource:", err);
+      }
+    }
+
+    async function loadInitialLiveTraffic() {
+      try {
+        const res = await fetch(`${API}/overview`);
+        const data = await res.json();
+        const events = data.recent_events || [];
+        liveTrafficBuffer = [...events];
+        renderLiveTrafficTable();
+      } catch (err) {
+        console.error("Failed to load initial live traffic:", err);
+      }
+    }
+
+    function toggleLiveTrafficStream() {
+      isLiveTrafficPaused = !isLiveTrafficPaused;
+      const btn = document.getElementById("livetraffic-pause-btn");
+      if (btn) btn.innerText = isLiveTrafficPaused ? "▶️ Resume" : "⏸️ Pause";
+    }
+
+    function clearLiveTrafficBuffer() {
+      liveTrafficBuffer = [];
+      renderLiveTrafficTable();
+    }
+
+    function applyLiveTrafficFilter() {
+      const select = document.getElementById("livetraffic-verdict-filter");
+      if (select) liveTrafficFilter = select.value;
+      renderLiveTrafficTable();
+    }
+
+    function prependLiveTrafficEvent(ev) {
+      liveTrafficBuffer.unshift(ev);
+      if (liveTrafficBuffer.length > 200) liveTrafficBuffer.pop();
+
+      if (liveTrafficFilter === "ALL" || ev.action === liveTrafficFilter) {
+        const tbody = document.getElementById("livetraffic-table-body");
+        if (tbody) {
+          if (tbody.children.length === 1 && tbody.children[0].innerText.includes("Connecting to")) {
+            tbody.innerHTML = "";
+          }
+          const tr = document.createElement("tr");
+          tr.className = "clickable-row";
+          tr.onclick = () => openEventForensics(ev.id);
+          tr.innerHTML = formatLiveTrafficRowHtml(ev);
+          tbody.insertBefore(tr, tbody.firstChild);
+          if (tbody.children.length > 200) {
+            tbody.removeChild(tbody.lastChild);
+          }
+        }
+      }
+      updateLiveTrafficBadge();
+    }
+
+    function renderLiveTrafficTable() {
+      const tbody = document.getElementById("livetraffic-table-body");
+      if (!tbody) return;
+
+      const filtered = liveTrafficFilter === "ALL" 
+        ? liveTrafficBuffer 
+        : liveTrafficBuffer.filter(ev => ev.action === liveTrafficFilter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">No live traffic events match filter "${escapeHtml(liveTrafficFilter)}".</td></tr>`;
+      } else {
+        tbody.innerHTML = filtered.map(ev => `
+          <tr class="clickable-row" onclick="openEventForensics('${escapeHtml(ev.id)}')">
+            ${formatLiveTrafficRowHtml(ev)}
+          </tr>
+        `).join("");
+      }
+      updateLiveTrafficBadge();
+    }
+
+    function formatLiveTrafficRowHtml(ev) {
+      const ts = formatTimestamp(ev.timestamp);
+      const safeAction = escapeHtml(ev.action);
+      const badgeClass = ev.action === 'BLOCK' ? 'badge-block' : (ev.action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
+      const safeMethod = escapeHtml(ev.method || 'GET');
+      const safePath = escapeHtml(ev.path || '/');
+      const safeIp = escapeHtml(ev.client_ip || '127.0.0.1');
+      const safeRule = escapeHtml(ev.rule_triggered || 'CLEAN-TRAFFIC');
+      const safeScore = Number(ev.risk_score) || 0;
+
+      return `
+        <td style="color: var(--text-muted); font-family: var(--font-mono); font-size: 11px;">${ts.time}</td>
+        <td><span class="badge ${badgeClass}">${safeAction}</span></td>
+        <td><span style="font-weight: 700; font-family: var(--font-mono); color: var(--deep-indigo);">${safeMethod}</span></td>
+        <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 2px 6px; border-radius: 4px; font-size: 11px;">${safePath}</code></td>
+        <td style="color: var(--deep-indigo); font-family: var(--font-mono); font-size: 11px;" data-telemetry-hud="client-ip" data-telemetry-id="${safeIp}">${safeIp}</td>
+        <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600; font-size: 11px; font-family: var(--font-mono);">${safeRule}</span></td>
+        <td style="font-weight: 700; font-family: var(--font-mono); color: ${safeScore > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${safeScore.toFixed(1)}</td>
+        <td><button class="btn btn-subtle" style="padding: 2px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${escapeHtml(ev.id)}')">Inspect</button></td>
+      `;
+    }
+
+    function updateLiveTrafficBadge() {
+      const badge = document.getElementById("livetraffic-count-badge");
+      if (badge) badge.innerText = `${liveTrafficBuffer.length} requests buffered`;
     }
 
     // -------------------------------------------------------------------------
@@ -2093,6 +2610,7 @@ app.add_middleware(
 
       const viewTitles = {
         dashboard: "Live SOC Telemetry",
+        livetraffic: "Live Traffic Stream & SSE Telemetry",
         domains: "Domain & Site Mesh",
         inventory: "Discovered API Routes",
         iprules: "IP Access Control",
@@ -2112,6 +2630,7 @@ app.add_middleware(
       }
 
       if (tabId === "dashboard") pollTelemetry(true);
+      if (tabId === "livetraffic") initLiveTrafficSSE();
       if (tabId === "domains") loadDomains();
       if (tabId === "inventory") loadEndpoints();
       if (tabId === "iprules") loadIpRules();
@@ -3180,6 +3699,7 @@ app.add_middleware(
     initUserSessionUI();
     initSidebarState();
     initInteractive3DPipeline();
+    initContextualHoverInspection();
     applyTheme();
     document.getElementById("tz-toggle-btn").innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
     document.getElementById("sound-toggle-btn").innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
@@ -3187,7 +3707,7 @@ app.add_middleware(
     // Restore Active Tab from URL Hash or localStorage (Prevents unwanted reset on refresh)
     const initialHash = window.location.hash.replace("#", "").trim();
     const savedTab = localStorage.getItem("sg_active_tab");
-    const validTabs = ["dashboard", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
+    const validTabs = ["dashboard", "livetraffic", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
     const targetTab = validTabs.includes(initialHash) ? initialHash : (validTabs.includes(savedTab) ? savedTab : "dashboard");
     switchTab(targetTab, false);
 
@@ -3204,13 +3724,14 @@ app.add_middleware(
       if (e.code === "Space") {
         e.preventDefault();
         toggleStreamPause();
-      } else if (e.key >= "1" && e.key <= "8") {
-        const tabKeys = ["dashboard", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
+      } else if (e.key >= "1" && e.key <= "9") {
+        const tabKeys = ["dashboard", "livetraffic", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
         const idx = parseInt(e.key, 10) - 1;
         if (tabKeys[idx]) switchTab(tabKeys[idx]);
       } else if (e.key === "Escape") {
         closeEventForensics();
         closeDomainModal();
+        closeUserProfileModal();
       }
     });
 

@@ -6,30 +6,52 @@ security events, policies, and simulation logs without requiring external Docker
 
 import sqlite3
 import json
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from contextlib import contextmanager
 
 DB_PATH = Path("/run/media/anup/D/sentinelgrid/backend/sentinelgrid.db")
+_thread_local = threading.local()
 
 
 def get_db_connection() -> sqlite3.Connection:
     """
-    High-concurrency SQLite connection tuned for high-throughput WAAP workloads:
+    High-concurrency thread-local SQLite connection pool:
+    - Reuses one persistent connection per OS worker thread to prevent file descriptor exhaustion.
     - 30-second busy timeout prevents lock aborts during heavy batch writes.
     - WAL journal mode allows simultaneous non-blocking reads during active writes.
     - synchronous = NORMAL reduces fsync disk I/O overhead by 10x-50x with zero corruption risk in WAL mode.
     - 64MB shared in-memory cache and MEMORY temp_store minimize disk reads.
+    - wal_autocheckpoint = 1000 bounds WAL size and prevents log bloat.
     """
-    conn = sqlite3.connect(str(DB_PATH), timeout=30.0)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode = WAL")
-    conn.execute("PRAGMA busy_timeout = 30000")
-    conn.execute("PRAGMA synchronous = NORMAL")
-    conn.execute("PRAGMA cache_size = -64000")
-    conn.execute("PRAGMA temp_store = MEMORY")
-    conn.execute("PRAGMA foreign_keys = ON")
+    conn = getattr(_thread_local, "conn", None)
+    if conn is not None:
+        try:
+            conn.execute("SELECT 1")
+        except (sqlite3.ProgrammingError, sqlite3.OperationalError):
+            conn = None
+
+    if conn is None:
+        conn = sqlite3.connect(str(DB_PATH), timeout=30.0, check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode = WAL")
+        conn.execute("PRAGMA busy_timeout = 30000")
+        conn.execute("PRAGMA synchronous = NORMAL")
+        conn.execute("PRAGMA cache_size = -64000")
+        conn.execute("PRAGMA temp_store = MEMORY")
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA wal_autocheckpoint = 1000")
+        _thread_local.conn = conn
     return conn
+
+
+@contextmanager
+def get_db():
+    """Context manager yielding the thread-local database connection."""
+    conn = get_db_connection()
+    yield conn
 
 
 def init_database():
@@ -154,7 +176,6 @@ def init_database():
             cur.execute("""
             UPDATE users SET password_hash = ?, role = 'manager' WHERE email = 'anupdhokiya0@gmail.com'
             """, (admin123_hash,))
-    conn.close()
 
 
 init_database()
