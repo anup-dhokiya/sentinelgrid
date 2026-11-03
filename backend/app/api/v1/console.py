@@ -124,21 +124,32 @@ def get_or_create_website(conn, website_id: Optional[str]) -> str:
 # -----------------------------------------------------------------------------
 
 @router.get("/overview")
-async def get_overview():
-    """Returns aggregated metrics for the central WAAP operations console."""
+async def get_overview(website_id: Optional[str] = None):
+    """Returns aggregated metrics for the central WAAP operations console, optionally scoped to a domain."""
     conn = get_db_connection()
     with conn:
         websites_count = conn.execute("SELECT COUNT(*) FROM websites").fetchone()[0]
-        endpoints_count = conn.execute("SELECT COUNT(*) FROM api_endpoints").fetchone()[0]
-        shadow_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE status='shadow'").fetchone()[0]
-        events_count = conn.execute("SELECT COUNT(*) FROM security_events").fetchone()[0]
-        blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE action='BLOCK'").fetchone()[0]
 
-        recent_events = [
-            dict(row) for row in conn.execute(
-                "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 25"
-            ).fetchall()
-        ]
+        if website_id and website_id != "ALL":
+            endpoints_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ?", (website_id,)).fetchone()[0]
+            shadow_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ? AND status='shadow'", (website_id,)).fetchone()[0]
+            events_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ?", (website_id,)).fetchone()[0]
+            blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ? AND action='BLOCK'", (website_id,)).fetchone()[0]
+            recent_events = [
+                dict(row) for row in conn.execute(
+                    "SELECT * FROM security_events WHERE website_id = ? ORDER BY timestamp DESC LIMIT 35", (website_id,)
+                ).fetchall()
+            ]
+        else:
+            endpoints_count = conn.execute("SELECT COUNT(*) FROM api_endpoints").fetchone()[0]
+            shadow_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE status='shadow'").fetchone()[0]
+            events_count = conn.execute("SELECT COUNT(*) FROM security_events").fetchone()[0]
+            blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE action='BLOCK'").fetchone()[0]
+            recent_events = [
+                dict(row) for row in conn.execute(
+                    "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 35"
+                ).fetchall()
+            ]
 
         active_websites = [
             dict(row) for row in conn.execute("SELECT * FROM websites ORDER BY created_at DESC").fetchall()
@@ -150,6 +161,7 @@ async def get_overview():
 
     return {
         "websites_count": websites_count,
+        "selected_website_id": website_id or "ALL",
         "endpoints_count": endpoints_count,
         "shadow_endpoints_count": shadow_count,
         "total_events": events_count,
@@ -254,6 +266,64 @@ async def toggle_website_status(website_id: str):
         new_status = "disabled" if row["status"] == "active" else "active"
         conn.execute("UPDATE websites SET status = ? WHERE id = ?", (new_status, website_id))
     return {"status": "toggled", "website_id": website_id, "new_state": new_status}
+
+
+@router.get("/websites/{website_id}/stats")
+async def get_website_stats(website_id: str):
+    """Returns deep security telemetry, breakdown, and top threat vectors for a specific protected domain."""
+    conn = get_db_connection()
+    with conn:
+        site = conn.execute("SELECT * FROM websites WHERE id = ? OR domain = ?", (website_id, website_id)).fetchone()
+        if not site:
+            raise HTTPException(status_code=404, detail="Website not found.")
+
+        site_id = site["id"]
+        policy = conn.execute("SELECT * FROM policies WHERE website_id = ? ORDER BY version DESC LIMIT 1", (site_id,)).fetchone()
+        endpoints = conn.execute("SELECT * FROM api_endpoints WHERE website_id = ? ORDER BY path ASC", (site_id,)).fetchall()
+
+        total_events = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ?", (site_id,)).fetchone()[0]
+        blocked_events = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ? AND action='BLOCK'", (site_id,)).fetchone()[0]
+        allow_events = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ? AND action='ALLOW'", (site_id,)).fetchone()[0]
+
+        top_rules = [
+            {"rule": r[0], "count": r[1]}
+            for r in conn.execute(
+                "SELECT rule_triggered, COUNT(*) as cnt FROM security_events WHERE website_id = ? AND action='BLOCK' GROUP BY rule_triggered ORDER BY cnt DESC LIMIT 5",
+                (site_id,)
+            ).fetchall()
+        ]
+
+        top_ips = [
+            {"ip": r[0], "count": r[1]}
+            for r in conn.execute(
+                "SELECT client_ip, COUNT(*) as cnt FROM security_events WHERE website_id = ? AND action='BLOCK' GROUP BY client_ip ORDER BY cnt DESC LIMIT 5",
+                (site_id,)
+            ).fetchall()
+        ]
+
+        recent = [
+            dict(r) for r in conn.execute(
+                "SELECT * FROM security_events WHERE website_id = ? ORDER BY timestamp DESC LIMIT 20",
+                (site_id,)
+            ).fetchall()
+        ]
+
+    return {
+        "website": dict(site),
+        "policy": dict(policy) if policy else None,
+        "endpoints": [dict(e) for e in endpoints],
+        "metrics": {
+            "total_events": total_events,
+            "blocked_events": blocked_events,
+            "allow_events": allow_events,
+            "block_rate_percent": round((blocked_events / total_events * 100), 1) if total_events else 0.0,
+            "endpoints_count": len(endpoints),
+            "shadow_endpoints_count": len([e for e in endpoints if e["status"] == "shadow"])
+        },
+        "top_rules": top_rules,
+        "top_ips": top_ips,
+        "recent_events": recent
+    }
 
 
 @router.delete("/websites/{website_id}")
@@ -634,22 +704,49 @@ class EventIngestRequest(BaseModel):
     action: str
     latency_ms: float
     timestamp: float
+    details: Optional[str] = None
+    payload: Optional[str] = None
+    headers: Optional[str] = None
 
 
 @router.post("/events/ingest")
 async def ingest_event(ev: EventIngestRequest):
-    now_iso = datetime.fromtimestamp(ev.timestamp, timezone.utc).isoformat()
+    try:
+        now_iso = datetime.fromtimestamp(ev.timestamp, timezone.utc).isoformat()
+    except Exception:
+        now_iso = datetime.now(timezone.utc).isoformat()
+
     conn = get_db_connection()
     with conn:
+        # Resolve website_id safely to guarantee foreign key integrity
+        site_row = conn.execute("SELECT id FROM websites WHERE id = ? OR domain = ?", (ev.website_id, ev.website_id)).fetchone()
+        if site_row:
+            target_site_id = site_row[0]
+        else:
+            primary = conn.execute("SELECT id FROM websites ORDER BY created_at ASC LIMIT 1").fetchone()
+            target_site_id = primary[0] if primary else "site-6de116b4"
+
+        details_parts = []
+        if ev.details:
+            details_parts.append(ev.details)
+        else:
+            details_parts.append(f"Edge Intercept | Latency: {ev.latency_ms}ms | CVE: {ev.cve_reference or 'N/A'}")
+        if ev.payload:
+            details_parts.append(f"Payload: {ev.payload[:300]}")
+        if ev.headers:
+            details_parts.append(f"Headers: {ev.headers[:200]}")
+
+        final_details = " | ".join(details_parts)
+
         conn.execute("""
         INSERT OR REPLACE INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            ev.event_id, ev.website_id, now_iso, ev.client_ip, ev.method, ev.path,
+            ev.event_id, target_site_id, now_iso, ev.client_ip, ev.method, ev.path,
             ev.action, ev.risk_score, ev.rule_triggered, ev.owasp_category,
-            f"Edge Intercept | Latency: {ev.latency_ms}ms | CVE: {ev.cve_reference or 'N/A'}"
+            final_details
         ))
-    return {"status": "ingested", "event_id": ev.event_id}
+    return {"status": "ingested", "event_id": ev.event_id, "website_id": target_site_id}
 
 
 # -----------------------------------------------------------------------------
