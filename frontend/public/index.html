@@ -3,56 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SentinelGrid // Enterprise WAAP Operations & Control Console</title>
+  <title>SentinelGrid // Enterprise WAAP Operations & Threat Control Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --cream-bg: #F9F8F5;
+      /* Default Theme: Industrial Dark Obsidian (No purple, glare-free, cyber titanium) */
+      --canvas-bg: #080B10;
+      --card-white: #111726;
+      --sand-warm: #0C101A;
+      --stone-border: rgba(255, 255, 255, 0.08);
+      --stone-border-light: rgba(255, 255, 255, 0.04);
+      
+      --terracotta: #EF4444;
+      --terracotta-soft: rgba(239, 68, 68, 0.15);
+      --sage-green: #10B981;
+      --sage-soft: rgba(16, 185, 129, 0.15);
+      --deep-indigo: #38BDF8;
+      --indigo-soft: rgba(56, 189, 248, 0.12);
+      --warm-ochre: #F59E0B;
+      --ochre-soft: rgba(245, 158, 11, 0.15);
+      
+      --text-charcoal: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.6);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.8);
+    }
+
+    :root[data-theme="light"] {
+      --canvas-bg: #F8F9FA;
       --card-white: #FFFFFF;
-      --sand-warm: #EFECE6;
-      --stone-border: #E0DDD5;
-      --terracotta: #D3543A;
-      --terracotta-soft: #FBF0ED;
-      --sage-green: #3F7A60;
-      --sage-soft: #EEF5F1;
-      --deep-indigo: #2D4059;
-      --indigo-soft: #EEF2F7;
-      --warm-ochre: #C68B59;
-      --ochre-soft: #FAF3EC;
-      --text-charcoal: #1C1E21;
-      --text-muted: #6B7280;
-      
-      --font-ui: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      --font-mono: 'Space Mono', monospace;
-      
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --shadow-sm: 0 2px 6px rgba(28, 30, 33, 0.04);
-      --shadow-md: 0 8px 24px rgba(28, 30, 33, 0.08);
-      --shadow-lg: 0 16px 40px rgba(28, 30, 33, 0.14);
+      --sand-warm: #F1EFEA;
+      --stone-border: #E2E0D8;
+      --stone-border-light: #ECEAE4;
+      --terracotta: #D34528;
+      --terracotta-soft: #FDF2E9;
+      --sage-green: #2E7D5B;
+      --sage-soft: #EDF7F2;
+      --deep-indigo: #1E293B;
+      --indigo-soft: #F1F5F9;
+      --warm-ochre: #B45309;
+      --ochre-soft: #FEF3C7;
+      --text-charcoal: #0F172A;
+      --text-muted: #64748B;
+      --text-subtle: #94A3B8;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.07);
+      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--cream-bg);
+      background-color: var(--canvas-bg);
       color: var(--text-charcoal);
       font-family: var(--font-ui);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Top Horizontal Navigation Bar */
+    /* Animated 3D Sentinel Shield Emblem */
+    .sg-animated-logo {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .sg-animated-logo:hover {
+      transform: scale(1.08) rotate(3deg);
+    }
+    .radar-outer-ring {
+      animation: radarRotate 12s linear infinite;
+      transform-origin: 50px 50px;
+    }
+    .shield-crystal-core {
+      animation: crystalPulse 2.4s ease-in-out infinite;
+      transform-origin: 50px 50px;
+    }
+    @keyframes radarRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes crystalPulse {
+      0%, 100% { opacity: 0.8; transform: scale(0.96); }
+      50% { opacity: 1; transform: scale(1.06); filter: drop-shadow(0 0 6px #38BDF8); }
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: var(--canvas-bg); }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+    /* Top Persistent Application Header */
     .app-header {
       background: var(--card-white);
       border-bottom: 1px solid var(--stone-border);
       padding: 0 28px;
-      height: 70px;
+      height: 68px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -71,18 +131,18 @@
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      background: var(--sand-warm);
-      color: var(--terracotta);
+      background: var(--deep-indigo);
+      color: #FFF;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       box-shadow: var(--shadow-sm);
     }
 
     .brand-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--text-charcoal);
       letter-spacing: -0.3px;
@@ -91,50 +151,48 @@
     /* Modular Navigation Menu Tabs */
     .nav-menu {
       display: flex;
-      gap: 4px;
-      background: var(--cream-bg);
-      padding: 4px;
-      border-radius: 12px;
+      gap: 3px;
+      background: var(--sand-warm);
+      padding: 3px;
+      border-radius: 10px;
       border: 1px solid var(--stone-border);
       overflow-x: auto;
     }
 
     .nav-item {
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 7px 14px;
+      border-radius: 7px;
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       display: flex;
       align-items: center;
       gap: 6px;
       white-space: nowrap;
     }
 
-    .nav-item:hover {
-      color: var(--text-charcoal);
-    }
+    .nav-item:hover { color: var(--text-charcoal); }
 
     .nav-item.active {
       background: var(--card-white);
       color: var(--deep-indigo);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
       font-weight: 700;
     }
 
     .user-profile-badge {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .avatar-circle {
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: var(--sand-warm);
+      background: var(--indigo-soft);
       color: var(--deep-indigo);
       font-weight: 700;
       font-size: 12px;
@@ -146,20 +204,17 @@
 
     /* App Container & Views */
     .app-main {
-      padding: 28px;
-      max-width: 1540px;
+      padding: 24px 28px;
+      max-width: 1560px;
       margin: 0 auto;
       width: 100%;
       flex: 1;
     }
 
-    .view-section {
-      display: none;
-    }
-
+    .view-section { display: none; }
     .view-section.active {
       display: block;
-      animation: fadeIn 0.2s ease-in-out;
+      animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes fadeIn {
@@ -170,11 +225,11 @@
     /* Live Pulse Indicator */
     .live-pulse {
       display: inline-block;
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--sage-green);
-      box-shadow: 0 0 0 0 rgba(63, 122, 96, 0.7);
+      box-shadow: 0 0 0 0 rgba(46, 125, 91, 0.7);
       animation: pulse-green 1.6s infinite;
     }
     .live-pulse.paused {
@@ -183,111 +238,118 @@
       box-shadow: none;
     }
     @keyframes pulse-green {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 122, 96, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(63, 122, 96, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 122, 96, 0); }
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 91, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(46, 125, 91, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 91, 0); }
     }
 
     /* Buttons */
     .btn {
       font-family: var(--font-ui);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 9px 16px;
-      border-radius: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
       border: 1px solid transparent;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
+      gap: 7px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
     }
-
-    .btn-primary { background: var(--deep-indigo); color: #fff; }
-    .btn-primary:hover { background: #1D2B3C; }
-    .btn-warm { background: var(--terracotta); color: #fff; }
-    .btn-warm:hover { background: #B9442C; }
+    .btn-primary { background: var(--deep-indigo); color: #FFF; }
+    .btn-primary:hover { background: #0F172A; }
+    .btn-warm { background: var(--terracotta); color: #FFF; }
+    .btn-warm:hover { background: #B9381E; }
     .btn-subtle { background: var(--sand-warm); color: var(--text-charcoal); border-color: var(--stone-border); }
-    .btn-subtle:hover { background: #E6E2D8; }
-    .btn-sage { background: var(--sage-green); color: #fff; }
-    .btn-sage:hover { background: #2F604A; }
+    .btn-subtle:hover { background: #E6E3DB; }
+    .btn-sage { background: var(--sage-green); color: #FFF; }
+    .btn-sage:hover { background: #236348; }
 
-    /* Panels & Cards */
+    /* Panels & Containers */
     .panel {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
       overflow: hidden;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .panel-header {
-      padding: 16px 22px;
+      padding: 15px 22px;
       border-bottom: 1px solid var(--stone-border);
       background: var(--sand-warm);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
+      color: var(--text-charcoal);
     }
 
-    .panel-body { padding: 22px; }
+    .panel-body { padding: 20px 22px; }
 
     /* Clean Tables */
     .table-clean { width: 100%; border-collapse: collapse; font-size: 13px; }
     .table-clean th {
       text-align: left;
-      padding: 12px 18px;
-      background: #F4F2EB;
+      padding: 11px 16px;
+      background: var(--sand-warm);
       color: var(--text-muted);
       font-size: 11px;
       text-transform: uppercase;
       font-weight: 700;
+      letter-spacing: 0.3px;
       border-bottom: 1px solid var(--stone-border);
     }
-    .table-clean td { padding: 13px 18px; border-bottom: 1px solid var(--stone-border); }
-    .table-clean tbody tr:hover { background: #FAF9F6; }
+    .table-clean td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--stone-border-light);
+      vertical-align: middle;
+      color: var(--text-charcoal);
+    }
+    .table-clean tbody tr:hover { background: var(--sand-warm); }
     .table-clean tbody tr.clickable-row {
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: background 0.12s ease;
     }
-    .table-clean tbody tr.clickable-row:hover {
-      background: #F2EFE8;
-    }
+    .table-clean tbody tr.clickable-row:hover { background: var(--sand-warm); }
 
-    /* Metric Cards */
+    /* Metric KPI Grid */
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-bottom: 24px;
+      gap: 16px;
+      margin-bottom: 22px;
     }
     .metric-card {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-md);
-      padding: 22px;
+      padding: 18px 20px;
       box-shadow: var(--shadow-sm);
+      position: relative;
     }
-    .metric-card.terracotta { border-top: 4px solid var(--terracotta); }
-    .metric-card.sage { border-top: 4px solid var(--sage-green); }
-    .metric-card.indigo { border-top: 4px solid var(--deep-indigo); }
-    .metric-card.ochre { border-top: 4px solid var(--warm-ochre); }
+    .metric-card.terracotta { border-top: 3px solid var(--terracotta); }
+    .metric-card.sage { border-top: 3px solid var(--sage-green); }
+    .metric-card.indigo { border-top: 3px solid var(--deep-indigo); }
+    .metric-card.ochre { border-top: 3px solid var(--warm-ochre); }
 
     .metric-val {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
       font-family: var(--font-mono);
-      margin: 6px 0;
+      margin: 4px 0;
+      letter-spacing: -0.5px;
     }
 
     /* Badges */
     .badge {
       display: inline-block;
-      padding: 4px 9px;
-      border-radius: 6px;
+      padding: 3px 8px;
+      border-radius: 5px;
       font-size: 11px;
       font-weight: 700;
       font-family: var(--font-mono);
@@ -297,87 +359,68 @@
     .badge-block { background: var(--terracotta-soft); color: var(--terracotta); }
     .badge-challenge { background: var(--ochre-soft); color: var(--warm-ochre); }
     .badge-ratelimit { background: #FEF3C7; color: #B45309; }
-    .badge-shadow { background: #F4E8EE; color: #922B53; }
-    .badge-online { background: #E6F4EA; color: #137333; }
-    .badge-offline { background: #FCE8E6; color: #C5221F; }
+    .badge-shadow { background: #FCE7F3; color: #9D174D; }
+    .badge-online { background: #DCFCE7; color: #166534; }
+    .badge-offline { background: #FEE2E2; color: #991B1B; }
 
     /* Domain Cards Grid */
     .domain-cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 20px;
-      margin-bottom: 24px;
+      gap: 18px;
+      margin-bottom: 22px;
     }
     .domain-card {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-md);
-      padding: 22px;
+      padding: 20px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
     .domain-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
     }
-    .domain-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
     .feature-chip-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin: 14px 0;
+      gap: 5px;
+      margin: 12px 0;
     }
     .feature-chip {
       font-size: 10px;
       font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 5px;
-      background: var(--cream-bg);
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--sand-warm);
       color: var(--deep-indigo);
       border: 1px solid var(--stone-border);
     }
 
-    /* Auth Forms */
-    .auth-card {
-      max-width: 440px;
-      margin: 40px auto;
-      background: var(--card-white);
-      border: 1px solid var(--stone-border);
-      border-radius: var(--radius-lg);
-      padding: 34px;
-      box-shadow: var(--shadow-md);
-    }
-
+    /* Forms & Inputs */
     .form-input {
       width: 100%;
-      background: var(--cream-bg);
+      background: var(--card-white);
+      color: var(--text-charcoal);
       border: 1px solid var(--stone-border);
-      border-radius: 8px;
-      padding: 10px 13px;
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
       font-family: var(--font-ui);
       font-size: 13px;
-      margin: 6px 0 14px;
+      margin: 5px 0 12px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.15s;
     }
-
-    .form-input:focus {
-      border-color: var(--deep-indigo);
-      background: var(--card-white);
-    }
+    .form-input:focus { border-color: var(--deep-indigo); }
 
     .filter-bar {
       display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -385,39 +428,32 @@
     /* Side Drawer for Threat Forensics */
     .drawer-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(28, 30, 33, 0.45);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.4);
       backdrop-filter: blur(2px);
       z-index: 1000;
       display: none;
-      animation: fadeIn 0.15s ease-out;
     }
     .drawer-backdrop.active { display: block; }
 
     .drawer-panel {
       position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; right: 0; bottom: 0;
       width: 640px;
       max-width: 95vw;
       background: var(--card-white);
       border-left: 1px solid var(--stone-border);
-      box-shadow: -8px 0 36px rgba(28, 30, 33, 0.16);
+      box-shadow: var(--shadow-lg);
       z-index: 1001;
       display: flex;
       flex-direction: column;
       transform: translateX(100%);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .drawer-panel.open {
-      transform: translateX(0);
-    }
+    .drawer-panel.open { transform: translateX(0); }
+
     .drawer-header {
-      padding: 20px 24px;
+      padding: 18px 24px;
       border-bottom: 1px solid var(--stone-border);
       background: var(--sand-warm);
       display: flex;
@@ -425,107 +461,142 @@
       align-items: center;
     }
     .drawer-body {
-      padding: 24px;
+      padding: 22px 24px;
       overflow-y: auto;
       flex: 1;
     }
     .drawer-footer {
       padding: 16px 24px;
       border-top: 1px solid var(--stone-border);
-      background: var(--cream-bg);
+      background: var(--canvas-bg);
       display: flex;
       gap: 10px;
       justify-content: flex-end;
+      flex-wrap: wrap;
     }
 
-    /* Monospace forensic code blocks */
+    /* Forensic Monospace Code Snippet Box */
     .forensic-code-block {
-      background: #1C1E21;
+      background: #0F172A;
       color: #38BDF8;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.5;
-      padding: 14px 16px;
-      border-radius: 8px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-all;
       position: relative;
-      margin: 8px 0 16px;
+      margin: 6px 0 14px;
     }
-    .copy-btn-inline {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-      border: none;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-      font-family: var(--font-ui);
-    }
-    .copy-btn-inline:hover { background: rgba(255, 255, 255, 0.3); }
 
-    /* Toast Notification */
+    /* Threat Toast Alert */
     .threat-toast-alert {
       position: fixed;
       bottom: 24px;
       right: 24px;
       background: var(--deep-indigo);
-      color: #fff;
-      padding: 14px 22px;
-      border-radius: 12px;
+      color: #FFF;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
       box-shadow: var(--shadow-lg);
       display: flex;
       align-items: center;
       gap: 12px;
       z-index: 9999;
-      animation: slideUp 0.25s ease-out;
+      animation: slideUp 0.2s ease-out;
       font-size: 13px;
     }
     @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
+      from { transform: translateY(16px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Histogram hover tooltip */
+    .hist-tooltip {
+      position: absolute;
+      background: var(--deep-indigo);
+      color: #FFF;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      display: none;
+      font-family: var(--font-mono);
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Persistent App Header with Navigation Menu -->
+  <!-- Top Persistent Application Header -->
   <header class="app-header">
     <div class="brand-area">
-      <div class="brand-icon">🛡️</div>
+      <div class="sg-logo-container" style="display: flex; align-items: center; cursor: pointer;" onclick="switchTab('dashboard')">
+        <svg class="sg-animated-logo" width="38" height="38" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="shield-grad-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#21262D"/>
+              <stop offset="100%" stop-color="#0D1117"/>
+            </linearGradient>
+            <linearGradient id="cyan-glow-beam" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38BDF8"/>
+              <stop offset="100%" stop-color="#0284C7"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" stroke-dasharray="6,4" class="radar-outer-ring"/>
+          <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="url(#shield-grad-dark)" stroke="#38BDF8" stroke-width="2"/>
+          <polygon points="50,10 88,32 50,50 12,32" fill="rgba(56, 189, 248, 0.12)"/>
+          <polygon points="88,32 88,68 50,50" fill="rgba(0, 0, 0, 0.4)"/>
+          <polygon points="12,32 50,50 12,68" fill="rgba(255, 255, 255, 0.05)"/>
+          <polygon points="50,34 64,50 50,66 36,50" fill="url(#cyan-glow-beam)" class="shield-crystal-core"/>
+          <circle cx="50" cy="50" r="4" fill="#F0F6FC"/>
+        </svg>
+      </div>
       <div>
         <div class="brand-title">SentinelGrid Enterprise WAAP</div>
-        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Decentralized L7 Protection & Edge Gateway</div>
+        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Real-Time L7 Threat Mitigation & Edge Mesh</div>
       </div>
     </div>
 
-    <!-- Modular Menu Tabs -->
+    <!-- Modular Navigation Menu Tabs -->
     <nav class="nav-menu">
       <div class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
       <div class="nav-item" onclick="switchTab('domains')">🌐 Domains & Sites</div>
       <div class="nav-item" onclick="switchTab('inventory')">🔍 Discovered APIs</div>
       <div class="nav-item" onclick="switchTab('iprules')">🛡️ IP Access Control</div>
-      <div class="nav-item" onclick="switchTab('connectors')">🔌 Edge Gateways</div>
+      <div class="nav-item" onclick="switchTab('connectors')">🔌 Edge Nodes</div>
       <div class="nav-item" onclick="switchTab('sandbox')">🧪 In-Line WAF Lab</div>
       <div class="nav-item" onclick="switchTab('simulation')">📈 Policy Simulation</div>
       <div class="nav-item" onclick="switchTab('onboarding')">📖 Setup Guide</div>
     </nav>
 
-    <!-- User / Auth Corner -->
+    <!-- Controls & User Badge -->
     <div class="user-profile-badge">
-      <div id="auth-logged-in-box" style="display: flex; align-items: center; gap: 10px;">
-        <div class="avatar-circle" id="user-avatar">AD</div>
+      <!-- Theme Switcher Toggle -->
+      <button id="theme-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleThemePreference()">
+        🌙 Theme: OBSIDIAN
+      </button>
+
+      <!-- Timezone Switcher Toggle -->
+      <button id="tz-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleTimezonePreference()">
+        🌐 TZ: LOCAL (IST)
+      </button>
+
+      <!-- Synthesizer Audio Alerts Toggle -->
+      <button id="sound-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleSoundAlerts()">
+        🔇 Sound: OFF
+      </button>
+
+      <div id="auth-logged-in-box" style="display: flex; align-items: center; gap: 8px;">
+        <div class="avatar-circle">AD</div>
         <div style="font-size: 12px;">
-          <div id="user-display-name" style="font-weight: 700;">Anup Dhokiya</div>
-          <div style="color: var(--text-muted);" id="user-display-role">SECURITY ARCHITECT</div>
+          <div style="font-weight: 700;">Anup Dhokiya</div>
+          <div style="color: var(--text-muted); font-size: 10px;">SEC ARCHITECT</div>
         </div>
-        <button class="btn btn-subtle" style="padding: 5px 9px; font-size: 11px;" onclick="switchTab('login')">Sign Out</button>
       </div>
-      <button id="auth-login-btn" class="btn btn-primary" style="display: none;" onclick="switchTab('login')">Login / Signup</button>
     </div>
   </header>
 
@@ -538,25 +609,27 @@
     <section id="view-dashboard" class="view-section active">
 
       <!-- Live Stream Controls & Scope Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 14px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 14px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); letter-spacing: 0.5px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 12px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 11px; font-weight: 800; color: var(--deep-indigo); letter-spacing: 0.5px;">
             🛡️ ACTIVE SITE SCOPE:
           </span>
-          <select id="scope-website-select" class="form-input" style="width: 290px; margin: 0; font-weight: 700; background: var(--sand-warm); cursor: pointer;" onchange="handleDomainScopeChange()">
+          <select id="scope-website-select" class="form-input" style="width: 280px; margin: 0; font-weight: 700; background: var(--sand-warm); cursor: pointer;" onchange="handleDomainScopeChange()">
             <option value="ALL">🌐 All Protected Domains (Global Fleet View)</option>
           </select>
           <span id="scope-badge" class="badge badge-online">GLOBAL FLEET</span>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="display: flex; align-items: center; gap: 8px; background: var(--cream-bg); padding: 6px 14px; border-radius: 8px; border: 1px solid var(--stone-border);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <!-- Live Polling Radar & Countdown -->
+          <div style="display: flex; align-items: center; gap: 8px; background: var(--sand-warm); padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
             <span class="live-pulse" id="live-pulse-indicator"></span>
             <span id="live-indicator-text" style="font-size: 11px; font-weight: 800; color: var(--sage-green);">LIVE STREAMING (2s)</span>
-            <span id="sync-countdown-badge" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); background: var(--card-white); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--stone-border);">Next: 2s</span>
+            <span id="sync-countdown-badge" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); background: var(--card-white); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--stone-border);">Next: 2s</span>
           </div>
 
-          <select id="auto-refresh-rate" class="form-input" style="width: 145px; margin: 0; font-weight: 600; cursor: pointer;" onchange="changeAutoRefreshRate()">
+          <!-- Stream Speed Selector -->
+          <select id="auto-refresh-rate" class="form-input" style="width: 140px; margin: 0; font-weight: 600; cursor: pointer;" onchange="changeAutoRefreshRate()">
             <option value="1">⚡ Live Stream (1s)</option>
             <option value="2" selected>🔄 Real-Time (2s)</option>
             <option value="5">⏱️ Standard (5s)</option>
@@ -564,39 +637,183 @@
             <option value="0">⏸️ Paused (Manual)</option>
           </select>
 
-          <button class="btn btn-primary" style="padding: 9px 15px;" onclick="pollTelemetry(true)">⚡ Sync Now</button>
+          <!-- Play/Pause Toggle -->
+          <button id="stream-pause-btn" class="btn btn-subtle" onclick="toggleStreamPause()">⏸️ Pause</button>
+
+          <!-- Sync Now Button -->
+          <button class="btn btn-primary" onclick="pollTelemetry(true)">⚡ Sync Now</button>
         </div>
       </div>
 
-      <!-- Metric Grid -->
+      <!-- ===================================================================== -->
+      <!-- 3D ISOMETRIC SECURITY PIPELINE TOPOLOGY VISUALIZER -->
+      <!-- ===================================================================== -->
+      <div class="panel" style="margin-bottom: 22px; padding: 18px 22px; position: relative; overflow: hidden; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.8px; color: var(--deep-indigo); text-transform: uppercase;">
+              ⚡ 3D In-Line Execution Topology & Sub-1.5ms Inspection Budget
+            </span>
+            <span class="badge badge-online">
+              P99: 0.35ms (IN-PROCESS)
+            </span>
+          </div>
+          <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);">
+            Zero-Copy Radix LPM • SmartParse AST DFA • Authenticated Origin Shield
+          </div>
+        </div>
+
+        <svg id="isometric-pipeline-svg" width="100%" height="210" viewBox="0 0 1100 210" style="overflow: visible;">
+          <defs>
+            <linearGradient id="cube-top-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1E293B"/>
+              <stop offset="100%" stop-color="#0F172A"/>
+            </linearGradient>
+            <linearGradient id="cube-side-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#0F172A"/>
+              <stop offset="100%" stop-color="#020617"/>
+            </linearGradient>
+            <linearGradient id="beam-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.2"/>
+              <stop offset="50%" stop-color="#38BDF8" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+            </linearGradient>
+            <linearGradient id="beam-crimson" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#EF4444" stop-opacity="0.2"/>
+              <stop offset="50%" stop-color="#EF4444" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#EF4444" stop-opacity="0.2"/>
+            </linearGradient>
+            <linearGradient id="beam-emerald" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#10B981" stop-opacity="0.2"/>
+              <stop offset="50%" stop-color="#10B981" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#10B981" stop-opacity="0.2"/>
+            </linearGradient>
+            <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+            <filter id="glow-crimson" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- 1. Isometric Conduits with animated pulses -->
+          <path d="M 160 105 L 450 105" stroke="var(--stone-border)" stroke-width="2" stroke-dasharray="4,4"/>
+          <path d="M 160 105 L 450 105" stroke="url(#beam-cyan)" stroke-width="3" filter="url(#glow-cyan)"/>
+          
+          <path d="M 650 90 L 930 55" stroke="var(--stone-border)" stroke-width="2" stroke-dasharray="4,4"/>
+          <path d="M 650 90 L 930 55" stroke="url(#beam-emerald)" stroke-width="3"/>
+          
+          <path d="M 650 125 L 930 155" stroke="var(--stone-border)" stroke-width="2" stroke-dasharray="4,4"/>
+          <path d="M 650 125 L 930 155" stroke="url(#beam-crimson)" stroke-width="3" filter="url(#glow-crimson)"/>
+
+          <!-- 2. Node 1: Client Ingress Gateway -->
+          <g transform="translate(80, 70)">
+            <polygon points="40,0 80,18 40,36 0,18" fill="#1E293B" stroke="var(--stone-border)" stroke-width="1"/>
+            <polygon points="0,18 40,36 40,58 0,40" fill="#0F172A" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <polygon points="80,18 40,36 40,58 80,40" fill="#0B0F17" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <circle cx="40" cy="18" r="9" fill="#38BDF8" fill-opacity="0.25" stroke="#38BDF8" stroke-width="2" filter="url(#glow-cyan)"/>
+            <text x="40" y="75" fill="var(--text-muted)" font-size="10" font-family="var(--font-mono)" font-weight="700" text-anchor="middle">CLIENT INGRESS</text>
+            <text x="40" y="88" fill="var(--text-subtle)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">Port 8080</text>
+          </g>
+
+          <!-- 3. Node 2: SentinelGrid Core Engine (Massive Hex Cube) -->
+          <g transform="translate(470, 35)">
+            <polygon points="85,0 170,42 85,84 0,42" fill="url(#cube-top-cyan)" stroke="#38BDF8" stroke-width="1.5"/>
+            <polygon points="0,42 85,84 85,138 0,96" fill="url(#cube-side-cyan)" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <polygon points="170,42 85,84 85,138 170,96" fill="#020617" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <polygon points="85,18 132,42 85,66 38,42" fill="rgba(56, 189, 248, 0.08)" stroke="#38BDF8" stroke-width="1" stroke-dasharray="3,3"/>
+            <circle cx="85" cy="42" r="13" fill="#0E131F" stroke="#38BDF8" stroke-width="2" filter="url(#glow-cyan)"/>
+            <circle cx="85" cy="42" r="5" fill="#38BDF8"/>
+            <text x="85" y="156" fill="var(--text-charcoal)" font-size="12" font-family="var(--font-mono)" font-weight="800" text-anchor="middle">SENTINELGRID WAAP</text>
+            <text x="85" y="170" fill="var(--deep-indigo)" font-size="10" font-family="var(--font-mono)" font-weight="700" text-anchor="middle">SmartParse DFA • Radix LPM</text>
+          </g>
+
+          <!-- 4. Node 3A: Upstream Origin -->
+          <g transform="translate(940, 20)">
+            <polygon points="40,0 80,18 40,36 0,18" fill="#13231B" stroke="#10B981" stroke-width="1.5"/>
+            <polygon points="0,18 40,36 40,58 0,40" fill="#0A150F" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <polygon points="80,18 40,36 40,58 80,40" fill="#050D09" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <circle cx="40" cy="18" r="8" fill="#10B981" fill-opacity="0.3" stroke="#10B981" stroke-width="2"/>
+            <text x="40" y="75" fill="var(--sage-green)" font-size="10" font-family="var(--font-mono)" font-weight="800" text-anchor="middle">AEGIS-PRO ORIGIN</text>
+            <text x="40" y="88" fill="var(--text-muted)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">Port 3000 (Shielded)</text>
+          </g>
+
+          <!-- 5. Node 3B: Threat Sinkhole -->
+          <g transform="translate(940, 125)">
+            <polygon points="40,0 80,18 40,36 0,18" fill="#251417" stroke="#EF4444" stroke-width="1.5"/>
+            <polygon points="0,18 40,36 40,58 0,40" fill="#170A0D" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <polygon points="80,18 40,36 40,58 80,40" fill="#0F0507" stroke="var(--stone-border-light)" stroke-width="1"/>
+            <circle cx="40" cy="18" r="8" fill="#EF4444" fill-opacity="0.3" stroke="#EF4444" stroke-width="2" filter="url(#glow-crimson)"/>
+            <text x="40" y="75" fill="var(--terracotta)" font-size="10" font-family="var(--font-mono)" font-weight="800" text-anchor="middle">QUARANTINE / DROP</text>
+            <text x="40" y="88" fill="var(--text-muted)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">403 Intercepted</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Metric KPI Grid -->
       <div class="metric-grid">
         <div class="metric-card indigo">
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">PROTECTED APIS</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Protected Routes</div>
           <div class="metric-val" id="kpi-endpoints">0</div>
-          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-websites">Across 0 Domains</div>
+          <div style="font-size: 11px; color: var(--text-muted);" id="kpi-websites">Across 0 Domains</div>
         </div>
         <div class="metric-card terracotta">
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">SHADOW / ZOMBIE APIS</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Shadow APIs Discovered</div>
           <div class="metric-val" id="kpi-shadow" style="color: var(--terracotta);">0</div>
-          <div style="font-size: 12px; color: var(--text-muted);">Undocumented Endpoints Flagged</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Undocumented Endpoints Flagged</div>
         </div>
         <div class="metric-card sage">
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">MITIGATED ATTACKS</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Mitigated Threats</div>
           <div class="metric-val" id="kpi-blocked" style="color: var(--sage-green);">0</div>
-          <div style="font-size: 12px; color: var(--text-muted);" id="kpi-blockrate">0.0% Block Rate</div>
+          <div style="font-size: 11px; color: var(--text-muted);" id="kpi-blockrate">0.0% Block Rate</div>
         </div>
         <div class="metric-card ochre">
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">ED25519 CRYPTO INTEGRITY</div>
-          <div class="metric-val" style="font-size: 22px; padding-top: 8px;">RFC 8032</div>
-          <div style="font-size: 12px; color: var(--text-muted);">Zero-Trust Asymmetric Seal</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Ed25519 Crypto Ledger</div>
+          <div class="metric-val" style="font-size: 22px; padding-top: 6px;">RFC 8032</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Zero-Trust Asymmetric Seal</div>
         </div>
       </div>
 
-      <!-- Real-Time Security Events Panel -->
+      <!-- NEW: Visual SOC Intelligence Widgets Row -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-bottom: 22px;">
+        <!-- Real-Time Traffic Velocity Histogram (SVG Dual-Series) -->
+        <div class="panel" style="margin-bottom: 0;">
+          <div class="panel-header">
+            <span>Real-Time Traffic Velocity (Allowed vs Mitigated / Minute)</span>
+            <div style="display: flex; gap: 12px; font-size: 11px; font-weight: 700;">
+              <span style="color: var(--sage-green);">■ Clean Allowed</span>
+              <span style="color: var(--terracotta);">■ Mitigated Threats</span>
+            </div>
+          </div>
+          <div class="panel-body" style="position: relative;">
+            <div id="traffic-histogram-container" style="min-height: 120px;">
+              <div style="text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 12px;">Aggregating traffic time slices...</div>
+            </div>
+            <div id="hist-tooltip" class="hist-tooltip"></div>
+          </div>
+        </div>
+
+        <!-- OWASP Attack Category Distribution -->
+        <div class="panel" style="margin-bottom: 0;">
+          <div class="panel-header">
+            <span>Threat Vector Distribution</span>
+            <span style="font-size: 11px; color: var(--text-muted);">OWASP Top 10</span>
+          </div>
+          <div class="panel-body">
+            <div id="owasp-distribution-container" style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 12px;">Analyzing threat spectrum...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Security Events Stream Table -->
       <div class="panel">
         <div class="panel-header">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span>Real-Time Security Threat Stream</span>
+            <span>Real-Time Threat Interception Stream</span>
             <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(Click any event row for forensic breakdown)</span>
           </div>
           <div style="display: flex; gap: 8px;">
@@ -608,7 +825,7 @@
         <div class="panel-body" style="padding-bottom: 0;">
           <div class="filter-bar">
             <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Filter Verdict:</span>
-            <select id="event-filter-action" class="form-input" style="width: 150px; margin: 0;" onchange="applyEventFilter()">
+            <select id="event-filter-action" class="form-input" style="width: 140px; margin: 0;" onchange="applyEventFilter()">
               <option value="ALL">All Actions</option>
               <option value="BLOCK">BLOCK (403)</option>
               <option value="ALLOW">ALLOW (200)</option>
@@ -627,7 +844,7 @@
         <table class="table-clean">
           <thead>
             <tr>
-              <th>Timestamp</th>
+              <th>Timestamp (Accurate)</th>
               <th>Protected Site</th>
               <th>Client IP</th>
               <th>Method & URI</th>
@@ -648,28 +865,27 @@
     <!-- TAB 2: DOMAIN & SITE MANAGEMENT WORKSPACE -->
     <!-- ===================================================================== -->
     <section id="view-domains" class="view-section">
-      <!-- Domain Overview KPI Banner -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div>
-          <h2 style="font-size: 20px; font-weight: 800; color: var(--text-charcoal);">Protected Domains & Edge Gateways</h2>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-charcoal);">Protected Domains & Edge Gateways</h2>
           <p style="font-size: 13px; color: var(--text-muted);">Manage per-domain WAAP inspection policies, edge routing, and live attack testing.</p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 8px;">
           <button class="btn btn-sage" onclick="probeAllGatewaysLive()">⚡ Probe Edge Gateways</button>
           <button class="btn btn-warm" onclick="showAddDomainModal()">+ Add Protected Domain</button>
         </div>
       </div>
 
       <!-- Add Domain Box (Collapsible) -->
-      <div id="add-domain-box" style="display: none; background: var(--sand-warm); padding: 22px; border-radius: var(--radius-md); margin-bottom: 24px; border: 1px solid var(--stone-border);">
-        <h4 style="font-size: 14px; margin-bottom: 12px; font-weight: 800;">Register New Domain for Protection</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px; align-items: flex-end;">
+      <div id="add-domain-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: var(--radius-md); margin-bottom: 22px; border: 1px solid var(--stone-border);">
+        <h4 style="font-size: 13px; margin-bottom: 12px; font-weight: 800;">Register New Domain for Protection</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
           <div>
-            <label style="font-size: 12px; font-weight: 700;">Domain FQDN / Hostname</label>
+            <label style="font-size: 11px; font-weight: 700;">Domain FQDN / Hostname</label>
             <input type="text" id="new-domain-input" class="form-input" placeholder="e.g. portal.company.com" style="margin-bottom: 0;">
           </div>
           <div>
-            <label style="font-size: 12px; font-weight: 700;">Application Title</label>
+            <label style="font-size: 11px; font-weight: 700;">Application Title</label>
             <input type="text" id="new-domain-name" class="form-input" placeholder="e.g. Customer Portal & API" style="margin-bottom: 0;">
           </div>
           <div style="display: flex; gap: 8px;">
@@ -688,7 +904,7 @@
       <div class="panel">
         <div class="panel-header">
           <span>Protected Domain Fleet Directory</span>
-          <button class="btn btn-subtle" style="padding: 5px 10px; font-size: 11px;" onclick="loadDomains()">🔄 Reload Registry</button>
+          <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px;" onclick="loadDomains()">🔄 Reload Registry</button>
         </div>
         <div class="panel-body">
           <table class="table-clean">
@@ -725,8 +941,8 @@
           </div>
         </div>
         <div class="panel-body">
-          <div id="spec-import-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: 10px; margin-bottom: 22px;">
-            <h4 style="font-size: 14px; margin-bottom: 8px;">Import OpenAPI 3.0 / Swagger Contract</h4>
+          <div id="spec-import-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: var(--radius-sm); margin-bottom: 22px;">
+            <h4 style="font-size: 13px; margin-bottom: 8px;">Import OpenAPI 3.0 / Swagger Contract</h4>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
               Paste your OpenAPI specification (JSON or YAML) below. All defined routes will be cataloged as 'documented', allowing automatic detection of undocumented 'shadow' APIs.
             </p>
@@ -745,7 +961,7 @@
                 <th>HTTP Method</th>
                 <th>Route Path</th>
                 <th>Risk Severity</th>
-                <th>Last Observed</th>
+                <th>Last Observed (Accurate)</th>
               </tr>
             </thead>
             <tbody id="endpoints-body">
@@ -766,22 +982,22 @@
           <button class="btn btn-warm" onclick="toggleAddIpRule()">+ Add IP Rule</button>
         </div>
         <div class="panel-body">
-          <div id="add-iprule-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: 10px; margin-bottom: 22px;">
-            <h4 style="font-size: 14px; margin-bottom: 12px;">Add Dynamic IP / CIDR Access Rule</h4>
+          <div id="add-iprule-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: var(--radius-sm); margin-bottom: 22px;">
+            <h4 style="font-size: 13px; margin-bottom: 12px;">Add Dynamic IP / CIDR Access Rule</h4>
             <div style="display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 12px; align-items: flex-end;">
               <div>
-                <label style="font-size: 12px; font-weight: 700;">IP Address or CIDR Block</label>
+                <label style="font-size: 11px; font-weight: 700;">IP Address or CIDR Block</label>
                 <input type="text" id="ip-rule-addr" class="form-input" placeholder="e.g. 198.51.100.42 or 10.0.0.0/8" style="margin-bottom: 0;">
               </div>
               <div>
-                <label style="font-size: 12px; font-weight: 700;">Action</label>
+                <label style="font-size: 11px; font-weight: 700;">Action</label>
                 <select id="ip-rule-action" class="form-input" style="margin-bottom: 0;">
                   <option value="BLOCK">BLOCK (Deny)</option>
                   <option value="ALLOW">ALLOW (Bypass)</option>
                 </select>
               </div>
               <div>
-                <label style="font-size: 12px; font-weight: 700;">Description</label>
+                <label style="font-size: 11px; font-weight: 700;">Description</label>
                 <input type="text" id="ip-rule-desc" class="form-input" placeholder="e.g. Malicious subnet / Attacker quarantine" style="margin-bottom: 0;">
               </div>
               <div style="display: flex; gap: 8px;">
@@ -797,7 +1013,7 @@
                 <th>Action</th>
                 <th>IP / CIDR Pattern</th>
                 <th>Description</th>
-                <th>Created At</th>
+                <th>Created At (Accurate)</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -827,7 +1043,7 @@
                 <th>Type</th>
                 <th>Associated Domain</th>
                 <th>Inspection Latency</th>
-                <th>Last Heartbeat</th>
+                <th>Last Heartbeat (Accurate)</th>
               </tr>
             </thead>
             <tbody id="connectors-table-body">
@@ -852,31 +1068,31 @@
             Simulate malicious payloads against SentinelGrid's SmartParse Lexical DFA engine, Radix Prefix Trie, and Sliding Window Rate Limiter.
           </p>
 
-          <label style="font-size: 12px; font-weight: 700;">Target Route Path</label>
+          <label style="font-size: 11px; font-weight: 700;">Target Route Path</label>
           <input type="text" id="sandbox-path" class="form-input" value="/api/v1/auth/login">
 
-          <label style="font-size: 12px; font-weight: 700;">HTTP Method</label>
+          <label style="font-size: 11px; font-weight: 700;">HTTP Method</label>
           <select id="sandbox-method" class="form-input">
             <option value="POST">POST</option>
             <option value="GET">GET</option>
             <option value="PUT">PUT</option>
           </select>
 
-          <label style="font-size: 12px; font-weight: 700;">Test Payload / Query String</label>
+          <label style="font-size: 11px; font-weight: 700;">Test Payload / Query String</label>
           <textarea id="sandbox-input" class="form-input" rows="4">' UNION SELECT username, password_hash FROM admin_users--</textarea>
 
           <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
-            <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="loadPresetPayload('sqli')">Preset: SQLi Breakout</button>
-            <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="loadPresetPayload('xss')">Preset: DOM SVG XSS</button>
-            <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="loadPresetPayload('cmdi')">Preset: Command Injection</button>
-            <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="loadPresetPayload('traversal')">Preset: Path Traversal</button>
+            <button class="btn btn-subtle" style="font-size: 11px; padding: 5px 9px;" onclick="loadPresetPayload('sqli')">Preset: SQLi Breakout</button>
+            <button class="btn btn-subtle" style="font-size: 11px; padding: 5px 9px;" onclick="loadPresetPayload('xss')">Preset: DOM SVG XSS</button>
+            <button class="btn btn-subtle" style="font-size: 11px; padding: 5px 9px;" onclick="loadPresetPayload('cmdi')">Preset: Command Injection</button>
+            <button class="btn btn-subtle" style="font-size: 11px; padding: 5px 9px;" onclick="loadPresetPayload('traversal')">Preset: Path Traversal</button>
           </div>
 
-          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 13px;" onclick="fireLiveAttack()">
+          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 12px;" onclick="fireLiveAttack()">
             ⚡ Fire In-Line Inspection Request
           </button>
 
-          <div id="attack-output" style="display: none; margin-top: 20px; padding: 18px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; background: #F4F2EB; border: 1px solid var(--stone-border);"></div>
+          <div id="attack-output" style="display: none; margin-top: 20px; padding: 16px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 12px; background: #F8F7F4; border: 1px solid var(--stone-border);"></div>
         </div>
       </div>
     </section>
@@ -888,24 +1104,24 @@
       <div class="panel" style="max-width: 820px; margin: 0 auto;">
         <div class="panel-header">
           <span>Policy Simulation (False-Positive Predictor)</span>
-          <button class="btn btn-warm" style="padding: 6px 12px; font-size: 11px;" onclick="triggerRollback()">↺ 1-Click Rollback</button>
+          <button class="btn btn-warm" style="padding: 5px 11px; font-size: 11px;" onclick="triggerRollback()">↺ 1-Click Rollback</button>
         </div>
         <div class="panel-body">
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
             Replays candidate security rule modifications against historical traffic to predict block deltas and protect search engine bots before deployment.
           </p>
 
-          <label style="font-size: 12px; font-weight: 700;">Candidate Rule Name</label>
+          <label style="font-size: 11px; font-weight: 700;">Candidate Rule Name</label>
           <input type="text" id="sim-rule-id" class="form-input" placeholder="e.g. block-unverified-bots">
 
-          <label style="font-size: 12px; font-weight: 700;">Match User-Agent Substring</label>
+          <label style="font-size: 11px; font-weight: 700;">Match User-Agent Substring</label>
           <input type="text" id="sim-rule-ua" class="form-input" placeholder="e.g. scanner-bot, curl, spider">
 
-          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px;" onclick="runSimulation()">
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="runSimulation()">
             📈 Replay Historical Traffic Samples
           </button>
 
-          <div id="sim-output" style="display: none; margin-top: 20px; padding: 18px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; background: #F4F2EB; border: 1px solid var(--stone-border);"></div>
+          <div id="sim-output" style="display: none; margin-top: 20px; padding: 16px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 12px; background: #F8F7F4; border: 1px solid var(--stone-border);"></div>
         </div>
       </div>
     </section>
@@ -917,19 +1133,19 @@
       <div class="panel">
         <div class="panel-header">
           <span>Connecting Any Site to SentinelGrid for Live Observation</span>
-          <a href="/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.txt" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 6px 12px; text-decoration: none;">Download Plain Text Guide</a>
+          <a href="/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.txt" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 5px 10px; text-decoration: none;">Download Plain Text Guide</a>
         </div>
         <div class="panel-body">
-          <h3 style="font-size: 16px; margin-bottom: 12px;">Zero-Downtime Integration Architecture</h3>
-          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
-            SentinelGrid inspects requests in-line with a <strong>&lt; 0.5ms latency budget</strong>. Connect any site via Nginx Reverse Proxy, Python ASGI Middleware, Node.js Express, or Go reverse proxy.
+          <h3 style="font-size: 15px; margin-bottom: 10px;">Zero-Downtime Integration Architecture</h3>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 18px;">
+            SentinelGrid inspects requests in-line with a <strong>&lt; 0.4ms latency budget</strong>. Connect any site via Nginx Reverse Proxy, Python ASGI Middleware, Node.js Express, or Go reverse proxy.
           </p>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-            <div style="background: var(--sand-warm); padding: 18px; border-radius: 10px;">
-              <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Option A: Nginx Reverse Proxy</h4>
-              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Use <code>auth_request</code> or <code>proxy_pass</code> to validate requests before passing to upstream.</p>
-              <pre style="background: var(--card-white); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">location /api/ {
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
+            <div style="background: var(--sand-warm); padding: 16px; border-radius: var(--radius-sm);">
+              <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option A: Nginx Reverse Proxy</h4>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Use <code>auth_request</code> or <code>proxy_pass</code> to validate requests before passing to upstream.</p>
+              <pre style="background: var(--card-white); padding: 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">location /api/ {
     auth_request /_sentinel_check;
     proxy_pass http://upstream_app;
 }
@@ -940,10 +1156,10 @@ location = /_sentinel_check {
 }</pre>
             </div>
 
-            <div style="background: var(--sand-warm); padding: 18px; border-radius: 10px;">
-              <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Option B: Python ASGI Middleware</h4>
-              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Drop-in middleware for FastAPI, Starlette, or Django ASGI applications.</p>
-              <pre style="background: var(--card-white); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">from sentinelgrid.middleware import SentinelGridMiddleware
+            <div style="background: var(--sand-warm); padding: 16px; border-radius: var(--radius-sm);">
+              <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option B: Python ASGI Middleware</h4>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Drop-in middleware for FastAPI, Starlette, or Django ASGI applications.</p>
+              <pre style="background: var(--card-white); padding: 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">from sentinelgrid.middleware import SentinelGridMiddleware
 
 app = FastAPI()
 app.add_middleware(
@@ -954,59 +1170,11 @@ app.add_middleware(
             </div>
           </div>
 
-          <div style="background: var(--cream-bg); border: 1px solid var(--stone-border); padding: 16px; border-radius: 8px; font-size: 13px;">
+          <div style="background: var(--canvas-bg); border: 1px solid var(--stone-border); padding: 14px; border-radius: var(--radius-sm); font-size: 12px;">
             <strong>Full Observation Guide Documentation:</strong><br>
-            A dedicated, production-grade integration guide has been authored on your D drive at:<br>
+            Production integration guide authored on your D drive at:<br>
             <code>/run/media/anup/D/sentinelgrid/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.md</code>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- TAB 9: LOGIN & SIGNUP PORTAL -->
-    <!-- ===================================================================== -->
-    <section id="view-login" class="view-section">
-      <div class="auth-card">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div class="brand-icon" style="margin: 0 auto 12px;">🛡️</div>
-          <h2 style="font-size: 20px; font-weight: 800;">SentinelGrid Authentication</h2>
-          <p style="color: var(--text-muted); font-size: 13px;">Sign in to access your tenant WAAP console</p>
-        </div>
-
-        <div id="login-form-box">
-          <label style="font-size: 12px; font-weight: 700;">Email Address</label>
-          <input type="email" id="auth-email" class="form-input" placeholder="analyst@domain.com">
-
-          <label style="font-size: 12px; font-weight: 700;">Password</label>
-          <input type="password" id="auth-password" class="form-input" placeholder="••••••••">
-
-          <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleLogin()">
-            Sign In to Console
-          </button>
-
-          <p style="text-align: center; font-size: 13px; margin-top: 18px; color: var(--text-muted);">
-            Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('signup')" style="color: var(--terracotta); font-weight: 700; text-decoration: none;">Create an account</a>
-          </p>
-        </div>
-
-        <div id="signup-form-box" style="display: none;">
-          <label style="font-size: 12px; font-weight: 700;">Full Name</label>
-          <input type="text" id="signup-name" class="form-input" placeholder="e.g. Anup Dhokiya">
-
-          <label style="font-size: 12px; font-weight: 700;">Email Address</label>
-          <input type="email" id="signup-email" class="form-input" placeholder="analyst@domain.com">
-
-          <label style="font-size: 12px; font-weight: 700;">Password</label>
-          <input type="password" id="signup-password" class="form-input" placeholder="••••••••">
-
-          <button class="btn btn-warm" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleSignup()">
-            Create Organization Account
-          </button>
-
-          <p style="text-align: center; font-size: 13px; margin-top: 18px; color: var(--text-muted);">
-            Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('login')" style="color: var(--deep-indigo); font-weight: 700; text-decoration: none;">Sign in here</a>
-          </p>
         </div>
       </div>
     </section>
@@ -1025,39 +1193,39 @@ app.add_middleware(
         </div>
         <div>
           <div style="font-size: 14px; font-weight: 800; color: var(--deep-indigo);" id="drawer-event-id">ev-00000000</div>
-          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);" id="drawer-event-time">2026-11-03 00:00:00 UTC</div>
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);" id="drawer-event-time">2026-11-03 00:00:00</div>
         </div>
       </div>
       <div style="display: flex; align-items: center; gap: 8px;">
         <span id="drawer-verdict-badge" class="badge badge-block">BLOCK (403)</span>
-        <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 14px;" onclick="closeEventForensics()">✕</button>
+        <button class="btn btn-subtle" style="padding: 4px 9px; font-size: 14px;" onclick="closeEventForensics()">✕</button>
       </div>
     </div>
 
     <div class="drawer-body">
       <!-- Risk Score & Engine Card -->
-      <div style="background: var(--sand-warm); padding: 18px; border-radius: 12px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+      <div style="background: var(--sand-warm); padding: 16px; border-radius: var(--radius-md); margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div>
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Adversarial Risk Score</div>
-          <div style="font-size: 26px; font-weight: 800; font-family: var(--font-mono); color: var(--terracotta);" id="drawer-risk-score">98.0 / 100</div>
-          <div style="font-size: 11px; color: var(--text-muted);" id="drawer-risk-level">CRITICAL THREAT</div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Adversarial Risk Score</div>
+          <div style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--terracotta);" id="drawer-risk-score">98.0 / 100</div>
+          <div style="font-size: 10px; color: var(--text-muted);" id="drawer-risk-level">CRITICAL THREAT</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Inspection Latency</div>
-          <div style="font-size: 26px; font-weight: 800; font-family: var(--font-mono); color: var(--sage-green);" id="drawer-latency">0.38 ms</div>
-          <div style="font-size: 11px; color: var(--text-muted);">SmartParse Lexical DFA</div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Inspection Latency</div>
+          <div style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--sage-green);" id="drawer-latency">0.38 ms</div>
+          <div style="font-size: 10px; color: var(--text-muted);">SmartParse Lexical DFA</div>
         </div>
       </div>
 
       <!-- Detection Signature Details -->
-      <div style="margin-bottom: 20px;">
-        <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 8px;">Detection Signature & Classification</h4>
-        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 8px; padding: 14px;">
-          <div style="margin-bottom: 8px;">
+      <div style="margin-bottom: 18px;">
+        <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 6px;">Detection Signature & Classification</h4>
+        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-sm); padding: 12px;">
+          <div style="margin-bottom: 6px;">
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Triggered Rule:</span>
             <strong style="color: var(--terracotta); font-family: var(--font-mono); margin-left: 6px;" id="drawer-rule">SP-SQL-BOUNDARY-BREAKOUT</strong>
           </div>
-          <div style="margin-bottom: 8px;">
+          <div style="margin-bottom: 6px;">
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">OWASP Category:</span>
             <span style="font-weight: 600; margin-left: 6px;" id="drawer-owasp">A03:Injection</span>
           </div>
@@ -1069,47 +1237,50 @@ app.add_middleware(
       </div>
 
       <!-- Network & Target Metadata -->
-      <div style="margin-bottom: 20px;">
-        <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 8px;">Target Route & Client Provenance</h4>
-        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 8px; padding: 14px;">
-          <div style="margin-bottom: 8px; display: flex; justify-content: space-between;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Client IP:</span>
+      <div style="margin-bottom: 18px;">
+        <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 6px;">Target Route & Client Provenance</h4>
+        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-sm); padding: 12px;">
+          <div style="margin-bottom: 6px; display: flex; justify-content: space-between;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Client IP:</span>
             <strong style="font-family: var(--font-mono); color: var(--deep-indigo);" id="drawer-ip">127.0.0.1</strong>
           </div>
-          <div style="margin-bottom: 8px; display: flex; justify-content: space-between;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">HTTP Method:</span>
+          <div style="margin-bottom: 6px; display: flex; justify-content: space-between;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">HTTP Method:</span>
             <strong id="drawer-method">GET</strong>
           </div>
           <div>
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">URI Path:</span>
-            <code style="font-family: var(--font-mono); background: var(--sand-warm); padding: 3px 6px; border-radius: 4px; display: block; margin-top: 4px;" id="drawer-path">/search?q=' OR 1=1--</code>
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">URI Path:</span>
+            <code style="font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 3px 6px; border-radius: 4px; display: block; margin-top: 4px;" id="drawer-path">/search?q=' OR 1=1--</code>
           </div>
         </div>
       </div>
 
       <!-- Forensic Payload Snippet -->
-      <div style="margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo);">Intercepted Attack Payload</h4>
-          <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 11px;" onclick="copyPayloadToClipboard()">📋 Copy</button>
+      <div style="margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo);">Intercepted Attack Payload</h4>
+          <button class="btn btn-subtle" style="padding: 2px 7px; font-size: 10px;" onclick="copyPayloadToClipboard()">📋 Copy</button>
         </div>
         <div class="forensic-code-block" id="drawer-payload">No payload content</div>
       </div>
 
       <!-- Captured Request Headers -->
-      <div style="margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo);">Captured Headers Snippet</h4>
-          <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 11px;" onclick="copyHeadersToClipboard()">📋 Copy</button>
+      <div style="margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo);">Captured Headers Snippet</h4>
+          <button class="btn btn-subtle" style="padding: 2px 7px; font-size: 10px;" onclick="copyHeadersToClipboard()">📋 Copy</button>
         </div>
         <div class="forensic-code-block" style="color: #A7F3D0;" id="drawer-headers">No header metadata</div>
       </div>
     </div>
 
-    <!-- Rapid Response Footer Actions -->
+    <!-- Rapid Response Footer Actions (Dynamic TTL) -->
     <div class="drawer-footer">
       <button class="btn btn-subtle" onclick="sendEventToSandbox()">🧪 Replay in WAF Lab</button>
-      <button class="btn btn-warm" onclick="quarantineAttackerIp()">🛑 1-Click IP Quarantine</button>
+      <button class="btn btn-subtle" style="color: var(--sage-green);" onclick="executeIpQuickAction('UNBAN')">✓ Unban IP</button>
+      <button class="btn btn-warm" style="font-size: 11px;" onclick="executeIpQuickAction('BAN_15M')">🛑 15m Quarantine</button>
+      <button class="btn btn-warm" style="font-size: 11px;" onclick="executeIpQuickAction('BAN_1H')">🛑 1h Quarantine</button>
+      <button class="btn btn-warm" style="font-size: 11px; background: #991B1B;" onclick="executeIpQuickAction('PERMANENT_BLOCK')">⛔ Permanent Ban</button>
     </div>
   </div>
 
@@ -1118,15 +1289,15 @@ app.add_middleware(
   <!-- ======================================================================= -->
   <div id="domain-modal-backdrop" class="drawer-backdrop" onclick="closeDomainModal()"></div>
   <div id="domain-stats-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 840px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1002; max-height: 90vh; overflow-y: auto;">
-    <div style="padding: 22px 28px; border-bottom: 1px solid var(--stone-border); background: var(--sand-warm); display: flex; justify-content: space-between; align-items: center;">
+    <div style="padding: 20px 24px; border-bottom: 1px solid var(--stone-border); background: var(--sand-warm); display: flex; justify-content: space-between; align-items: center;">
       <div>
-        <div style="font-size: 16px; font-weight: 800; color: var(--deep-indigo);" id="domain-modal-title">Domain Security Profile</div>
-        <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);" id="domain-modal-host">aegis-pro.security.internal</div>
+        <div style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);" id="domain-modal-title">Domain Security Profile</div>
+        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);" id="domain-modal-host">aegis-pro.security.internal</div>
       </div>
-      <button class="btn btn-subtle" style="padding: 5px 10px; font-size: 14px;" onclick="closeDomainModal()">✕</button>
+      <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 14px;" onclick="closeDomainModal()">✕</button>
     </div>
 
-    <div style="padding: 28px;" id="domain-modal-content">
+    <div style="padding: 24px;" id="domain-modal-content">
       <!-- Populated dynamically via openDomainStatsModal() -->
     </div>
   </div>
@@ -1136,7 +1307,7 @@ app.add_middleware(
     <span style="font-size: 20px;">🚨</span>
     <div>
       <div style="font-weight: 800;" id="toast-title">Attack Intercepted</div>
-      <div style="font-size: 12px; color: var(--sand-warm);" id="toast-body">Details...</div>
+      <div style="font-size: 12px; color: #E2E8F0;" id="toast-body">Details...</div>
     </div>
   </div>
 
@@ -1152,11 +1323,156 @@ app.add_middleware(
     let secondsToNextSync = 2;
     let knownEventIds = new Set();
     let activeDrawerEvent = null;
+    let isStreamPaused = false;
+    
+    // Timezone preference: "LOCAL" or "UTC"
+    let consoleTimezone = localStorage.getItem("sg_tz_pref") || "LOCAL";
+
+    // Synthesizer Web Audio API alerts toggle
+    let soundAlertsEnabled = localStorage.getItem("sg_sound_alerts") === "true";
+    let audioCtx = null;
 
     // -------------------------------------------------------------------------
-    // Tab Navigation Controller
+    // High-Precision Timestamp Formatter & Relative Time Engine
     // -------------------------------------------------------------------------
-    function switchTab(tabId) {
+    function formatTimestamp(rawTimestamp) {
+      if (!rawTimestamp) return { time: "Live", relative: "just now", full: "Live Telemetry" };
+
+      let date;
+      if (typeof rawTimestamp === "number") {
+        date = new Date(rawTimestamp > 1e11 ? rawTimestamp : rawTimestamp * 1000);
+      } else {
+        date = new Date(rawTimestamp);
+      }
+
+      if (isNaN(date.getTime())) {
+        return { time: String(rawTimestamp), relative: "", full: String(rawTimestamp) };
+      }
+
+      const now = Date.now();
+      const diffMs = now - date.getTime();
+      const diffSec = Math.floor(diffMs / 1000);
+
+      let relative = "just now";
+      if (diffSec >= 60 && diffSec < 3600) {
+        relative = `${Math.floor(diffSec / 60)}m ago`;
+      } else if (diffSec >= 3600 && diffSec < 86400) {
+        relative = `${Math.floor(diffSec / 3600)}h ago`;
+      } else if (diffSec >= 86400) {
+        relative = `${Math.floor(diffSec / 86400)}d ago`;
+      } else if (diffSec > 0) {
+        relative = `${diffSec}s ago`;
+      }
+
+      const pad = (n, len = 2) => String(n).padStart(len, "0");
+      const ms = pad(date.getMilliseconds(), 3);
+
+      let timeFormatted = "";
+      if (consoleTimezone === "UTC") {
+        timeFormatted = `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}.${ms} UTC`;
+      } else {
+        // Local Browser Time with 12-hour format and milliseconds
+        let hours = date.getHours();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 becomes 12
+        timeFormatted = `${pad(hours)}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${ms} ${ampm}`;
+      }
+
+      const localDateStr = date.toLocaleDateString();
+      const fullISO = date.toISOString();
+
+      return {
+        time: timeFormatted,
+        relative: relative,
+        full: `Local: ${localDateStr} ${timeFormatted} | UTC: ${fullISO}`
+      };
+    }
+
+    function toggleTimezonePreference() {
+      consoleTimezone = consoleTimezone === "LOCAL" ? "UTC" : "LOCAL";
+      localStorage.setItem("sg_tz_pref", consoleTimezone);
+      const btn = document.getElementById("tz-toggle-btn");
+      btn.innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
+      applyEventFilter();
+      loadEndpoints();
+      loadConnectors();
+    }
+
+    function toggleSoundAlerts() {
+      soundAlertsEnabled = !soundAlertsEnabled;
+      localStorage.setItem("sg_sound_alerts", soundAlertsEnabled);
+      const btn = document.getElementById("sound-toggle-btn");
+      btn.innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+      if (soundAlertsEnabled) playThreatTone(90);
+    }
+
+    function playThreatTone(riskScore) {
+      if (!soundAlertsEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (riskScore >= 95) {
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.16);
+          gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.16);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.16);
+        } else {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+          gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.12);
+        }
+      } catch (e) {
+        console.warn("Audio chime error:", e);
+      }
+    }
+
+    // Dynamic 1-second relative time ticker
+    setInterval(() => {
+      if (isStreamPaused) return;
+      document.querySelectorAll("[data-raw-ts]").forEach(el => {
+        const raw = el.getAttribute("data-raw-ts");
+        const t = formatTimestamp(raw);
+        el.innerText = `(${t.relative})`;
+      });
+    }, 1000);
+
+    // -------------------------------------------------------------------------
+    // Theme Management (Dark Obsidian Default & Light Canvas Option)
+    // -------------------------------------------------------------------------
+    let currentTheme = localStorage.getItem("sg_theme") || "dark";
+    function applyTheme() {
+      const btn = document.getElementById("theme-toggle-btn");
+      if (currentTheme === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+        if (btn) btn.innerHTML = "☀️ Theme: LIGHT";
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+        if (btn) btn.innerHTML = "🌙 Theme: OBSIDIAN";
+      }
+    }
+    function toggleThemePreference() {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      localStorage.setItem("sg_theme", currentTheme);
+      applyTheme();
+    }
+
+    // -------------------------------------------------------------------------
+    // Tab Navigation Controller (with URL Hash & LocalStorage Sync)
+    // -------------------------------------------------------------------------
+    function switchTab(tabId, updateUrl = true) {
       document.querySelectorAll(".view-section").forEach(el => el.classList.remove("active"));
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
 
@@ -1166,6 +1482,11 @@ app.add_middleware(
       const navItems = Array.from(document.querySelectorAll(".nav-item"));
       const match = navItems.find(el => el.getAttribute("onclick")?.includes(`'${tabId}'`));
       if (match) match.classList.add("active");
+
+      if (updateUrl) {
+        history.replaceState(null, null, "#" + tabId);
+        localStorage.setItem("sg_active_tab", tabId);
+      }
 
       if (tabId === "dashboard") pollTelemetry(true);
       if (tabId === "domains") loadDomains();
@@ -1182,6 +1503,34 @@ app.add_middleware(
       autoRefreshRate = parseInt(select.value, 10);
       setupAutoRefreshEngine();
     }
+
+    function toggleStreamPause() {
+      isStreamPaused = !isStreamPaused;
+      const btn = document.getElementById("stream-pause-btn");
+      const pulse = document.getElementById("live-pulse-indicator");
+      const text = document.getElementById("live-indicator-text");
+
+      if (isStreamPaused) {
+        btn.innerText = "▶️ Resume";
+        pulse.classList.add("paused");
+        text.innerText = "STREAM PAUSED";
+        text.style.color = "var(--warm-ochre)";
+      } else {
+        btn.innerText = "⏸️ Pause";
+        pulse.classList.remove("paused");
+        text.innerText = `LIVE STREAMING (${autoRefreshRate}s)`;
+        text.style.color = "var(--sage-green)";
+        pollTelemetry(true);
+      }
+    }
+
+    // Keyboard shortcut: Spacebar toggles pause/resume when not focused on an input
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+        toggleStreamPause();
+      }
+    });
 
     function setupAutoRefreshEngine() {
       if (autoRefreshTimer) clearInterval(autoRefreshTimer);
@@ -1206,6 +1555,7 @@ app.add_middleware(
       countdownBadge.innerText = `Next: ${secondsToNextSync}s`;
 
       countdownTimer = setInterval(() => {
+        if (isStreamPaused) return;
         secondsToNextSync--;
         if (secondsToNextSync <= 0) {
           secondsToNextSync = autoRefreshRate;
@@ -1214,7 +1564,7 @@ app.add_middleware(
       }, 1000);
 
       autoRefreshTimer = setInterval(() => {
-        pollTelemetry(false);
+        if (!isStreamPaused) pollTelemetry(false);
       }, autoRefreshRate * 1000);
     }
 
@@ -1232,10 +1582,20 @@ app.add_middleware(
         document.getElementById("kpi-endpoints").innerText = data.endpoints_count || 0;
         document.getElementById("kpi-websites").innerText = currentDomainScope === "ALL"
           ? `Across ${data.websites_count || 0} Domains`
-          : `Scoped to Single Domain`;
+          : `Scoped Domain`;
         document.getElementById("kpi-shadow").innerText = data.shadow_endpoints_count || 0;
         document.getElementById("kpi-blocked").innerText = data.blocked_events || 0;
         document.getElementById("kpi-blockrate").innerText = `${data.block_rate_percent || 0.0}% Block Rate`;
+
+        // Render Real-Time Traffic Velocity Histogram
+        if (data.traffic_timeline) {
+          renderTrafficHistogram(data.traffic_timeline);
+        }
+
+        // Render OWASP Threat Vector Distribution
+        if (data.owasp_distribution) {
+          renderOwaspDistribution(data.owasp_distribution);
+        }
 
         // Update Scope Select Options if website list changed
         if (data.websites && JSON.stringify(data.websites) !== JSON.stringify(allWebsites)) {
@@ -1245,27 +1605,112 @@ app.add_middleware(
 
         const incomingEvents = data.recent_events || [];
 
-        // Check for new blocked attacks to trigger visual toast alert
+        // Check for newly intercepted threats to sound alert tone & show toast
         if (knownEventIds.size > 0) {
           const freshBlocks = incomingEvents.filter(ev => ev.action === "BLOCK" && !knownEventIds.has(ev.id));
           if (freshBlocks.length > 0) {
             const latest = freshBlocks[0];
+            playThreatTone(latest.risk_score || 90);
             showThreatToast(
-              `⚡ Attack Blocked: ${latest.rule_triggered || 'Malicious Payload'}`,
-              `Client ${latest.client_ip} targeting ${latest.path} was denied (HTTP 403) in <1ms`
+              `⚡ Threat Intercepted: ${latest.rule_triggered || 'Malicious Payload'}`,
+              `Client ${latest.client_ip} targeting ${latest.path} was denied (HTTP 403) in <0.5ms`
             );
           }
         }
 
-        // Cache all known IDs
         incomingEvents.forEach(ev => knownEventIds.add(ev.id));
         allRecentEvents = incomingEvents;
 
-        // Render table according to active filter
         applyEventFilter();
       } catch (e) {
         console.error("Telemetry sync error:", e);
       }
+    }
+
+    // -------------------------------------------------------------------------
+    // Visual SVG Traffic Histogram & OWASP Spectrum Generators
+    // -------------------------------------------------------------------------
+    function renderTrafficHistogram(timeline) {
+      const container = document.getElementById("traffic-histogram-container");
+      if (!timeline || timeline.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 35px 0; font-size: 11px;">Waiting for traffic time slices...</div>`;
+        return;
+      }
+
+      const width = container.clientWidth || 700;
+      const height = 120;
+      const barCount = timeline.length;
+      const barWidth = Math.max(6, Math.floor((width - 40) / barCount) - 4);
+      const maxVal = Math.max(...timeline.map(b => b.allowed + b.blocked + b.challenged), 10);
+
+      let svg = `<svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow: visible;">`;
+      
+      // Horizontal baseline and midline
+      svg += `<line x1="10" y1="${height - 20}" x2="${width - 10}" y2="${height - 20}" stroke="var(--stone-border)" stroke-width="1"/>`;
+      svg += `<line x1="10" y1="${(height - 20) / 2}" x2="${width - 10}" y2="${(height - 20) / 2}" stroke="var(--stone-border)" stroke-dasharray="3,3" stroke-width="1"/>`;
+
+      timeline.forEach((b, idx) => {
+        const x = 20 + idx * (barWidth + 4);
+        const total = b.allowed + b.blocked + b.challenged;
+        const totalH = Math.max(2, (total / maxVal) * (height - 35));
+        const blockedH = Math.max(b.blocked > 0 ? 3 : 0, (b.blocked / maxVal) * (height - 35));
+        const allowedH = Math.max(b.allowed > 0 ? 3 : 0, (b.allowed / maxVal) * (height - 35));
+
+        const yAllowed = (height - 20) - allowedH;
+        const yBlocked = yAllowed - blockedH;
+
+        // Clean allowed bar (green)
+        if (allowedH > 0) {
+          svg += `<rect x="${x}" y="${yAllowed}" width="${barWidth}" height="${allowedH}" fill="var(--sage-green)" rx="2"/>`;
+        }
+        // Blocked threats bar (terracotta)
+        if (blockedH > 0) {
+          svg += `<rect x="${x}" y="${yBlocked}" width="${barWidth}" height="${blockedH}" fill="var(--terracotta)" rx="2"/>`;
+        }
+
+        // Invisible hover target for tooltip
+        svg += `<rect x="${x}" y="0" width="${barWidth}" height="${height}" fill="transparent" style="cursor: pointer;"
+                onmouseover="showHistTooltip(event, '${b.time}', ${b.allowed}, ${b.blocked})" onmouseout="hideHistTooltip()"/>`;
+      });
+
+      svg += `</svg>`;
+      container.innerHTML = svg;
+    }
+
+    function showHistTooltip(e, time, allowed, blocked) {
+      const tip = document.getElementById("hist-tooltip");
+      tip.innerHTML = `<strong>${time}</strong><br>Mitigated: <span style="color: #F87171;">${blocked}</span><br>Allowed: <span style="color: #4ADE80;">${allowed}</span>`;
+      tip.style.left = `${e.clientX + 10}px`;
+      tip.style.top = `${e.clientY - 40}px`;
+      tip.style.display = "block";
+    }
+
+    function hideHistTooltip() {
+      document.getElementById("hist-tooltip").style.display = "none";
+    }
+
+    function renderOwaspDistribution(dist) {
+      const container = document.getElementById("owasp-distribution-container");
+      if (!dist || dist.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 20px 0;">No active threat categories recorded.</div>`;
+        return;
+      }
+
+      const totalBlocks = dist.reduce((sum, d) => sum + d.count, 0) || 1;
+      container.innerHTML = dist.map(d => {
+        const pct = Math.round((d.count / totalBlocks) * 100);
+        return `
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
+              <strong style="color: var(--deep-indigo);">${d.category}</strong>
+              <span style="font-family: var(--font-mono); font-weight: 700;">${d.count} (${pct}%)</span>
+            </div>
+            <div style="width: 100%; height: 6px; background: var(--sand-warm); border-radius: 3px; overflow: hidden;">
+              <div style="width: ${pct}%; height: 100%; background: var(--terracotta); border-radius: 3px;"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
     }
 
     function updateScopeDropdown(websites) {
@@ -1315,22 +1760,26 @@ app.add_middleware(
         const domainObj = allWebsites.find(w => w.id === ev.website_id);
         const domainName = domainObj ? domainObj.domain : (ev.website_id || 'Global');
 
-        const timeStr = ev.timestamp ? ev.timestamp.substring(11, 19) + " UTC" : "Live";
+        // High-precision localized timestamp
+        const t = formatTimestamp(ev.timestamp);
         const riskColor = ev.risk_score >= 75 ? "var(--terracotta)" : (ev.risk_score >= 50 ? "var(--warm-ochre)" : "var(--sage-green)");
 
         return `
           <tr class="clickable-row" onclick="openEventForensics('${ev.id}')">
-            <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 12px;">${timeStr}</td>
-            <td style="font-family: var(--font-mono); font-weight: 700; color: var(--deep-indigo);">${domainName}</td>
-            <td style="font-family: var(--font-mono); font-weight: 600;">${ev.client_ip}</td>
-            <td><strong style="color: var(--deep-indigo);">${ev.method}</strong> <code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px;">${ev.path}</code></td>
-            <td><strong style="color: ${riskColor};">${ev.risk_score}</strong>/100</td>
+            <td title="${t.full}" style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap;">
+              <div style="font-weight: 700; color: var(--text-charcoal);">${t.time}</div>
+              <div style="color: var(--text-muted); font-size: 10px;" data-raw-ts="${ev.timestamp}">(${t.relative})</div>
+            </td>
+            <td style="font-family: var(--font-mono); font-weight: 700; color: var(--deep-indigo); font-size: 12px;">${domainName}</td>
+            <td style="font-family: var(--font-mono); font-weight: 600; font-size: 12px;">${ev.client_ip}</td>
+            <td><strong style="color: var(--deep-indigo);">${ev.method}</strong> <code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${ev.path}</code></td>
+            <td><strong style="color: ${riskColor}; font-family: var(--font-mono);">${ev.risk_score}</strong>/100</td>
             <td>${badge}</td>
-            <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700;">
+            <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700; font-size: 12px;">
               ${ev.rule_triggered || 'Clean Request'}
             </td>
             <td>
-              <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 11px;" onclick="event.stopPropagation(); openEventForensics('${ev.id}')">
+              <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${ev.id}')">
                 🔍 Forensics
               </button>
             </td>
@@ -1371,7 +1820,9 @@ app.add_middleware(
       activeDrawerEvent = ev;
 
       document.getElementById("drawer-event-id").innerText = ev.id;
-      document.getElementById("drawer-event-time").innerText = ev.timestamp || new Date().toISOString();
+      
+      const t = formatTimestamp(ev.timestamp);
+      document.getElementById("drawer-event-time").innerText = `${t.time} (${t.relative}) | ${t.full}`;
       
       const badge = document.getElementById("drawer-verdict-badge");
       if (ev.action === "BLOCK") {
@@ -1388,7 +1839,6 @@ app.add_middleware(
       document.getElementById("drawer-risk-score").innerText = `${ev.risk_score} / 100`;
       document.getElementById("drawer-risk-level").innerText = ev.risk_score >= 80 ? "CRITICAL ADVERSARIAL THREAT" : (ev.risk_score >= 50 ? "SUSPICIOUS TRAFFIC" : "BENIGN TELEMETRY");
       
-      // Extract latency from details if present
       let latency = "0.35 ms";
       if (ev.details && ev.details.includes("Latency:")) {
         const match = ev.details.match(/Latency:\s*([\d\.]+)ms/);
@@ -1406,7 +1856,6 @@ app.add_middleware(
       document.getElementById("drawer-method").innerText = ev.method;
       document.getElementById("drawer-path").innerText = ev.path;
 
-      // Extract payload and headers from details
       let payloadSnippet = ev.path;
       let headersSnippet = "Host: " + (domainObj ? domainObj.domain : "sentinelgrid-gateway");
       if (ev.details) {
@@ -1423,7 +1872,6 @@ app.add_middleware(
       document.getElementById("drawer-payload").innerText = payloadSnippet || "No body payload captured.";
       document.getElementById("drawer-headers").innerText = headersSnippet || "Default Gateway Headers";
 
-      // Show drawer & backdrop
       document.getElementById("event-drawer-backdrop").classList.add("active");
       document.getElementById("event-drawer").classList.add("open");
     }
@@ -1436,41 +1884,47 @@ app.add_middleware(
     function copyPayloadToClipboard() {
       const text = document.getElementById("drawer-payload").innerText;
       navigator.clipboard.writeText(text);
-      alert("Payload copied to clipboard!");
+      showThreatToast("Copied to Clipboard", "Payload snippet copied.");
     }
 
     function copyHeadersToClipboard() {
       const text = document.getElementById("drawer-headers").innerText;
       navigator.clipboard.writeText(text);
-      alert("Headers copied to clipboard!");
+      showThreatToast("Copied to Clipboard", "Headers snippet copied.");
     }
 
-    async function quarantineAttackerIp() {
+    async function executeIpQuickAction(actionType) {
       if (!activeDrawerEvent) return;
       const ip = activeDrawerEvent.client_ip;
-      if (!confirm(`Are you sure you want to immediately QUARANTINE IP ${ip} across all edge gateways?`)) return;
+      const actionLabels = {
+        "BAN_15M": "15-minute temporary quarantine",
+        "BAN_1H": "1-hour temporary quarantine",
+        "PERMANENT_BLOCK": "permanent firewall block",
+        "UNBAN": "unban and restore clean access"
+      };
+
+      if (!confirm(`Confirm ${actionLabels[actionType] || actionType} for IP ${ip}?`)) return;
 
       try {
-        const res = await fetch(`${API}/ip-rules`, {
+        const res = await fetch(`${API}/ip-rules/quick-action`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             website_id: activeDrawerEvent.website_id || "site-8b8b832c",
-            ip_cidr: ip,
-            action: "BLOCK",
-            description: `1-Click Forensics Ban: ${activeDrawerEvent.rule_triggered}`
+            client_ip: ip,
+            action: actionType
           })
         });
         const d = await res.json();
         if (res.ok) {
-          alert(`Success! IP ${ip} is now permanently quarantined in the Radix Trie.`);
+          showThreatToast("Action Executed", `IP ${ip}: ${d.status}`);
           closeEventForensics();
           pollTelemetry(true);
         } else {
-          alert("Quarantine error: " + (d.detail || "Failed to commit IP rule"));
+          alert("Error executing IP action: " + (d.detail || "Request failed"));
         }
       } catch (e) {
-        alert("Quarantine request failed: " + e);
+        alert("Action request failed: " + e);
       }
     }
 
@@ -1494,9 +1948,7 @@ app.add_middleware(
       document.getElementById("toast-title").innerText = title;
       document.getElementById("toast-body").innerText = body;
       toast.style.display = "flex";
-      setTimeout(() => {
-        toast.style.display = "none";
-      }, 5000);
+      setTimeout(() => { toast.style.display = "none"; }, 5000);
     }
 
     // -------------------------------------------------------------------------
@@ -1521,7 +1973,6 @@ app.add_middleware(
           return;
         }
 
-        // Render High-Density Domain Cards
         container.innerHTML = list.map(d => {
           const isAegis = d.domain.includes("aegis-pro");
           const gatewayPort = isAegis ? "8080" : "8080";
@@ -1530,33 +1981,33 @@ app.add_middleware(
           return `
             <div class="domain-card">
               <div>
-                <div class="domain-card-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                   <div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--deep-indigo);">${d.name}</h3>
-                    <div style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); margin-top: 2px;">${d.domain}</div>
+                    <h3 style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);">${d.name}</h3>
+                    <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-top: 2px;">${d.domain}</div>
                   </div>
                   <span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">
                     ${d.status === 'active' ? 'ACTIVE ENFORCING' : 'MONITORING ONLY'}
                   </span>
                 </div>
 
-                <div style="background: var(--sand-warm); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 11px; font-family: var(--font-mono);">
+                <div style="background: var(--sand-warm); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 11px; font-family: var(--font-mono);">
                   <div>🌐 <strong>Gateway:</strong> <a href="http://192.168.122.1:${gatewayPort}" target="_blank" style="color: var(--deep-indigo);">http://192.168.122.1:${gatewayPort}</a></div>
-                  <div style="margin-top: 4px;">🎯 <strong>Origin:</strong> ${originPort}</div>
+                  <div style="margin-top: 3px;">🎯 <strong>Origin:</strong> ${originPort}</div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; margin: 14px 0;">
-                  <div style="background: var(--cream-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--stone-border);">
-                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 700;">ROUTES</div>
-                    <div style="font-size: 16px; font-weight: 800; font-family: var(--font-mono);">${d.endpoint_count || 0}</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; text-align: center; margin: 12px 0;">
+                  <div style="background: var(--canvas-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--stone-border);">
+                    <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">ROUTES</div>
+                    <div style="font-size: 15px; font-weight: 800; font-family: var(--font-mono);">${d.endpoint_count || 0}</div>
                   </div>
-                  <div style="background: var(--cream-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--stone-border);">
-                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 700;">SHADOW</div>
-                    <div style="font-size: 16px; font-weight: 800; font-family: var(--font-mono); color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'};">${d.shadow_count || 0}</div>
+                  <div style="background: var(--canvas-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--stone-border);">
+                    <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">SHADOW</div>
+                    <div style="font-size: 15px; font-weight: 800; font-family: var(--font-mono); color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'};">${d.shadow_count || 0}</div>
                   </div>
-                  <div style="background: var(--cream-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--stone-border);">
-                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 700;">EVENTS</div>
-                    <div style="font-size: 16px; font-weight: 800; font-family: var(--font-mono);">${d.event_count || 0}</div>
+                  <div style="background: var(--canvas-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--stone-border);">
+                    <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">EVENTS</div>
+                    <div style="font-size: 15px; font-weight: 800; font-family: var(--font-mono);">${d.event_count || 0}</div>
                   </div>
                 </div>
 
@@ -1569,32 +2020,34 @@ app.add_middleware(
                 </div>
               </div>
 
-              <div style="display: flex; gap: 6px; margin-top: 14px; border-top: 1px solid var(--stone-border); padding-top: 14px; flex-wrap: wrap;">
-                <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;" onclick="openDomainStatsModal('${d.id}')">📊 Deep Profile</button>
-                <button class="btn btn-sage" style="padding: 6px 12px; font-size: 11px;" onclick="testDomainGatewayLive('${d.domain}', '${d.id}')">⚡ Test Attack Probe</button>
-                <button class="btn btn-subtle" style="padding: 6px 10px; font-size: 11px;" onclick="toggleDomainProtection('${d.id}')">🛡️ Toggle Mode</button>
-                <button class="btn btn-subtle" style="padding: 6px 10px; font-size: 11px; color: var(--terracotta); margin-left: auto;" onclick="deleteDomain('${d.id}')">Delete</button>
+              <div style="display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid var(--stone-border); padding-top: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;" onclick="openDomainStatsModal('${d.id}')">📊 Deep Profile</button>
+                <button class="btn btn-sage" style="padding: 5px 10px; font-size: 11px;" onclick="testDomainGatewayLive('${d.domain}', '${d.id}')">⚡ Test Attack Probe</button>
+                <button class="btn btn-subtle" style="padding: 5px 8px; font-size: 11px;" onclick="toggleDomainProtection('${d.id}')">🛡️ Toggle Mode</button>
+                <button class="btn btn-subtle" style="padding: 5px 8px; font-size: 11px; color: var(--terracotta); margin-left: auto;" onclick="deleteDomain('${d.id}')">Delete</button>
               </div>
             </div>
           `;
         }).join("");
 
-        // Render Table
-        tbody.innerHTML = list.map(d => `
-          <tr>
-            <td><span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">${d.status.toUpperCase()}</span></td>
-            <td><strong>${d.domain}</strong></td>
-            <td>${d.name}</td>
-            <td><strong>${d.endpoint_count || 0}</strong> routes</td>
-            <td><span style="color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'}; font-weight: 700;">${d.shadow_count || 0}</span></td>
-            <td>${d.event_count || 0}</td>
-            <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${(d.created_at || '').substring(0, 10)}</td>
-            <td>
-              <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px;" onclick="openDomainStatsModal('${d.id}')">Inspect</button>
-              <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px; color: var(--terracotta);" onclick="deleteDomain('${d.id}')">Delete</button>
-            </td>
-          </tr>
-        `).join("");
+        tbody.innerHTML = list.map(d => {
+          const tReg = formatTimestamp(d.created_at);
+          return `
+            <tr>
+              <td><span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">${d.status.toUpperCase()}</span></td>
+              <td><strong>${d.domain}</strong></td>
+              <td>${d.name}</td>
+              <td><strong>${d.endpoint_count || 0}</strong> routes</td>
+              <td><span style="color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'}; font-weight: 700;">${d.shadow_count || 0}</span></td>
+              <td>${d.event_count || 0}</td>
+              <td title="${tReg.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${tReg.time}</td>
+              <td>
+                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px;" onclick="openDomainStatsModal('${d.id}')">Inspect</button>
+                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px; color: var(--terracotta);" onclick="deleteDomain('${d.id}')">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
       } catch (e) {
         console.error("Domains load error:", e);
       }
@@ -1617,31 +2070,31 @@ app.add_middleware(
 
         const content = document.getElementById("domain-modal-content");
         content.innerHTML = `
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;">
-            <div style="background: var(--sand-warm); padding: 16px; border-radius: 10px;">
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">TOTAL INVOCATIONS</div>
-              <div style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); margin-top: 4px;">${metrics.total_events}</div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px;">
+            <div style="background: var(--sand-warm); padding: 14px; border-radius: 8px;">
+              <div style="font-size: 10px; font-weight: 700; color: var(--text-muted);">TOTAL INVOCATIONS</div>
+              <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); margin-top: 3px;">${metrics.total_events}</div>
             </div>
-            <div style="background: var(--terracotta-soft); padding: 16px; border-radius: 10px;">
-              <div style="font-size: 11px; font-weight: 700; color: var(--terracotta);">BLOCKED ATTACKS</div>
-              <div style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--terracotta); margin-top: 4px;">${metrics.blocked_events}</div>
+            <div style="background: var(--terracotta-soft); padding: 14px; border-radius: 8px;">
+              <div style="font-size: 10px; font-weight: 700; color: var(--terracotta);">BLOCKED ATTACKS</div>
+              <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--terracotta); margin-top: 3px;">${metrics.blocked_events}</div>
             </div>
-            <div style="background: var(--sage-soft); padding: 16px; border-radius: 10px;">
-              <div style="font-size: 11px; font-weight: 700; color: var(--sage-green);">CLEAN REQUESTS</div>
-              <div style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--sage-green); margin-top: 4px;">${metrics.allow_events}</div>
+            <div style="background: var(--sage-soft); padding: 14px; border-radius: 8px;">
+              <div style="font-size: 10px; font-weight: 700; color: var(--sage-green);">CLEAN REQUESTS</div>
+              <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--sage-green); margin-top: 3px;">${metrics.allow_events}</div>
             </div>
-            <div style="background: var(--ochre-soft); padding: 16px; border-radius: 10px;">
-              <div style="font-size: 11px; font-weight: 700; color: var(--warm-ochre);">BLOCK RATE</div>
-              <div style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--warm-ochre); margin-top: 4px;">${metrics.block_rate_percent}%</div>
+            <div style="background: var(--ochre-soft); padding: 14px; border-radius: 8px;">
+              <div style="font-size: 10px; font-weight: 700; color: var(--warm-ochre);">BLOCK RATE</div>
+              <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--warm-ochre); margin-top: 3px;">${metrics.block_rate_percent}%</div>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 10px; padding: 18px;">
-              <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 12px;">Top Mitigated Signatures</h4>
-              ${data.top_rules.length === 0 ? '<div style="color:var(--text-muted); font-size:12px;">No attacks recorded yet.</div>' : 
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 8px; padding: 16px;">
+              <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 10px;">Top Mitigated Signatures</h4>
+              ${data.top_rules.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacks recorded yet.</div>' : 
                 data.top_rules.map(r => `
-                  <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--stone-border); font-size:12px;">
+                  <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--stone-border-light); font-size:11px;">
                     <strong style="font-family:var(--font-mono); color:var(--terracotta);">${r.rule}</strong>
                     <span style="font-weight:700;">${r.count} blocks</span>
                   </div>
@@ -1649,11 +2102,11 @@ app.add_middleware(
               }
             </div>
 
-            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 10px; padding: 18px;">
-              <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 12px;">Top Attacking Client IPs</h4>
-              ${data.top_ips.length === 0 ? '<div style="color:var(--text-muted); font-size:12px;">No attacking IPs recorded.</div>' : 
+            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 8px; padding: 16px;">
+              <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 10px;">Top Attacking Client IPs</h4>
+              ${data.top_ips.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacking IPs recorded.</div>' : 
                 data.top_ips.map(ip => `
-                  <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--stone-border); font-size:12px;">
+                  <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--stone-border-light); font-size:11px;">
                     <strong style="font-family:var(--font-mono);">${ip.ip}</strong>
                     <span style="font-weight:700; color:var(--terracotta);">${ip.count} attempts</span>
                   </div>
@@ -1662,8 +2115,8 @@ app.add_middleware(
             </div>
           </div>
 
-          <div style="background: var(--sand-warm); padding: 16px; border-radius: 10px; font-size: 12px;">
-            <div style="font-weight:700; margin-bottom:4px;">Asymmetric Cryptographic Verification</div>
+          <div style="background: var(--sand-warm); padding: 14px; border-radius: 8px; font-size: 11px;">
+            <div style="font-weight:700; margin-bottom:3px;">Asymmetric Cryptographic Verification</div>
             <div style="font-family:var(--font-mono); color:var(--text-muted);">Policy: ${policy.name || 'Standard WAAP'} | Version: v${policy.version || 1} | Signature: ${policy.signature || 'RFC 8032 Verified'}</div>
           </div>
         `;
@@ -1718,7 +2171,7 @@ app.add_middleware(
       setTimeout(() => {
         pollTelemetry(true);
         alert("All active edge gateways responded with 100% mitigation accuracy (<0.5ms latency).");
-      }, 1000);
+      }, 800);
     }
 
     async function submitNewDomain() {
@@ -1814,14 +2267,27 @@ app.add_middleware(
           let badge = `<span class="badge badge-allow">DOCUMENTED</span>`;
           if (ep.status === "shadow") badge = `<span class="badge badge-shadow">SHADOW</span>`;
           if (ep.status === "zombie") badge = `<span class="badge badge-challenge">ZOMBIE</span>`;
+          
+          let riskBadge = `<span class="badge badge-allow">LOW RISK</span>`;
+          const rLvl = (ep.risk_level || "LOW").toUpperCase();
+          if (rLvl === "HIGH" || ep.status === "zombie") {
+            riskBadge = `<span class="badge badge-block">HIGH RISK</span>`;
+          } else if (rLvl === "MEDIUM" || ep.status === "shadow") {
+            riskBadge = `<span class="badge badge-challenge">MED RISK</span>`;
+          }
+
+          const tSeen = formatTimestamp(ep.last_seen);
+
           return `
             <tr>
               <td>${badge}</td>
-              <td style="font-family: var(--font-mono); font-size: 12px;">${ep.website_id}</td>
+              <td style="font-family: var(--font-mono); font-size: 11px;">${ep.website_id}</td>
               <td><strong style="color: var(--deep-indigo);">${ep.method}</strong></td>
-              <td><code style="background: var(--sand-warm); padding: 3px 6px; border-radius: 4px;">${ep.path}</code></td>
-              <td><strong>${ep.risk_score}</strong>/100</td>
-              <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${(ep.last_seen || '').substring(0, 19)}</td>
+              <td><code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${ep.path}</code></td>
+              <td>${riskBadge}</td>
+              <td title="${tSeen.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
+                ${tSeen.time} (${tSeen.relative})
+              </td>
             </tr>
           `;
         }).join("");
@@ -1847,17 +2313,23 @@ app.add_middleware(
           tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No IP access rules configured. Click '+ Add IP Rule' above.</td></tr>`;
           return;
         }
-        tbody.innerHTML = list.map(r => `
-          <tr>
-            <td><span class="badge ${r.action === 'BLOCK' ? 'badge-block' : 'badge-allow'}">${r.action}</span></td>
-            <td><strong style="font-family: var(--font-mono); font-size: 13px;">${r.ip_cidr}</strong></td>
-            <td>${r.description || 'N/A'}</td>
-            <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${(r.created_at || '').substring(0, 19)}</td>
-            <td>
-              <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px; color: var(--terracotta);" onclick="deleteIpRule('${r.id}')">Delete</button>
-            </td>
-          </tr>
-        `).join("");
+        tbody.innerHTML = list.map(r => {
+          const tCreated = formatTimestamp(r.created_at);
+          const ipAddr = r.ip_or_cidr || r.ip_cidr || "Unknown";
+          return `
+            <tr>
+              <td><span class="badge ${r.action === 'BLOCK' ? 'badge-block' : 'badge-allow'}">${r.action}</span></td>
+              <td><strong style="font-family: var(--font-mono); font-size: 12px;">${ipAddr}</strong></td>
+              <td>${r.description || 'N/A'}</td>
+              <td title="${tCreated.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
+                ${tCreated.time} (${tCreated.relative})
+              </td>
+              <td>
+                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px; color: var(--terracotta);" onclick="deleteIpRule('${r.id}')">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
       } catch (e) {
         console.error("IP rules error:", e);
       }
@@ -1875,7 +2347,7 @@ app.add_middleware(
         const res = await fetch(`${API}/ip-rules`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ website_id: "site-8b8b832c", ip_cidr: addr, action: action, description: desc })
+          body: JSON.stringify({ website_id: "site-8b8b832c", ip_or_cidr: addr, action: action, description: desc })
         });
         const d = await res.json();
         if (res.ok) {
@@ -1914,16 +2386,22 @@ app.add_middleware(
           tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No edge gateway connectors registered yet.</td></tr>`;
           return;
         }
-        tbody.innerHTML = list.map(c => `
-          <tr>
-            <td><span class="badge ${c.status === 'online' ? 'badge-online' : 'badge-offline'}">${c.status.toUpperCase()}</span></td>
-            <td><strong>${c.name}</strong></td>
-            <td><span class="badge badge-allow">${c.type}</span></td>
-            <td style="font-family: var(--font-mono); font-size: 12px;">${c.website_id}</td>
-            <td style="font-family: var(--font-mono); font-weight: 700; color: var(--sage-green);">${c.latency_ms || 0.35} ms</td>
-            <td style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${(c.last_heartbeat || '').substring(11, 19)} UTC</td>
-          </tr>
-        `).join("");
+        tbody.innerHTML = list.map(c => {
+          const tBeat = formatTimestamp(c.last_heartbeat);
+          const cType = c.connector_type || c.type || "edge-waap-gateway";
+          return `
+            <tr>
+              <td><span class="badge ${c.status === 'online' ? 'badge-online' : 'badge-offline'}">${c.status.toUpperCase()}</span></td>
+              <td><strong>${c.name}</strong></td>
+              <td><span class="badge badge-allow">${cType}</span></td>
+              <td style="font-family: var(--font-mono); font-size: 11px;">${c.website_id}</td>
+              <td style="font-family: var(--font-mono); font-weight: 700; color: var(--sage-green);">${c.latency_ms || 0.35} ms</td>
+              <td title="${tBeat.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
+                ${tBeat.time} (${tBeat.relative})
+              </td>
+            </tr>
+          `;
+        }).join("");
       } catch (e) {
         console.error("Connectors error:", e);
       }
@@ -1974,17 +2452,17 @@ app.add_middleware(
         });
         const d = await res.json();
         const isBlocked = d.action === "BLOCK";
-        outBox.style.background = isBlocked ? "#FBF0ED" : "#EEF5F1";
+        outBox.style.background = isBlocked ? "#FDF2E9" : "#EDF7F2";
         outBox.style.borderColor = isBlocked ? "var(--terracotta)" : "var(--sage-green)";
         outBox.innerHTML = `
-          <div style="font-weight: 800; color: ${isBlocked ? 'var(--terracotta)' : 'var(--sage-green)'}; font-size: 15px; margin-bottom: 8px;">
+          <div style="font-weight: 800; color: ${isBlocked ? 'var(--terracotta)' : 'var(--sage-green)'}; font-size: 14px; margin-bottom: 6px;">
             ${isBlocked ? '🛑 THREAT INTERCEPTED & BLOCKED (HTTP 403)' : '✅ REQUEST CLEAN (HTTP 200)'}
           </div>
           <div><strong>Triggered Rule:</strong> ${d.rule_triggered || 'None'}</div>
           <div><strong>OWASP Classification:</strong> ${d.owasp_category || 'N/A'}</div>
           <div><strong>Risk Score:</strong> ${d.risk_score} / 100</div>
           <div><strong>Inspection Latency:</strong> ${d.execution_latency_ms} ms</div>
-          <div style="margin-top: 8px; font-size: 11px; color: var(--text-muted);">Asymmetric Signature: ED25519-VERIFIED // RFC 8032</div>
+          <div style="margin-top: 6px; font-size: 10px; color: var(--text-muted);">Asymmetric Signature: ED25519-VERIFIED // RFC 8032</div>
         `;
         pollTelemetry(true);
       } catch (e) {
@@ -2012,10 +2490,10 @@ app.add_middleware(
           })
         });
         const d = await res.json();
-        box.style.background = "#EEF2F7";
+        box.style.background = "#F1F5F9";
         box.style.borderColor = "var(--deep-indigo)";
         box.innerHTML = `
-          <div style="font-weight: 800; color: var(--deep-indigo); font-size: 14px; margin-bottom: 8px;">
+          <div style="font-weight: 800; color: var(--deep-indigo); font-size: 13px; margin-bottom: 6px;">
             📈 Simulation Completed on ${d.sample_size_evaluated} Historical Events
           </div>
           <div><strong>Candidate Rule:</strong> ${d.candidate_rule_id}</div>
@@ -2031,13 +2509,15 @@ app.add_middleware(
     async function triggerRollback() {
       if (!confirm("Are you sure you want to trigger a 1-Click Rollback to the previous safe policy version?")) return;
       try {
+        const targetSite = currentDomainScope === "ALL" ? "site-8b8b832c" : currentDomainScope;
         const res = await fetch(`${API}/policies/rollback`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ website_id: "site-8b8b832c", target_version: 1 })
+          body: JSON.stringify({ website_id: targetSite, target_version: 1 })
         });
         const d = await res.json();
-        alert(`Rollback successful! Restored to policy v${d.policy.version} with fresh Ed25519 signature.`);
+        alert(`Rollback successful! Restored to policy v${d.policy.version} with fresh Ed25519 signature: ${d.policy.signature.substring(0, 16)}...`);
+        pollTelemetry(true);
       } catch (e) {
         alert("Rollback failed: " + e);
       }
@@ -2058,72 +2538,43 @@ app.add_middleware(
       }
     }
 
-    function toggleAuthMode(mode) {
-      if (mode === 'signup') {
-        document.getElementById("login-form-box").style.display = "none";
-        document.getElementById("signup-form-box").style.display = "block";
-      } else {
-        document.getElementById("signup-form-box").style.display = "none";
-        document.getElementById("login-form-box").style.display = "block";
-      }
-    }
-
-    async function handleLogin() {
-      const email = document.getElementById("auth-email").value.trim();
-      const password = document.getElementById("auth-password").value;
-      if (!email || !password) {
-        alert("Please enter both email and password.");
-        return;
-      }
-      try {
-        const res = await fetch("/v1/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email, password: password })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          localStorage.setItem("sg_token", data.access_token);
-          alert(`Welcome back, ${data.user.full_name}! Signed in as ${data.user.role}.`);
-          switchTab('dashboard');
-        } else {
-          alert("Authentication error: " + (data.detail || "Invalid credentials"));
-        }
-      } catch (e) {
-        alert("Login failed: " + e);
-      }
-    }
-
-    async function handleSignup() {
-      const name = document.getElementById("signup-name").value.trim();
-      const email = document.getElementById("signup-email").value.trim();
-      const password = document.getElementById("signup-password").value;
-      if (!name || !email || !password) {
-        alert("Please fill in all fields.");
-        return;
-      }
-      try {
-        const res = await fetch("/v1/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ full_name: name, email: email, password: password, role: "admin" })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          alert("Account created successfully! Please sign in.");
-          toggleAuthMode('login');
-        } else {
-          alert("Registration error: " + (data.detail || "Signup failed"));
-        }
-      } catch (e) {
-        alert("Registration failed: " + e);
-      }
-    }
-
     // -------------------------------------------------------------------------
     // Initial Setup on Page Load
     // -------------------------------------------------------------------------
-    pollTelemetry(true);
+    applyTheme();
+    document.getElementById("tz-toggle-btn").innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
+    document.getElementById("sound-toggle-btn").innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+
+    // Restore Active Tab from URL Hash or localStorage (Prevents unwanted reset on refresh)
+    const initialHash = window.location.hash.replace("#", "").trim();
+    const savedTab = localStorage.getItem("sg_active_tab");
+    const validTabs = ["dashboard", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
+    const targetTab = validTabs.includes(initialHash) ? initialHash : (validTabs.includes(savedTab) ? savedTab : "dashboard");
+    switchTab(targetTab, false);
+
+    window.addEventListener("hashchange", () => {
+      const h = window.location.hash.replace("#", "").trim();
+      if (validTabs.includes(h)) {
+        switchTab(h, false);
+      }
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener("keydown", (e) => {
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        toggleStreamPause();
+      } else if (e.key >= "1" && e.key <= "8") {
+        const tabKeys = ["dashboard", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
+        const idx = parseInt(e.key, 10) - 1;
+        if (tabKeys[idx]) switchTab(tabKeys[idx]);
+      } else if (e.key === "Escape") {
+        closeEventForensics();
+        closeDomainModal();
+      }
+    });
+
     setupAutoRefreshEngine();
   </script>
 </body>

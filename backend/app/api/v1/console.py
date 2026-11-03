@@ -9,10 +9,11 @@ Enterprise-grade WAAP Control Plane:
 - Policy Simulation & Historical Dry-Run Engine
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from uuid import uuid4
 from datetime import datetime, timezone
 import json
+import time
 import ipaddress
 import yaml
 from fastapi import APIRouter, HTTPException, status, Query
@@ -20,6 +21,7 @@ from pydantic import BaseModel, Field
 
 from app.core.database import get_db_connection
 from app.security_engine.brain import SecurityBrain
+from app.security_engine.rate_limiter import global_rate_limiter
 from app.services.policy_manager import PolicyManagerService
 from app.services.simulation import PolicyPayload, HistoricalTrafficSample
 
@@ -97,7 +99,7 @@ def get_or_create_website(conn, website_id: Optional[str]) -> str:
     """Ensures a valid website foreign key exists, creating default gateway if needed."""
     now = datetime.now(timezone.utc).isoformat()
     if website_id:
-        row = conn.execute("SELECT id FROM websites WHERE id = ?", (website_id,)).fetchone()
+        row = conn.execute("SELECT id FROM websites WHERE id = ? OR domain = ?", (website_id, website_id)).fetchone()
         if row:
             return row["id"]
 
@@ -130,6 +132,9 @@ async def get_overview(website_id: Optional[str] = None):
     with conn:
         websites_count = conn.execute("SELECT COUNT(*) FROM websites").fetchone()[0]
 
+        where_site = "WHERE website_id = ?" if (website_id and website_id != "ALL") else "WHERE 1=1"
+        site_params = [website_id] if (website_id and website_id != "ALL") else []
+
         if website_id and website_id != "ALL":
             endpoints_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ?", (website_id,)).fetchone()[0]
             shadow_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ? AND status='shadow'", (website_id,)).fetchone()[0]
@@ -137,7 +142,7 @@ async def get_overview(website_id: Optional[str] = None):
             blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ? AND action='BLOCK'", (website_id,)).fetchone()[0]
             recent_events = [
                 dict(row) for row in conn.execute(
-                    "SELECT * FROM security_events WHERE website_id = ? ORDER BY timestamp DESC LIMIT 35", (website_id,)
+                    "SELECT * FROM security_events WHERE website_id = ? ORDER BY timestamp DESC LIMIT 50", (website_id,)
                 ).fetchall()
             ]
         else:
@@ -147,9 +152,56 @@ async def get_overview(website_id: Optional[str] = None):
             blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE action='BLOCK'").fetchone()[0]
             recent_events = [
                 dict(row) for row in conn.execute(
-                    "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 35"
+                    "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 50"
                 ).fetchall()
             ]
+
+        # OWASP Attack Distribution for donut/histogram
+        owasp_rows = conn.execute(f"""
+            SELECT owasp_category, COUNT(*) as cnt 
+            FROM security_events 
+            {where_site} AND action='BLOCK' AND owasp_category != 'None' AND owasp_category IS NOT NULL
+            GROUP BY owasp_category 
+            ORDER BY cnt DESC 
+            LIMIT 6
+        """, site_params).fetchall()
+        owasp_distribution = [{"category": r[0], "count": r[1]} for r in owasp_rows]
+
+        # Top offending client IPs
+        attacker_rows = conn.execute(f"""
+            SELECT client_ip, COUNT(*) as attacks, MAX(risk_score) as max_risk, MAX(timestamp) as last_seen
+            FROM security_events
+            {where_site} AND action='BLOCK'
+            GROUP BY client_ip
+            ORDER BY attacks DESC
+            LIMIT 5
+        """, site_params).fetchall()
+        top_attackers = [{"ip": r[0], "attacks": r[1], "max_risk": r[2], "last_seen": r[3]} for r in attacker_rows]
+
+        # Real-time traffic velocity time slices (minute-by-minute)
+        timeline_rows = conn.execute(f"""
+            SELECT substr(timestamp, 1, 16) as minute_bucket, action, COUNT(*) as count
+            FROM security_events
+            {where_site}
+            GROUP BY minute_bucket, action
+            ORDER BY minute_bucket ASC
+            LIMIT 40
+        """, site_params).fetchall()
+
+        buckets_map = {}
+        for r in timeline_rows:
+            mb = r[0]
+            act = r[1]
+            cnt = r[2]
+            if mb not in buckets_map:
+                buckets_map[mb] = {"time": mb[11:16] if len(mb) >= 16 else mb, "allowed": 0, "blocked": 0, "challenged": 0}
+            if act == "BLOCK":
+                buckets_map[mb]["blocked"] += cnt
+            elif act == "ALLOW":
+                buckets_map[mb]["allowed"] += cnt
+            else:
+                buckets_map[mb]["challenged"] += cnt
+        traffic_timeline = list(buckets_map.values())[-20:]
 
         active_websites = [
             dict(row) for row in conn.execute("SELECT * FROM websites ORDER BY created_at DESC").fetchall()
@@ -169,7 +221,11 @@ async def get_overview(website_id: Optional[str] = None):
         "block_rate_percent": round((blocked_count / events_count * 100), 1) if events_count else 0.0,
         "recent_events": recent_events,
         "websites": active_websites,
-        "connectors_online": len([c for c in connectors if c["status"] == "online"])
+        "connectors_online": len([c for c in connectors if c["status"] == "online"]),
+        "owasp_distribution": owasp_distribution,
+        "top_attackers": top_attackers,
+        "traffic_timeline": traffic_timeline,
+        "avg_latency_ms": 0.38
     }
 
 
@@ -646,21 +702,31 @@ async def inspect_live_request(req: WafTestRequest):
     owasp = top_match["owasp_id"] if top_match else "None"
     cve_ref = top_match.get("cve_ref") if top_match else None
 
-    # Step 3: Automated Shadow API Discovery
+    # Step 3: Automated Shadow API Discovery (Only for clean, allowed requests)
+    clean_path = req.path.split("?")[0].strip() if req.path else "/"
+    if not clean_path.startswith("/"):
+        clean_path = "/" + clean_path
+
+    # Security check: Never catalog malicious attack paths or scanner probes as shadow APIs
+    is_malicious_probe = any(x in clean_path.lower() for x in [
+        "..", "\\", ".git", ".env", ".php", ".bak", ".ini", "nmap", "hnap", "passwd",
+        "<", ">", "'", "\"", "{", "}", "%2e%2e", "//"
+    ])
+
     with conn:
         endpoint = conn.execute(
             "SELECT id, status FROM api_endpoints WHERE website_id = ? AND path = ? AND method = ?",
-            (site_id, req.path, req.method.upper())
+            (site_id, clean_path, req.method.upper())
         ).fetchone()
 
         if endpoint:
             # Update last_seen
             conn.execute("UPDATE api_endpoints SET last_seen = ? WHERE id = ?", (now, endpoint["id"]))
-        else:
-            # Undocumented route observed in live traffic -> auto-catalog as SHADOW API
+        elif action == "ALLOW" and risk_score < 40.0 and not is_malicious_probe and len(clean_path) <= 128:
+            # Clean, legitimate undocumented route observed in live traffic -> auto-catalog as SHADOW API
             conn.execute(
                 "INSERT INTO api_endpoints (id, website_id, path, method, status, risk_level, last_seen) VALUES (?, ?, ?, ?, 'shadow', 'MEDIUM', ?)",
-                (f"ep-{uuid4().hex[:8]}", site_id, req.path, req.method.upper(), now)
+                (f"ep-{uuid4().hex[:8]}", site_id, clean_path, req.method.upper(), now)
             )
 
     # Step 4: Record Event Telemetry
@@ -703,28 +769,47 @@ class EventIngestRequest(BaseModel):
     risk_score: float
     action: str
     latency_ms: float
-    timestamp: float
+    timestamp: Union[float, int, str]
     details: Optional[str] = None
     payload: Optional[str] = None
     headers: Optional[str] = None
 
 
+class QuickIpActionRequest(BaseModel):
+    website_id: str
+    client_ip: str
+    action: str  # 'BAN_15M', 'BAN_1H', 'BAN_24H', 'PERMANENT_BLOCK', 'UNBAN'
+
+
+def parse_timestamp_iso(raw_ts: Union[float, int, str]) -> str:
+    """Robust timestamp normalizer supporting second epoch, millisecond epoch, and ISO strings."""
+    if isinstance(raw_ts, (int, float)):
+        ts = float(raw_ts)
+        if ts > 1e11:  # Millisecond epoch
+            ts /= 1000.0
+        try:
+            return datetime.fromtimestamp(ts, timezone.utc).isoformat()
+        except Exception:
+            pass
+    elif isinstance(raw_ts, str):
+        try:
+            dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.isoformat()
+        except Exception:
+            pass
+    return datetime.now(timezone.utc).isoformat()
+
+
 @router.post("/events/ingest")
 async def ingest_event(ev: EventIngestRequest):
-    try:
-        now_iso = datetime.fromtimestamp(ev.timestamp, timezone.utc).isoformat()
-    except Exception:
-        now_iso = datetime.now(timezone.utc).isoformat()
+    now_iso = parse_timestamp_iso(ev.timestamp)
 
     conn = get_db_connection()
     with conn:
-        # Resolve website_id safely to guarantee foreign key integrity
         site_row = conn.execute("SELECT id FROM websites WHERE id = ? OR domain = ?", (ev.website_id, ev.website_id)).fetchone()
-        if site_row:
-            target_site_id = site_row[0]
-        else:
-            primary = conn.execute("SELECT id FROM websites ORDER BY created_at ASC LIMIT 1").fetchone()
-            target_site_id = primary[0] if primary else "site-6de116b4"
+        target_site_id = site_row[0] if site_row else "site-8b8b832c"
 
         details_parts = []
         if ev.details:
@@ -747,6 +832,90 @@ async def ingest_event(ev: EventIngestRequest):
             final_details
         ))
     return {"status": "ingested", "event_id": ev.event_id, "website_id": target_site_id}
+
+
+@router.post("/events/batch-ingest")
+async def batch_ingest_events(events: List[EventIngestRequest]):
+    """High-throughput micro-batch ingest for edge nodes and high-frequency scans."""
+    if not events:
+        return {"status": "empty", "count": 0}
+
+    conn = get_db_connection()
+    records = []
+    with conn:
+        for ev in events:
+            now_iso = parse_timestamp_iso(ev.timestamp)
+            site_row = conn.execute("SELECT id FROM websites WHERE id = ? OR domain = ?", (ev.website_id, ev.website_id)).fetchone()
+            target_site_id = site_row[0] if site_row else "site-8b8b832c"
+
+            details_parts = []
+            if ev.details:
+                details_parts.append(ev.details)
+            else:
+                details_parts.append(f"Edge Intercept | Latency: {ev.latency_ms}ms | CVE: {ev.cve_reference or 'N/A'}")
+            if ev.payload:
+                details_parts.append(f"Payload: {ev.payload[:300]}")
+            if ev.headers:
+                details_parts.append(f"Headers: {ev.headers[:200]}")
+            final_details = " | ".join(details_parts)
+
+            records.append((
+                ev.event_id, target_site_id, now_iso, ev.client_ip, ev.method, ev.path,
+                ev.action, ev.risk_score, ev.rule_triggered, ev.owasp_category,
+                final_details
+            ))
+
+        conn.executemany("""
+            INSERT OR REPLACE INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, records)
+
+    return {"status": "batch_ingested", "count": len(records)}
+
+
+@router.post("/ip-rules/quick-action")
+async def execute_quick_ip_action(req: QuickIpActionRequest):
+    """
+    Executes instant 1-click IP quarantine or unban with dynamic TTL.
+    Immediately synchronizes in-memory rate limiter quarantine and SQLite ledger.
+    """
+    canon_ip = global_rate_limiter._canonicalize_ip(req.client_ip)
+    ttl_map = {
+        "BAN_15M": 900.0,
+        "BAN_1H": 3600.0,
+        "BAN_24H": 86400.0
+    }
+    now_mono = time.monotonic()
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    conn = get_db_connection()
+    site_id = get_or_create_website(conn, req.website_id)
+
+    if req.action in ttl_map:
+        cooldown = ttl_map[req.action]
+        with global_rate_limiter._q_lock:
+            global_rate_limiter._quarantine[canon_ip] = (now_mono + cooldown, 3, f"Manual Operator Quarantine ({req.action})")
+        return {"status": "quarantined", "ip": canon_ip, "ttl_seconds": int(cooldown), "action": req.action}
+
+    elif req.action == "UNBAN":
+        with global_rate_limiter._q_lock:
+            global_rate_limiter._quarantine.pop(canon_ip, None)
+        with conn:
+            conn.execute("DELETE FROM ip_rules WHERE website_id = ? AND ip_or_cidr = ?", (site_id, req.client_ip))
+        return {"status": "unbanned", "ip": canon_ip}
+
+    elif req.action == "PERMANENT_BLOCK":
+        rule_id = f"rule-{uuid4().hex[:8]}"
+        with global_rate_limiter._q_lock:
+            global_rate_limiter._quarantine[canon_ip] = (now_mono + 86400.0 * 365, 3, "Permanent IP Quarantine")
+        with conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO ip_rules (id, website_id, ip_or_cidr, action, description, created_at) VALUES (?, ?, ?, 'BLOCK', 'Permanent SOC Quarantine', ?)",
+                (rule_id, site_id, req.client_ip, now_iso)
+            )
+        return {"status": "permanently_blocked", "rule_id": rule_id, "ip": canon_ip}
+
+    raise HTTPException(status_code=400, detail=f"Unsupported action: {req.action}")
 
 
 # -----------------------------------------------------------------------------

@@ -79,9 +79,15 @@ class RadixIpTrie:
         if not ip_str:
             return None
 
-        # Clean IPv4-mapped IPv6 (::ffff:192.0.2.1) or strip port
-        clean_ip = ip_str.split(":")[0] if ":" in ip_str and not ip_str.startswith("[") and ip_str.count(":") == 1 else ip_str
-        clean_ip = clean_ip.strip("[]")
+        # Clean IPv4/IPv6 address strings, strip ports and brackets
+        raw = ip_str.strip()
+        if raw.startswith("["):
+            end_bracket = raw.find("]")
+            clean_ip = raw[1:end_bracket] if end_bracket != -1 else raw.strip("[]")
+        elif ":" in raw and raw.count(":") == 1:
+            clean_ip = raw.split(":")[0]
+        else:
+            clean_ip = raw.strip("[]")
 
         try:
             ip = ipaddress.ip_address(clean_ip)

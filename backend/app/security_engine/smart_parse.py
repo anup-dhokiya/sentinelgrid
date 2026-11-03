@@ -31,7 +31,7 @@ class SmartParse:
     """
 
     # Gate 0: Byte-level fast pre-filter regex (<0.03ms)
-    METACHAR_TRIGGER = re.compile(r"['\"<>;=\(\)\-\/#\*\\]")
+    METACHAR_TRIGGER = re.compile(r"['\"<>;=\(\)\-\/#\*\\`]")
 
     # SQL Lexical Keywords
     SQL_KEYWORDS = {
@@ -145,11 +145,20 @@ class SmartParse:
                 i += 1
                 continue
 
-            # Numeric Literals
+            # Numeric Literals (decimal or hex 0x...)
             if c.isdigit():
                 start = i
-                while i < n and (s[i].isdigit() or s[i] in '.xabcdefABCDEF'):
-                    i += 1
+                is_hex = (c == '0' and i + 1 < n and s[i + 1] in ('x', 'X'))
+                if is_hex:
+                    i += 2
+                    while i < n and (s[i].isdigit() or s[i].lower() in 'abcdef'):
+                        i += 1
+                else:
+                    seen_dot = False
+                    while i < n and (s[i].isdigit() or (s[i] == '.' and not seen_dot)):
+                        if s[i] == '.':
+                            seen_dot = True
+                        i += 1
                 tokens.append((TokenType.LITERAL_NUM, s[start:i]))
                 continue
 

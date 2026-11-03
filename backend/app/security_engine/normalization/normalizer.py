@@ -41,17 +41,21 @@ class RequestNormalizer:
         # 3. Unicode NFKC normalization
         s = unicodedata.normalize("NFKC", s)
 
-        # 4. Standardize backslashes to slashes
-        s = s.replace("\\", "/")
-
         return s
 
     @classmethod
     def normalize_path(cls, path: str) -> str:
         """Normalizes an HTTP URI path and collapses redundant slashes."""
         norm = cls.normalize_string(path)
-        # Collapse multiple slashes (e.g. ///api//v1 -> /api/v1)
-        norm = re.sub(r"/+", "/", norm)
+        # Standardize path backslashes to forward slashes for URI/filesystem consistency
+        norm = norm.replace("\\", "/")
+        # If query string is present in path, preserve query string while collapsing slashes only in path component
+        if "?" in norm:
+            path_part, query_part = norm.split("?", 1)
+            path_part = re.sub(r"/+", "/", path_part)
+            norm = f"{path_part}?{query_part}"
+        else:
+            norm = re.sub(r"/+", "/", norm)
         return norm
 
     @classmethod

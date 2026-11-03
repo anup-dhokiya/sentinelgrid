@@ -90,7 +90,7 @@ class SecurityBrain:
         ),
         ThreatSignature(
             rule_id="SSRF-CLOUD-METADATA-GCP-AZURE",
-            name="GCP / Azure Cloud Metadata Endpoint Probe",
+            name="Multi-Cloud IMDS & WireServer Probe (GCP, Azure, Oracle, Alibaba, DNS Rebind)",
             category="Server-Side Request Forgery",
             owasp_id="A10:Server-Side Request Forgery",
             severity="CRITICAL",
@@ -102,7 +102,12 @@ class SecurityBrain:
                 r"|computeMetadata/(?:v1|v1beta1)"
                 r"|metadata\.azure\.com(?:/metadata/instance)?"
                 r"|metadata/instance\b"
-                r"|100\.100\.100\.200"
+                r"|168\.63\.129\.16"                       # Azure WireServer IP
+                r"|192\.0\.0\.192"                          # Oracle Cloud Infrastructure (OCI) IMDS
+                r"|100\.100\.100\.200"                      # Alibaba Cloud ECS Metadata
+                r"|rebind\.[a-z0-9]+"                       # DNS Rebinding utilities
+                r"|rbndr\.us"
+                r"|127\.0\.0\.1\.nip\.io"
                 r")",
                 re.IGNORECASE
             )
@@ -122,6 +127,208 @@ class SecurityBrain:
                 r"|<[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^>]*>"
                 r"|\[[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^\]]*\]"
                 r"|<%\s*(?:system|exec|%x|IO\.read|File\.read|require|java\.)\b.*?%>"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+        # ---------------------------------------------------------------------
+        # Universal Multi-Stack Enterprise CVE & Exploit Vectors
+        # ---------------------------------------------------------------------
+        ThreatSignature(
+            rule_id="CVE-2024-4577-PHP-CGI-RCE",
+            name="PHP-CGI Windows Argument Injection RCE (CVE-2024-4577)",
+            category="Remote Code Execution",
+            owasp_id="A06:Vulnerable and Outdated Components",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"(?:"
+                r"(?:%ad|%AD|\xad|\u00ad|\ufffd|-)?\s*d\s*(?:\+|%20|\s)*(?:allow_url_include|auto_prepend_file|disable_functions)"
+                r"|auto_prepend_file\s*=\s*php://input"
+                r")",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2024-4577"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2017-5638-STRUTS2-OGNL",
+            name="Apache Struts2 OGNL Remote Code Execution (S2-045 / CVE-2017-5638)",
+            category="Remote Code Execution",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"(?:"
+                r"#_memberAccess"
+                r"|@ognl\.OgnlContext@DEFAULT_MEMBER_ACCESS"
+                r"|com\.opensymphony\.xwork2\.ActionContext"
+                r"|ActionContext\.container"
+                r"|MethodAccessor\.deniedMembers"
+                r"|com\.opensymphony\.xwork2\.ognl\.OgnlUtil"
+                r"|%\{.*?#.*?\.start\(\)\}"
+                r")",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2017-5638"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2022-42889-TEXT4SHELL",
+            name="Apache Commons Text Interpolator Lookup RCE (Text4Shell)",
+            category="Remote Code Execution",
+            owasp_id="A06:Vulnerable and Outdated Components",
+            severity="CRITICAL",
+            score=99.0,
+            pattern=re.compile(
+                r"\$\{\s*(?:script|dns|url)\s*:[^\}]*\}",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2022-42889"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2022-26134-CONFLUENCE-OGNL",
+            name="Atlassian Confluence Pre-Auth OGNL Injection RCE",
+            category="Remote Code Execution",
+            owasp_id="A01:Broken Access Control",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"(?:"
+                r"@java\.lang\.Runtime@getRuntime\(\)"
+                r"|@org\.apache\.commons\.io\.IOUtils@toString"
+                r"|@com\.opensymphony\.webwork\.ServletActionContext"
+                r"|X-Cmd-Response"
+                r"|xwork\.MethodAccessor"
+                r")",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2022-26134"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2023-4966-CITRIX-BLEED",
+            name="Citrix NetScaler ADC Sensitive Information Disclosure (Citrix Bleed)",
+            category="Information Disclosure",
+            owasp_id="A01:Broken Access Control",
+            severity="CRITICAL",
+            score=98.0,
+            pattern=re.compile(
+                r"/oauth/idp/\.well-known/openid-configuration",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2023-4966"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2020-14882-WEBLOGIC-CONSOLE-RCE",
+            name="Oracle WebLogic Console Path Traversal Auth Bypass & RCE",
+            category="Broken Access Control & RCE",
+            owasp_id="A01:Broken Access Control",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"(?:"
+                r"/console/css/%252e%252e"
+                r"|/console/images/%252e%252e"
+                r"|com\.tangosol\.coherence\.mvel2\.MVEL"
+                r"|com\.bea\.core\.repackaged\.springframework\.context\.support\.FileSystemXmlApplicationContext"
+                r")",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2020-14882"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2022-1388-F5-BIGIP-AUTH-BYPASS",
+            name="F5 BIG-IP iControl REST Unauthenticated Command Execution",
+            category="Remote Code Execution",
+            owasp_id="A07:Identification and Authentication Failures",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"/mgmt/tm/util/bash",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2022-1388"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2020-1938-TOMCAT-GHOSTCAT",
+            name="Apache Tomcat AJP File Read & Inclusion Probe (Ghostcat)",
+            category="Path Traversal",
+            owasp_id="A05:Security Misconfiguration",
+            severity="HIGH",
+            score=92.0,
+            pattern=re.compile(
+                r"(?:javax\.servlet\.include\.request_uri|javax\.servlet\.include\.path_info|javax\.servlet\.include\.servlet_path)",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2020-1938"
+        ),
+        ThreatSignature(
+            rule_id="PHP-STREAM-WRAPPER-INJECTION",
+            name="PHP Dangerous Stream Wrapper Injection (php://filter, phar://, expect://)",
+            category="Arbitrary File Read & RCE",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=96.0,
+            pattern=re.compile(
+                r"(?:"
+                r"php:/{1,2}(?:filter|input|stdin|memory|temp)"
+                r"|phar:/{1,2}.*?\.phar"
+                r"|expect:/{1,2}"
+                r"|data:/{0,2}text/plain;\s*base64"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="NODEJS-PROTOTYPE-POLLUTION-DEEP",
+            name="JavaScript / Node.js Prototype Pollution Payload Injection",
+            category="Prototype Pollution",
+            owasp_id="A04:Insecure Design",
+            severity="CRITICAL",
+            score=95.0,
+            pattern=re.compile(
+                r"(?:"
+                r"\"__proto__\"\s*:\s*\{"
+                r"|'__proto__'\s*:\s*\{"
+                r"|\b__proto__\b"
+                r"|\bconstructor\s*\.\s*prototype\b"
+                r"|\bObject\s*\.\s*prototype\b"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="PYTHON-JINJA2-MRO-ESCAPE",
+            name="Python Jinja2 / Mako MRO Builtins Sandbox Escape",
+            category="Server-Side Template Injection",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=98.0,
+            pattern=re.compile(
+                r"(?:"
+                r"__globals__"
+                r"|__subclasses__"
+                r"|__builtins__"
+                r"|__class__"
+                r"|__mro__"
+                r"|os\.popen"
+                r"|subprocess\.Popen"
+                r")",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="DOTNET-VIEWSTATE-DESERIALIZATION",
+            name=".NET ViewState / BinaryFormatter Dangerous Deserialization",
+            category="Insecure Deserialization",
+            owasp_id="A08:Software and Data Integrity Failures",
+            severity="CRITICAL",
+            score=95.0,
+            pattern=re.compile(
+                r"(?:"
+                r"TypeConfuseDelegate"
+                r"|ActivitySurrogateSelector"
+                r"|ObjectDataProvider"
+                r"|System\.Workflow\.ComponentModel"
+                r"|/wEPDwUK"
                 r")",
                 re.IGNORECASE
             )

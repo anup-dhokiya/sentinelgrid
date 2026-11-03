@@ -92,14 +92,22 @@ class SlidingWindowLimiter:
             Estimated = CurrentCount + (PreviousCount * (1 - Elapsed/WindowSize))
         Returns RFC 6585 header metrics and pass/drop verdict.
         """
-        shard_idx = self._get_shard(identifier)
+        canon_id = self._canonicalize_ip(identifier)
+        shard_idx = self._get_shard(canon_id)
         now = time.monotonic()
 
         with self._locks[shard_idx]:
-            state = self._windows[shard_idx].get(identifier)
+            # Capacity guard against OOM during wide scanning
+            if len(self._windows[shard_idx]) > 16384:
+                cutoff = now - (window_seconds * 2)
+                stale_keys = [k for k, v in self._windows[shard_idx].items() if v[0] < cutoff]
+                for k in stale_keys:
+                    del self._windows[shard_idx][k]
+
+            state = self._windows[shard_idx].get(canon_id)
             if not state:
                 # First request in window
-                self._windows[shard_idx][identifier] = (now, 1, 0)
+                self._windows[shard_idx][canon_id] = (now, 1, 0)
                 return {
                     "allowed": True,
                     "limit": limit,
@@ -113,7 +121,7 @@ class SlidingWindowLimiter:
 
             if elapsed >= window_seconds * 2:
                 # Two full windows passed: Reset completely
-                self._windows[shard_idx][identifier] = (now, 1, 0)
+                self._windows[shard_idx][canon_id] = (now, 1, 0)
                 return {
                     "allowed": True,
                     "limit": limit,
@@ -122,15 +130,17 @@ class SlidingWindowLimiter:
                     "retry_after": 0
                 }
             elif elapsed >= window_seconds:
-                # Shift current window into previous window
-                prev_count = current_count
+                # Shift current window into previous window with accurate time-decay
+                time_since_prev_end = elapsed - window_seconds
+                decay_weight = max(0.0, 1.0 - (time_since_prev_end / window_seconds))
+                prev_count = int(current_count * decay_weight)
                 current_count = 1
                 window_start = now
-                self._windows[shard_idx][identifier] = (window_start, current_count, prev_count)
+                self._windows[shard_idx][canon_id] = (window_start, current_count, prev_count)
                 elapsed = 0.0
             else:
                 current_count += 1
-                self._windows[shard_idx][identifier] = (window_start, current_count, prev_count)
+                self._windows[shard_idx][canon_id] = (window_start, current_count, prev_count)
 
             # Calculate mathematically interpolated count across sliding boundary
             weight = max(0.0, 1.0 - (elapsed / window_seconds))
