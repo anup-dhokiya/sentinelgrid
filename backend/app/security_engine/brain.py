@@ -332,6 +332,69 @@ class SecurityBrain:
                 r")",
                 re.IGNORECASE
             )
+        ),
+        ThreatSignature(
+            rule_id="CVE-2023-46604-ACTIVEMQ",
+            name="Apache ActiveMQ OpenWire Remote Code Execution (CVE-2023-46604)",
+            category="Remote Code Execution",
+            owasp_id="A06:Vulnerable and Outdated Components",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"(?:org\.springframework\.context\.support\.ClassPathXmlApplicationContext|ClassPathXmlApplicationContext)",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2023-46604"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2024-3400-PANOS-CMDI",
+            name="Palo Alto Networks PAN-OS GlobalProtect Command Injection",
+            category="Remote Code Execution",
+            owasp_id="A03:Injection",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"/ssl-vpn/hipreport\.esp",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2024-3400"
+        ),
+        ThreatSignature(
+            rule_id="CVE-2021-3129-LARAVEL-IGNITION",
+            name="Laravel Ignition Debug Mode Remote Code Execution (CVE-2021-3129)",
+            category="Remote Code Execution",
+            owasp_id="A06:Vulnerable and Outdated Components",
+            severity="CRITICAL",
+            score=100.0,
+            pattern=re.compile(
+                r"(?:_ignition/execute-solution|php://filter/write=convert\.iconv)",
+                re.IGNORECASE
+            ),
+            cve_ref="CVE-2021-3129"
+        ),
+        ThreatSignature(
+            rule_id="FASTJSON-DESERIALIZATION-RCE",
+            name="Fastjson Polymorphic Deserialization Remote Code Execution",
+            category="Insecure Deserialization",
+            owasp_id="A08:Software and Data Integrity Failures",
+            severity="CRITICAL",
+            score=98.0,
+            pattern=re.compile(
+                r"@type\s*[\'\"]?\s*:\s*[\'\"]?(?:com\.sun\.rowset\.JdbcRowSetImpl|org\.apache\.commons\.dbcp\.BasicDataSource|org\.apache\.tomcat\.dbcp\.dbcp\.BasicDataSource)",
+                re.IGNORECASE
+            )
+        ),
+        ThreatSignature(
+            rule_id="WERKZEUG-DEBUGGER-CONSOLE",
+            name="Werkzeug Interactive Debug Console Access Attempt",
+            category="Security Misconfiguration",
+            owasp_id="A05:Security Misconfiguration",
+            severity="HIGH",
+            score=90.0,
+            pattern=re.compile(
+                r"(?:/__debugger__|/console\?__debugger__)",
+                re.IGNORECASE
+            )
         )
     ]
 

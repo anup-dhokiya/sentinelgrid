@@ -16,7 +16,9 @@ import json
 import time
 import ipaddress
 import yaml
-from fastapi import APIRouter, HTTPException, status, Query
+import asyncio
+from fastapi import APIRouter, HTTPException, status, Query, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.core.database import get_db_connection
@@ -27,6 +29,16 @@ from app.services.simulation import PolicyPayload, HistoricalTrafficSample
 
 router = APIRouter(prefix="/v1", tags=["SentinelGrid Core"])
 policy_service = PolicyManagerService()
+
+# SSE Real-Time Event Bus
+sse_subscribers: List[asyncio.Queue] = []
+
+def broadcast_sse_event(ev_data: dict):
+    for q in list(sse_subscribers):
+        try:
+            q.put_nowait(ev_data)
+        except Exception:
+            pass
 
 
 # -----------------------------------------------------------------------------
@@ -865,12 +877,62 @@ async def batch_ingest_events(events: List[EventIngestRequest]):
                 final_details
             ))
 
+            # Broadcast instantly to all live SSE subscribers
+            broadcast_sse_event({
+                "id": ev.event_id,
+                "website_id": target_site_id,
+                "timestamp": now_iso,
+                "client_ip": ev.client_ip,
+                "method": ev.method,
+                "path": ev.path,
+                "action": ev.action,
+                "risk_score": ev.risk_score,
+                "rule_triggered": ev.rule_triggered,
+                "owasp_category": ev.owasp_category,
+                "details": final_details
+            })
+
         conn.executemany("""
             INSERT OR REPLACE INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, records)
 
     return {"status": "batch_ingested", "count": len(records)}
+
+
+@router.get("/events/stream")
+async def stream_live_events(request: Request):
+    """
+    Server-Sent Events (SSE) live pipeline for real-time traffic observability.
+    Broadcasts both clean allowed requests and intercepted threats instantaneously.
+    """
+    q: asyncio.Queue = asyncio.Queue(maxsize=100)
+    sse_subscribers.append(q)
+
+    async def event_generator():
+        try:
+            yield f"data: {json.dumps({'type': 'init', 'message': 'SentinelGrid SSE Pipeline Connected'})}\n\n"
+            while True:
+                if await request.is_disconnected():
+                    break
+                try:
+                    data = await asyncio.wait_for(q.get(), timeout=15.0)
+                    yield f"data: {json.dumps(data)}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": keep-alive\n\n"
+        finally:
+            if q in sse_subscribers:
+                sse_subscribers.remove(q)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
 
 
 @router.post("/ip-rules/quick-action")
