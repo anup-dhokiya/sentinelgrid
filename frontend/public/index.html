@@ -102,84 +102,265 @@
     }
 
     /* Custom Scrollbars */
-    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--canvas-bg); }
-    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 
-    /* Top Persistent Application Header */
-    .app-header {
-      background: var(--card-white);
-      border-bottom: 1px solid var(--stone-border);
-      padding: 0 28px;
-      height: 68px;
+    /* Modern Flex App Layout with Left Slide Collapsible Sidebar */
+    .app-layout {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* Left Slide Sidebar */
+    .app-sidebar {
+      width: 250px;
+      min-width: 250px;
+      background: var(--card-white);
+      border-right: 1px solid var(--stone-border);
+      display: flex;
+      flex-direction: column;
       position: sticky;
       top: 0;
-      z-index: 100;
+      height: 100vh;
+      z-index: 200;
+      transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
-    .brand-area {
+    .app-sidebar.collapsed {
+      width: 72px;
+      min-width: 72px;
+    }
+
+    .sidebar-header {
+      padding: 16px 14px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--stone-border-light);
     }
 
-    .brand-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: var(--deep-indigo);
-      color: #FFF;
+    .sidebar-brand {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 800;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .brand-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text-charcoal);
-      letter-spacing: -0.3px;
-    }
-
-    /* Modular Navigation Menu Tabs */
-    .nav-menu {
-      display: flex;
-      gap: 3px;
-      background: var(--sand-warm);
-      padding: 3px;
-      border-radius: 10px;
-      border: 1px solid var(--stone-border);
-      overflow-x: auto;
-    }
-
-    .nav-item {
-      padding: 7px 14px;
-      border-radius: 7px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
+      gap: 10px;
       cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      overflow: hidden;
       white-space: nowrap;
     }
 
-    .nav-item:hover { color: var(--text-charcoal); }
+    .sidebar-brand-text {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-charcoal);
+      transition: opacity 0.2s;
+    }
 
-    .nav-item.active {
-      background: var(--card-white);
+    .app-sidebar.collapsed .sidebar-brand-text {
+      display: none;
+    }
+
+    .sidebar-toggle-btn {
+      background: var(--sand-warm);
+      border: 1px solid var(--stone-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.15s;
+    }
+
+    .sidebar-toggle-btn:hover {
       color: var(--deep-indigo);
-      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+      border-color: var(--deep-indigo);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 10px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-section-title {
+      font-size: 10px;
+      font-family: var(--font-mono);
       font-weight: 700;
+      color: var(--text-subtle);
+      padding: 12px 18px 4px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .app-sidebar.collapsed .sidebar-section-title {
+      display: none;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 16px;
+      margin: 2px 8px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      background: var(--sand-warm);
+      color: var(--text-charcoal);
+    }
+
+    .sidebar-item.active {
+      background: var(--indigo-soft);
+      color: var(--deep-indigo);
+      font-weight: 700;
+    }
+
+    .sidebar-item.active::before {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 6px;
+      bottom: 6px;
+      width: 4px;
+      border-radius: 0 4px 4px 0;
+      background: var(--deep-indigo);
+    }
+
+    .sidebar-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-label {
+      transition: opacity 0.2s;
+    }
+
+    .app-sidebar.collapsed .sidebar-label {
+      display: none;
+    }
+
+    .sidebar-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--stone-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--sand-warm);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .sidebar-user-meta {
+      min-width: 0;
+      transition: opacity 0.2s;
+    }
+
+    .app-sidebar.collapsed .sidebar-user-meta {
+      display: none;
+    }
+
+    .sidebar-user-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-charcoal);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .role-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--stone-border);
+      text-transform: uppercase;
+    }
+    .role-badge.badge-manager {
+      color: #818CF8;
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+    .role-badge.badge-team-leader {
+      color: #FBBF24;
+      background: rgba(217, 119, 6, 0.15);
+      border-color: rgba(217, 119, 6, 0.4);
+    }
+    .role-badge.badge-member {
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-logout-icon {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: var(--radius-sm);
+      padding: 4px 6px;
+      transition: all 0.15s;
+    }
+    .btn-logout-icon:hover {
+      color: var(--terracotta);
+      border-color: rgba(239, 68, 68, 0.3);
+      background: var(--terracotta-soft);
+    }
+
+    /* Content Wrapper & Topbar */
+    .content-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-topbar {
+      background: var(--card-white);
+      border-bottom: 1px solid var(--stone-border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
     }
 
     .user-profile-badge {
@@ -531,75 +712,120 @@
 </head>
 <body>
 
-  <!-- Top Persistent Application Header -->
-  <header class="app-header">
-    <div class="brand-area">
-      <div class="sg-logo-container" style="display: flex; align-items: center; cursor: pointer;" onclick="switchTab('dashboard')">
-        <svg class="sg-animated-logo" width="38" height="38" viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="shield-grad-dark" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#21262D"/>
-              <stop offset="100%" stop-color="#0D1117"/>
-            </linearGradient>
-            <linearGradient id="cyan-glow-beam" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#38BDF8"/>
-              <stop offset="100%" stop-color="#0284C7"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" stroke-dasharray="6,4" class="radar-outer-ring"/>
-          <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="url(#shield-grad-dark)" stroke="#38BDF8" stroke-width="2"/>
-          <polygon points="50,10 88,32 50,50 12,32" fill="rgba(56, 189, 248, 0.12)"/>
-          <polygon points="88,32 88,68 50,50" fill="rgba(0, 0, 0, 0.4)"/>
-          <polygon points="12,32 50,50 12,68" fill="rgba(255, 255, 255, 0.05)"/>
-          <polygon points="50,34 64,50 50,66 36,50" fill="url(#cyan-glow-beam)" class="shield-crystal-core"/>
-          <circle cx="50" cy="50" r="4" fill="#F0F6FC"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-title">SentinelGrid Enterprise WAAP</div>
-        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Real-Time L7 Threat Mitigation & Edge Mesh</div>
-      </div>
-    </div>
-
-    <!-- Modular Navigation Menu Tabs -->
-    <nav class="nav-menu">
-      <div class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
-      <a href="/live-traffic.html" class="nav-item" style="text-decoration: none;">⚡ Live Traffic</a>
-      <div class="nav-item" onclick="switchTab('domains')">🌐 Domains & Sites</div>
-      <div class="nav-item" onclick="switchTab('inventory')">🔍 Discovered APIs</div>
-      <div class="nav-item" onclick="switchTab('iprules')">🛡️ IP Access Control</div>
-      <div class="nav-item" onclick="switchTab('connectors')">🔌 Edge Nodes</div>
-      <div class="nav-item" onclick="switchTab('sandbox')">🧪 In-Line WAF Lab</div>
-      <div class="nav-item" onclick="switchTab('simulation')">📈 Policy Simulation</div>
-      <div class="nav-item" onclick="switchTab('onboarding')">📖 Setup Guide</div>
-    </nav>
-
-    <!-- Controls & User Badge -->
-    <div class="user-profile-badge">
-      <!-- Theme Switcher Toggle -->
-      <button id="theme-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleThemePreference()">
-        🌙 Theme: OBSIDIAN
-      </button>
-
-      <!-- Timezone Switcher Toggle -->
-      <button id="tz-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleTimezonePreference()">
-        🌐 TZ: LOCAL (IST)
-      </button>
-
-      <!-- Synthesizer Audio Alerts Toggle -->
-      <button id="sound-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleSoundAlerts()">
-        🔇 Sound: OFF
-      </button>
-
-      <div id="auth-logged-in-box" style="display: flex; align-items: center; gap: 8px;">
-        <div class="avatar-circle">AD</div>
-        <div style="font-size: 12px;">
-          <div style="font-weight: 700;">Anup Dhokiya</div>
-          <div style="color: var(--text-muted); font-size: 10px;">SEC ARCHITECT</div>
+  <div class="app-layout" id="appLayout">
+    <!-- Left Slide Collapsible Rollable Sidebar -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand" onclick="switchTab('dashboard')">
+          <svg class="sg-animated-logo" width="30" height="30" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" stroke-dasharray="6,4" class="radar-outer-ring"/>
+            <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="#151E32" stroke="#38BDF8" stroke-width="2"/>
+            <polygon points="50,34 64,50 50,66 36,50" fill="#38BDF8" class="shield-crystal-core"/>
+          </svg>
+          <div class="sidebar-brand-text">
+            <div style="font-weight: 800; font-size: 14px; letter-spacing: -0.3px; color: var(--text-charcoal);">SentinelGrid</div>
+            <div style="font-size: 9px; color: var(--text-muted); font-family: var(--font-mono);">ENTERPRISE WAAP</div>
+          </div>
         </div>
+        <button class="sidebar-toggle-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse / Expand Sidebar">
+          <span id="collapse-arrow-icon">◀</span>
+        </button>
       </div>
-    </div>
-  </header>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-title">OPERATIONS</div>
+        <div class="sidebar-item nav-item active" onclick="switchTab('dashboard')">
+          <span class="sidebar-icon">📊</span>
+          <span class="sidebar-label">Dashboard</span>
+        </div>
+        <a href="/live-traffic.html" class="sidebar-item" style="text-decoration: none;">
+          <span class="sidebar-icon">⚡</span>
+          <span class="sidebar-label">Live Traffic</span>
+        </a>
+        <div class="sidebar-item nav-item" onclick="switchTab('domains')">
+          <span class="sidebar-icon">🌐</span>
+          <span class="sidebar-label">Domains & Sites</span>
+        </div>
+
+        <div class="sidebar-section-title">SURFACE & POLICIES</div>
+        <div class="sidebar-item nav-item" onclick="switchTab('inventory')">
+          <span class="sidebar-icon">🔍</span>
+          <span class="sidebar-label">Discovered APIs</span>
+        </div>
+        <div class="sidebar-item nav-item" onclick="switchTab('iprules')">
+          <span class="sidebar-icon">🛡️</span>
+          <span class="sidebar-label">IP Access Control</span>
+        </div>
+        <div class="sidebar-item nav-item" onclick="switchTab('connectors')">
+          <span class="sidebar-icon">🔌</span>
+          <span class="sidebar-label">Edge Nodes</span>
+        </div>
+
+        <div class="sidebar-section-title">TESTING & LABS</div>
+        <div class="sidebar-item nav-item" onclick="switchTab('sandbox')">
+          <span class="sidebar-icon">🧪</span>
+          <span class="sidebar-label">In-Line WAF Lab</span>
+        </div>
+        <div class="sidebar-item nav-item" onclick="switchTab('simulation')">
+          <span class="sidebar-icon">📈</span>
+          <span class="sidebar-label">Policy Simulation</span>
+        </div>
+        <div class="sidebar-item nav-item" onclick="switchTab('onboarding')">
+          <span class="sidebar-icon">📖</span>
+          <span class="sidebar-label">Setup Guide</span>
+        </div>
+      </nav>
+
+      <!-- Sidebar Bottom Profile & Role Badge -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar-circle" id="user-avatar">OP</div>
+          <div class="sidebar-user-meta">
+            <div class="sidebar-user-name" id="user-display-name">Operator</div>
+            <span class="role-badge" id="user-role-badge">MEMBER</span>
+          </div>
+        </div>
+        <button class="btn-logout-icon" onclick="handleLogout()" title="Log Out">⎋</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Toggle Sidebar">
+            <span>☰</span>
+          </button>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-charcoal); display: flex; align-items: center; gap: 6px;">
+            <span style="color: var(--text-muted);">SentinelGrid</span>
+            <span style="color: var(--stone-border);">/</span>
+            <span id="topbar-current-view" style="color: var(--deep-indigo);">Dashboard</span>
+          </div>
+        </div>
+
+        <!-- Controls & User Badge -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- Theme Switcher Toggle -->
+          <button id="theme-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleThemePreference()">
+            🌙 Theme: OBSIDIAN
+          </button>
+
+          <!-- Timezone Switcher Toggle -->
+          <button id="tz-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleTimezonePreference()">
+            🌐 TZ: LOCAL (IST)
+          </button>
+
+          <!-- Synthesizer Audio Alerts Toggle -->
+          <button id="sound-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleSoundAlerts()">
+            🔇 Sound: OFF
+          </button>
+
+          <a href="/register.html" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; text-decoration: none;" title="Add Team Operator">
+            ➕ New Operator
+          </a>
+        </div>
+      </header>
 
   <!-- Main View Router -->
   <main class="app-main">
@@ -647,110 +873,41 @@
       </div>
 
       <!-- ===================================================================== -->
-      <!-- 3D ISOMETRIC SECURITY PIPELINE TOPOLOGY VISUALIZER -->
+      <!-- 3D ISOMETRIC SECURITY PIPELINE TOPOLOGY & INTERACTIVE PARTICLE ENGINE -->
       <!-- ===================================================================== -->
-      <div class="panel" style="margin-bottom: 22px; padding: 18px 22px; position: relative; overflow: hidden; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div class="panel topology-card" id="topology3dCard" style="margin-bottom: 22px; padding: 18px 22px; position: relative; overflow: hidden; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); transform-style: preserve-3d; transition: transform 0.15s ease;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.8px; color: var(--deep-indigo); text-transform: uppercase;">
-              ⚡ 3D In-Line Execution Topology & Sub-1.5ms Inspection Budget
+              ⚡ Interactive 3D In-Line Execution Pipeline & Live Packet Mesh
             </span>
-            <span class="badge badge-online">
-              P99: 0.35ms (IN-PROCESS)
-            </span>
+            <span class="badge badge-online">P99: 0.35ms (IN-PROCESS)</span>
           </div>
-          <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);">
-            Zero-Copy Radix LPM • SmartParse AST DFA • Authenticated Origin Shield
+
+          <!-- 3D Stream Controls -->
+          <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; font-family: var(--font-mono);">
+            <label style="color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
+              Flow:
+              <select id="canvas-speed-select" class="form-input" style="padding: 2px 6px; font-size: 11px; width: 75px; margin: 0; background: var(--sand-warm);" onchange="setParticleSpeed(this.value)">
+                <option value="1">1.0x</option>
+                <option value="2" selected>2.0x</option>
+                <option value="4">4.0x</option>
+                <option value="0.5">0.5x</option>
+              </select>
+            </label>
+            <button class="btn btn-subtle" style="font-size: 10px; padding: 3px 8px;" onclick="triggerSimulatedThreatWave()">
+              🚨 Inject Attack Wave
+            </button>
+            <button class="btn btn-subtle" id="canvas-pause-btn" style="font-size: 10px; padding: 3px 8px;" onclick="toggleParticleStream()">
+              ⏸️ Pause 3D
+            </button>
           </div>
         </div>
 
-        <svg id="isometric-pipeline-svg" width="100%" height="210" viewBox="0 0 1100 210" style="overflow: visible;">
-          <defs>
-            <linearGradient id="cube-top-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#1E293B"/>
-              <stop offset="100%" stop-color="#0F172A"/>
-            </linearGradient>
-            <linearGradient id="cube-side-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#0F172A"/>
-              <stop offset="100%" stop-color="#020617"/>
-            </linearGradient>
-            <linearGradient id="beam-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.2"/>
-              <stop offset="50%" stop-color="#38BDF8" stop-opacity="1"/>
-              <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
-            </linearGradient>
-            <linearGradient id="beam-crimson" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#EF4444" stop-opacity="0.2"/>
-              <stop offset="50%" stop-color="#EF4444" stop-opacity="1"/>
-              <stop offset="100%" stop-color="#EF4444" stop-opacity="0.2"/>
-            </linearGradient>
-            <linearGradient id="beam-emerald" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#10B981" stop-opacity="0.2"/>
-              <stop offset="50%" stop-color="#10B981" stop-opacity="1"/>
-              <stop offset="100%" stop-color="#10B981" stop-opacity="0.2"/>
-            </linearGradient>
-            <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-            <filter id="glow-crimson" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
-
-          <!-- 1. Isometric Conduits with animated pulses -->
-          <path d="M 160 105 L 450 105" stroke="var(--stone-border)" stroke-width="2" stroke-dasharray="4,4"/>
-          <path d="M 160 105 L 450 105" stroke="url(#beam-cyan)" stroke-width="3" filter="url(#glow-cyan)"/>
-          
-          <path d="M 650 90 L 930 55" stroke="var(--stone-border)" stroke-width="2" stroke-dasharray="4,4"/>
-          <path d="M 650 90 L 930 55" stroke="url(#beam-emerald)" stroke-width="3"/>
-          
-          <path d="M 650 125 L 930 155" stroke="var(--stone-border)" stroke-width="2" stroke-dasharray="4,4"/>
-          <path d="M 650 125 L 930 155" stroke="url(#beam-crimson)" stroke-width="3" filter="url(#glow-crimson)"/>
-
-          <!-- 2. Node 1: Client Ingress Gateway -->
-          <g transform="translate(80, 70)">
-            <polygon points="40,0 80,18 40,36 0,18" fill="#1E293B" stroke="var(--stone-border)" stroke-width="1"/>
-            <polygon points="0,18 40,36 40,58 0,40" fill="#0F172A" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <polygon points="80,18 40,36 40,58 80,40" fill="#0B0F17" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <circle cx="40" cy="18" r="9" fill="#38BDF8" fill-opacity="0.25" stroke="#38BDF8" stroke-width="2" filter="url(#glow-cyan)"/>
-            <text x="40" y="75" fill="var(--text-muted)" font-size="10" font-family="var(--font-mono)" font-weight="700" text-anchor="middle">CLIENT INGRESS</text>
-            <text x="40" y="88" fill="var(--text-subtle)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">Port 8080</text>
-          </g>
-
-          <!-- 3. Node 2: SentinelGrid Core Engine (Massive Hex Cube) -->
-          <g transform="translate(470, 35)">
-            <polygon points="85,0 170,42 85,84 0,42" fill="url(#cube-top-cyan)" stroke="#38BDF8" stroke-width="1.5"/>
-            <polygon points="0,42 85,84 85,138 0,96" fill="url(#cube-side-cyan)" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <polygon points="170,42 85,84 85,138 170,96" fill="#020617" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <polygon points="85,18 132,42 85,66 38,42" fill="rgba(56, 189, 248, 0.08)" stroke="#38BDF8" stroke-width="1" stroke-dasharray="3,3"/>
-            <circle cx="85" cy="42" r="13" fill="#0E131F" stroke="#38BDF8" stroke-width="2" filter="url(#glow-cyan)"/>
-            <circle cx="85" cy="42" r="5" fill="#38BDF8"/>
-            <text x="85" y="156" fill="var(--text-charcoal)" font-size="12" font-family="var(--font-mono)" font-weight="800" text-anchor="middle">SENTINELGRID WAAP</text>
-            <text x="85" y="170" fill="var(--deep-indigo)" font-size="10" font-family="var(--font-mono)" font-weight="700" text-anchor="middle">SmartParse DFA • Radix LPM</text>
-          </g>
-
-          <!-- 4. Node 3A: Upstream Origin -->
-          <g transform="translate(940, 20)">
-            <polygon points="40,0 80,18 40,36 0,18" fill="#13231B" stroke="#10B981" stroke-width="1.5"/>
-            <polygon points="0,18 40,36 40,58 0,40" fill="#0A150F" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <polygon points="80,18 40,36 40,58 80,40" fill="#050D09" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <circle cx="40" cy="18" r="8" fill="#10B981" fill-opacity="0.3" stroke="#10B981" stroke-width="2"/>
-            <text x="40" y="75" fill="var(--sage-green)" font-size="10" font-family="var(--font-mono)" font-weight="800" text-anchor="middle">AEGIS-PRO ORIGIN</text>
-            <text x="40" y="88" fill="var(--text-muted)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">Port 3000 (Shielded)</text>
-          </g>
-
-          <!-- 5. Node 3B: Threat Sinkhole -->
-          <g transform="translate(940, 125)">
-            <polygon points="40,0 80,18 40,36 0,18" fill="#251417" stroke="#EF4444" stroke-width="1.5"/>
-            <polygon points="0,18 40,36 40,58 0,40" fill="#170A0D" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <polygon points="80,18 40,36 40,58 80,40" fill="#0F0507" stroke="var(--stone-border-light)" stroke-width="1"/>
-            <circle cx="40" cy="18" r="8" fill="#EF4444" fill-opacity="0.3" stroke="#EF4444" stroke-width="2" filter="url(#glow-crimson)"/>
-            <text x="40" y="75" fill="var(--terracotta)" font-size="10" font-family="var(--font-mono)" font-weight="800" text-anchor="middle">QUARANTINE / DROP</text>
-            <text x="40" y="88" fill="var(--text-muted)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">403 Intercepted</text>
-          </g>
-        </svg>
+        <div style="position: relative; width: 100%; min-height: 220px;">
+          <canvas id="interactive-3d-pipeline-canvas" width="1100" height="220" style="width: 100%; height: 220px; display: block; border-radius: 8px; background: var(--sand-warm); cursor: crosshair;"></canvas>
+          <div id="canvas-node-hud" style="position: absolute; display: none; background: rgba(17, 23, 38, 0.95); border: 1px solid var(--deep-indigo); border-radius: 8px; padding: 8px 12px; color: #FFF; font-size: 11px; font-family: var(--font-mono); pointer-events: none; z-index: 50; box-shadow: 0 4px 16px rgba(0,0,0,0.6);"></div>
+        </div>
       </div>
 
       <!-- Metric KPI Grid -->
@@ -1181,6 +1338,8 @@ app.add_middleware(
     </section>
 
   </main>
+    </div> <!-- /content-wrapper -->
+  </div> <!-- /app-layout -->
 
   <!-- ======================================================================= -->
   <!-- MODAL / DRAWER 1: THREAT FORENSICS SIDE DRAWER -->
@@ -1315,6 +1474,447 @@ app.add_middleware(
   <!-- Interactive Modular JavaScript Controller -->
   <script>
     const API = "/v1";
+
+    // -------------------------------------------------------------------------
+    // Session Authentication Guard & RBAC Initializer
+    // -------------------------------------------------------------------------
+    const authToken = localStorage.getItem("sg_auth_token");
+    let currentUser = null;
+    try {
+      currentUser = JSON.parse(localStorage.getItem("sg_auth_user") || "null");
+    } catch (_) {}
+
+    // Redirect unauthenticated operators immediately to login
+    if (!authToken || !currentUser) {
+      window.location.replace("/login.html");
+    }
+
+    function initUserSessionUI() {
+      if (!currentUser) return;
+      const nameEl = document.getElementById("user-display-name");
+      const avatarEl = document.getElementById("user-avatar");
+      const badgeEl = document.getElementById("user-role-badge");
+
+      const displayName = currentUser.full_name || currentUser.email.split("@")[0];
+      if (nameEl) nameEl.innerText = displayName;
+
+      if (avatarEl) {
+        const parts = displayName.trim().split(" ");
+        let initials = parts[0][0].toUpperCase();
+        if (parts.length > 1) initials += parts[1][0].toUpperCase();
+        else if (displayName.length > 1) initials += displayName[1].toUpperCase();
+        avatarEl.innerText = initials;
+      }
+
+      if (badgeEl) {
+        const role = (currentUser.role || "member").toUpperCase();
+        badgeEl.innerText = role;
+        badgeEl.className = "role-badge";
+        if (role === "MANAGER") badgeEl.classList.add("badge-manager");
+        else if (role === "TEAM_LEADER") badgeEl.classList.add("badge-team-leader");
+        else badgeEl.classList.add("badge-member");
+      }
+    }
+
+    async function handleLogout() {
+      const token = localStorage.getItem("sg_auth_token");
+      try {
+        if (token) {
+          await fetch(`${API}/auth/logout`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+        }
+      } catch (_) {}
+      localStorage.removeItem("sg_auth_token");
+      localStorage.removeItem("sg_auth_user");
+      window.location.replace("/login.html");
+    }
+
+    // -------------------------------------------------------------------------
+    // Collapsible Left-Slide Sidebar Controller
+    // -------------------------------------------------------------------------
+    function toggleSidebarCollapse() {
+      const sidebar = document.getElementById("appSidebar");
+      if (!sidebar) return;
+      const isCollapsed = sidebar.classList.toggle("collapsed");
+      localStorage.setItem("sg_sidebar_collapsed", isCollapsed ? "true" : "false");
+    }
+
+    function initSidebarState() {
+      if (localStorage.getItem("sg_sidebar_collapsed") === "true") {
+        document.getElementById("appSidebar")?.classList.add("collapsed");
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Interactive 3D In-Line Execution Pipeline & Live Packet Mesh Engine
+    // -------------------------------------------------------------------------
+    let particleAnimationId = null;
+    let particleSpeedMultiplier = 2.0;
+    let isParticleStreamActive = true;
+    const particles = [];
+    const explosionSparks = [];
+
+    const PIPELINE_NODES = [
+      {
+        id: "ingress",
+        label: "Client Ingress",
+        sublabel: "Untrusted Web Traffic",
+        badge: "PORT 443 / TLS",
+        xRatio: 0.12,
+        yRatio: 0.50,
+        radius: 26,
+        color: "#38BDF8",
+        glow: "rgba(56, 189, 248, 0.35)",
+        desc: "Edge TLS termination & HTTP/2 connection pool receiving live client requests.",
+        telemetry: { status: "ACTIVE", rps: "1,420 req/s", transport: "TLS 1.3" }
+      },
+      {
+        id: "waap",
+        label: "SentinelGrid WAAP",
+        sublabel: "In-Process Zero-Trust Engine",
+        badge: "GATE 0-6 P99:0.35ms",
+        xRatio: 0.50,
+        yRatio: 0.50,
+        radius: 36,
+        color: "#818CF8",
+        glow: "rgba(129, 140, 248, 0.45)",
+        desc: "In-process normalization, regex token gate, Shannon entropy & Ed25519 signature enforcement.",
+        telemetry: { status: "PROTECTED", latency: "0.35ms", crypto: "Ed25519 RFC 8032" }
+      },
+      {
+        id: "origin",
+        label: "Protected Origin",
+        sublabel: "Sanitized Upstream Service",
+        badge: "UPSTREAM 3000",
+        xRatio: 0.88,
+        yRatio: 0.28,
+        radius: 26,
+        color: "#34D399",
+        glow: "rgba(52, 211, 153, 0.4)",
+        desc: "Sanitized, legitimate user requests forwarded without sidecar latency.",
+        telemetry: { status: "HEALTHY", upstream: "127.0.0.1:3000", error_rate: "0.00%" }
+      },
+      {
+        id: "quarantine",
+        label: "Threat Quarantine",
+        sublabel: "Mitigated Attack Sinkhole",
+        badge: "403 BLOCKED",
+        xRatio: 0.88,
+        yRatio: 0.72,
+        radius: 26,
+        color: "#F87171",
+        glow: "rgba(248, 113, 113, 0.45)",
+        desc: "Exploit vectors (SQLi, XSS, BOLA, RCE) deflected and dropped with microsecond forensics.",
+        telemetry: { status: "CONTAINING", trap: "Dynamic Tarpit", mitigated: "100.0%" }
+      }
+    ];
+
+    function setParticleSpeed(val) {
+      particleSpeedMultiplier = parseFloat(val) || 2.0;
+    }
+
+    function toggleParticleStream() {
+      isParticleStreamActive = !isParticleStreamActive;
+      const btn = document.getElementById("canvas-pause-btn");
+      if (btn) btn.innerText = isParticleStreamActive ? "⏸️ Pause 3D" : "▶️ Resume 3D";
+    }
+
+    function triggerSimulatedThreatWave() {
+      showToast("🚨 Attack Wave Injected: 35 malicious exploit packets dispatched to pipeline!", "error");
+      for (let i = 0; i < 35; i++) {
+        particles.push({
+          leg: 0,
+          t: -0.04 * i,
+          speed: (0.007 + Math.random() * 0.004) * particleSpeedMultiplier,
+          isThreat: true,
+          size: 3.5 + Math.random() * 1.5,
+          trail: []
+        });
+      }
+    }
+
+    function initInteractive3DPipeline() {
+      const canvas = document.getElementById("interactive-3d-pipeline-canvas");
+      const card = document.getElementById("topology3dCard");
+      const hud = document.getElementById("canvas-node-hud");
+      if (!canvas || !card) return;
+
+      const ctx = canvas.getContext("2d");
+
+      // Perspective tilt listener on container
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const dx = (e.clientX - rect.left) / rect.width - 0.5;
+        const dy = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `perspective(1200px) rotateX(${-dy * 5}deg) rotateY(${dx * 7}deg)`;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg)";
+        if (hud) hud.style.display = "none";
+      });
+
+      // Mouse Hover HUD on Canvas Nodes
+      canvas.addEventListener("mousemove", (e) => {
+        if (!hud) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mouseX = (e.clientX - rect.left) * scaleX;
+        const mouseY = (e.clientY - rect.top) * scaleY;
+
+        let hovered = null;
+        for (const n of PIPELINE_NODES) {
+          const nx = n.xRatio * canvas.width;
+          const ny = n.yRatio * canvas.height;
+          const dist = Math.hypot(mouseX - nx, mouseY - ny);
+          if (dist <= n.radius + 8) {
+            hovered = n;
+            break;
+          }
+        }
+
+        if (hovered) {
+          hud.style.display = "block";
+          hud.style.left = `${Math.min(rect.width - 240, Math.max(10, e.clientX - rect.left + 15))}px`;
+          hud.style.top = `${Math.min(rect.height - 110, Math.max(10, e.clientY - rect.top - 20))}px`;
+          hud.innerHTML = `
+            <div style="font-weight: 800; color: ${hovered.color}; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+              <span>${escapeHtml(hovered.label)}</span>
+              <span style="font-size: 9px; padding: 1px 4px; background: rgba(255,255,255,0.1); border-radius: 3px;">${hovered.badge}</span>
+            </div>
+            <div style="font-size: 10px; color: #CBD5E1; margin-bottom: 6px;">${escapeHtml(hovered.desc)}</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 9px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
+              ${Object.entries(hovered.telemetry).map(([k, v]) => `<div><span style="color:#94A3B8;">${k.toUpperCase()}:</span> <strong>${escapeHtml(v)}</strong></div>`).join("")}
+            </div>
+          `;
+        } else {
+          hud.style.display = "none";
+        }
+      });
+
+      function evalCubicBezier(p0, p1, p2, p3, t) {
+        const u = 1 - t;
+        const tt = t * t;
+        const uu = u * u;
+        const uuu = uu * u;
+        const ttt = tt * t;
+        return {
+          x: uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x,
+          y: uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y
+        };
+      }
+
+      function spawnBaseParticle() {
+        if (!isParticleStreamActive) return;
+        const isThreat = Math.random() < 0.22;
+        particles.push({
+          leg: 0,
+          t: 0,
+          speed: (0.0045 + Math.random() * 0.0035) * particleSpeedMultiplier,
+          isThreat: isThreat,
+          size: isThreat ? 3.8 : 3.0,
+          trail: []
+        });
+      }
+
+      let lastSpawn = 0;
+      function render(now) {
+        if (now - lastSpawn > (110 / particleSpeedMultiplier)) {
+          spawnBaseParticle();
+          lastSpawn = now;
+        }
+
+        const W = canvas.width;
+        const H = canvas.height;
+
+        const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+        ctx.fillStyle = isDark ? "#0D1117" : "#F7F6F2";
+        ctx.fillRect(0, 0, W, H);
+
+        // Draw 3D Isometric Grid Floor
+        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.03)";
+        ctx.lineWidth = 1;
+        const step = 28;
+        for (let x = 0; x < W; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y < H; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+
+        const nodes = {};
+        for (const n of PIPELINE_NODES) {
+          nodes[n.id] = {
+            ...n,
+            x: n.xRatio * W,
+            y: n.yRatio * H
+          };
+        }
+
+        const paths = [
+          {
+            p0: { x: nodes.ingress.x + nodes.ingress.radius, y: nodes.ingress.y },
+            p1: { x: (nodes.ingress.x + nodes.waap.x) / 2, y: nodes.ingress.y },
+            p2: { x: (nodes.ingress.x + nodes.waap.x) / 2, y: nodes.waap.y },
+            p3: { x: nodes.waap.x - nodes.waap.radius, y: nodes.waap.y },
+            color: isDark ? "rgba(56, 189, 248, 0.22)" : "rgba(2, 132, 199, 0.25)"
+          },
+          {
+            p0: { x: nodes.waap.x + nodes.waap.radius, y: nodes.waap.y - 8 },
+            p1: { x: nodes.waap.x + (nodes.origin.x - nodes.waap.x) * 0.45, y: nodes.waap.y - 12 },
+            p2: { x: nodes.origin.x - (nodes.origin.x - nodes.waap.x) * 0.45, y: nodes.origin.y },
+            p3: { x: nodes.origin.x - nodes.origin.radius, y: nodes.origin.y },
+            color: isDark ? "rgba(52, 211, 153, 0.25)" : "rgba(5, 150, 105, 0.28)"
+          },
+          {
+            p0: { x: nodes.waap.x + nodes.waap.radius, y: nodes.waap.y + 8 },
+            p1: { x: nodes.waap.x + (nodes.quarantine.x - nodes.waap.x) * 0.45, y: nodes.waap.y + 16 },
+            p2: { x: nodes.quarantine.x - (nodes.quarantine.x - nodes.waap.x) * 0.45, y: nodes.quarantine.y },
+            p3: { x: nodes.quarantine.x - nodes.quarantine.radius, y: nodes.quarantine.y },
+            color: isDark ? "rgba(248, 113, 113, 0.28)" : "rgba(220, 38, 38, 0.3)"
+          }
+        ];
+
+        paths.forEach((p, idx) => {
+          ctx.beginPath();
+          ctx.moveTo(p.p0.x, p.p0.y);
+          ctx.bezierCurveTo(p.p1.x, p.p1.y, p.p2.x, p.p2.y, p.p3.x, p.p3.y);
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 3.5;
+          ctx.setLineDash(idx === 2 ? [6, 4] : []);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        });
+
+        if (isParticleStreamActive) {
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.t += p.speed;
+
+            if (p.t < 0) continue;
+
+            const path = paths[p.leg];
+            if (!path) {
+              particles.splice(i, 1);
+              continue;
+            }
+
+            const pos = evalCubicBezier(path.p0, path.p1, path.p2, path.p3, Math.min(1, p.t));
+            p.trail.push({ x: pos.x, y: pos.y });
+            if (p.trail.length > 6) p.trail.shift();
+
+            if (p.t >= 1.0) {
+              if (p.leg === 0) {
+                p.leg = p.isThreat ? 2 : 1;
+                p.t = 0;
+                p.trail = [];
+              } else {
+                if (p.leg === 2) {
+                  for (let s = 0; s < 6; s++) {
+                    const ang = Math.random() * Math.PI * 2;
+                    const spd = 1.0 + Math.random() * 2.5;
+                    explosionSparks.push({
+                      x: nodes.quarantine.x,
+                      y: nodes.quarantine.y,
+                      vx: Math.cos(ang) * spd,
+                      vy: Math.sin(ang) * spd,
+                      life: 1.0
+                    });
+                  }
+                }
+                particles.splice(i, 1);
+                continue;
+              }
+            }
+
+            if (p.trail.length > 1) {
+              ctx.beginPath();
+              ctx.moveTo(p.trail[0].x, p.trail[0].y);
+              for (let tr = 1; tr < p.trail.length; tr++) {
+                ctx.lineTo(p.trail[tr].x, p.trail[tr].y);
+              }
+              ctx.strokeStyle = p.isThreat ? "rgba(248, 113, 113, 0.4)" : "rgba(56, 189, 248, 0.4)";
+              ctx.lineWidth = p.size * 0.7;
+              ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.isThreat ? "#EF4444" : (p.leg === 1 ? "#22C55E" : "#38BDF8");
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+
+          for (let s = explosionSparks.length - 1; s >= 0; s--) {
+            const sp = explosionSparks[s];
+            sp.x += sp.vx;
+            sp.y += sp.vy;
+            sp.life -= 0.04;
+            if (sp.life <= 0) {
+              explosionSparks.splice(s, 1);
+              continue;
+            }
+            ctx.beginPath();
+            ctx.arc(sp.x, sp.y, 2 * sp.life, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(248, 113, 113, ${sp.life})`;
+            ctx.fill();
+          }
+        }
+
+        for (const key of Object.keys(nodes)) {
+          const n = nodes[key];
+
+          const pulse = (Math.sin(now * 0.003 + n.radius) + 1) * 0.5;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.radius + 4 + pulse * 4, 0, Math.PI * 2);
+          ctx.fillStyle = n.glow;
+          ctx.fill();
+
+          const grad = ctx.createRadialGradient(n.x - 4, n.y - 4, 2, n.x, n.y, n.radius);
+          grad.addColorStop(0, "#FFFFFF");
+          grad.addColorStop(0.35, n.color);
+          grad.addColorStop(1, isDark ? "#111827" : "#334155");
+
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.strokeStyle = n.color;
+          ctx.lineWidth = 2.5;
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = "#FFFFFF";
+          ctx.font = n.id === "waap" ? "bold 13px system-ui" : "bold 10px system-ui";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          const icon = n.id === "ingress" ? "🌐" : (n.id === "waap" ? "🛡️" : (n.id === "origin" ? "✅" : "⛔"));
+          ctx.fillText(icon, n.x, n.y);
+
+          ctx.font = "bold 11px system-ui, -apple-system, sans-serif";
+          ctx.fillStyle = isDark ? "#F8FAFC" : "#1E293B";
+          ctx.fillText(n.label, n.x, n.y + n.radius + 14);
+
+          ctx.font = "9px var(--font-mono, monospace)";
+          ctx.fillStyle = n.color;
+          ctx.fillText(n.badge, n.x, n.y + n.radius + 26);
+        }
+
+        particleAnimationId = requestAnimationFrame(render);
+      }
+
+      particleAnimationId = requestAnimationFrame(render);
+    }
 
     function escapeHtml(str) {
       if (!str) return "";
@@ -1490,6 +2090,21 @@ app.add_middleware(
       const navItems = Array.from(document.querySelectorAll(".nav-item"));
       const match = navItems.find(el => el.getAttribute("onclick")?.includes(`'${tabId}'`));
       if (match) match.classList.add("active");
+
+      const viewTitles = {
+        dashboard: "Live SOC Telemetry",
+        domains: "Domain & Site Mesh",
+        inventory: "Discovered API Routes",
+        iprules: "IP Access Control",
+        connectors: "Edge Nodes & Connectors",
+        sandbox: "In-Line WAF Lab",
+        simulation: "Policy Simulation",
+        onboarding: "Architecture & Setup Guide"
+      };
+      const topbarTitle = document.getElementById("topbar-current-view");
+      if (topbarTitle && viewTitles[tabId]) {
+        topbarTitle.innerText = viewTitles[tabId];
+      }
 
       if (updateUrl) {
         history.replaceState(null, null, "#" + tabId);
@@ -2562,6 +3177,9 @@ app.add_middleware(
     // -------------------------------------------------------------------------
     // Initial Setup on Page Load
     // -------------------------------------------------------------------------
+    initUserSessionUI();
+    initSidebarState();
+    initInteractive3DPipeline();
     applyTheme();
     document.getElementById("tz-toggle-btn").innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
     document.getElementById("sound-toggle-btn").innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";

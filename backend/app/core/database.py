@@ -139,15 +139,21 @@ def init_database():
         CREATE INDEX IF NOT EXISTS idx_connectors_site ON connectors(website_id);
         """)
 
-        # Ensure default administrator exists
+        # Ensure default administrator exists with 'manager' role and 'admin123' password
         cur = conn.cursor()
         cur.execute("SELECT count(*) FROM users WHERE email = 'anupdhokiya0@gmail.com'")
+        now = datetime.now(timezone.utc).isoformat()
+        admin123_hash = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"  # SHA-256 of "admin123"
         if cur.fetchone()[0] == 0:
-            now = datetime.now(timezone.utc).isoformat()
             cur.execute("""
             INSERT INTO users (id, email, password_hash, full_name, role, created_at)
-            VALUES ('usr-admin', 'anupdhokiya0@gmail.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'Anup Dhokiya', 'admin', ?)
-            """, (now,))
+            VALUES ('usr-admin', 'anupdhokiya0@gmail.com', ?, 'Anup Dhokiya', 'manager', ?)
+            """, (admin123_hash, now))
+        else:
+            # Synchronize password hash and role for existing seed
+            cur.execute("""
+            UPDATE users SET password_hash = ?, role = 'manager' WHERE email = 'anupdhokiya0@gmail.com'
+            """, (admin123_hash,))
     conn.close()
 
 

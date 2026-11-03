@@ -25,6 +25,9 @@ class SignupRequest(BaseModel):
     email: str
     password: str
     full_name: str
+    role: str = "member"  # 'manager', 'team_leader', 'member'
+
+ALLOWED_ROLES = {"manager", "team_leader", "member"}
 
 
 def hash_password(password: str) -> str:
@@ -54,10 +57,10 @@ def verify_password(plain_password: str, stored_hash: str) -> bool:
 
 
 def create_session(user_id: str) -> str:
-    """Persists a new cryptographically random session token in SQLite."""
+    """Persists a new cryptographically random session token in SQLite with 7-day TTL."""
     token = f"sg_session_{secrets.token_hex(24)}"
     now = datetime.now(timezone.utc)
-    expires = now + timedelta(hours=24)
+    expires = now + timedelta(days=7)
     conn = get_db_connection()
     with conn:
         conn.execute(
@@ -117,6 +120,19 @@ async def login(req: LoginRequest):
 
 @router.post("/signup")
 async def signup(req: SignupRequest):
+    role_clean = req.role.lower().strip()
+    if role_clean not in ALLOWED_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid role. Allowed operational roles are: {', '.join(sorted(ALLOWED_ROLES))}"
+        )
+
+    if len(req.password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters."
+        )
+
     pwd_hash = hash_password(req.password)
     user_id = f"usr-{uuid4().hex[:8]}"
     now = datetime.now(timezone.utc).isoformat()
@@ -125,8 +141,8 @@ async def signup(req: SignupRequest):
     try:
         with conn:
             conn.execute(
-                "INSERT INTO users (id, email, password_hash, full_name, role, created_at) VALUES (?, ?, ?, ?, 'analyst', ?)",
-                (user_id, req.email.lower().strip(), pwd_hash, req.full_name.strip(), now)
+                "INSERT INTO users (id, email, password_hash, full_name, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (user_id, req.email.lower().strip(), pwd_hash, req.full_name.strip(), role_clean, now)
             )
     except Exception as e:
         if "UNIQUE constraint failed" in str(e):
@@ -146,8 +162,38 @@ async def signup(req: SignupRequest):
         "token": token,
         "user": {
             "id": user_id,
-            "email": req.email,
-            "full_name": req.full_name,
-            "role": "analyst"
+            "email": req.email.lower().strip(),
+            "full_name": req.full_name.strip(),
+            "role": role_clean
         }
     }
+
+
+@router.get("/me")
+async def get_current_user_profile(authorization: Optional[str] = Header(None)):
+    """Returns active user identity and RBAC role from Bearer token."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing or invalid Bearer token.")
+
+    token = authorization.split("Bearer ", 1)[1].strip()
+    user = verify_session(token)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired or invalid.")
+
+    return {
+        "id": user["id"],
+        "email": user["email"],
+        "full_name": user["full_name"],
+        "role": user["role"]
+    }
+
+
+@router.post("/logout")
+async def logout(authorization: Optional[str] = Header(None)):
+    """Revokes session token from database."""
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        conn = get_db_connection()
+        with conn:
+            conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
+    return {"status": "logged_out", "message": "Session invalidated successfully."}
