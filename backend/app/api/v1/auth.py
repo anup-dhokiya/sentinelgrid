@@ -4,9 +4,11 @@ Provides JWT/Token-based Login, Signup, and User Session Verification.
 """
 
 import hashlib
-from datetime import datetime, timezone
+import secrets
+from datetime import datetime, timezone, timedelta
 from uuid import uuid4
-from fastapi import APIRouter, HTTPException, status
+from typing import Optional, Dict, Any
+from fastapi import APIRouter, HTTPException, status, Header, Depends
 from pydantic import BaseModel
 
 from app.core.database import get_db_connection
@@ -26,27 +28,80 @@ class SignupRequest(BaseModel):
 
 
 def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+    """Computes a cryptographically salted PBKDF2-HMAC-SHA256 hash (100,000 rounds)."""
+    salt = secrets.token_hex(16)
+    key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 100_000)
+    return f"pbkdf2:sha256:100000${salt}${key.hex()}"
+
+
+def verify_password(plain_password: str, stored_hash: str) -> bool:
+    """Verifies plain password against PBKDF2 hash or legacy unsalted SHA-256."""
+    if not stored_hash:
+        return False
+    if stored_hash.startswith("pbkdf2:sha256:"):
+        try:
+            parts = stored_hash.split("$")
+            rounds = int(parts[0].split(":")[2])
+            salt = parts[1]
+            expected_hex = parts[2]
+            computed = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt.encode("utf-8"), rounds).hex()
+            return secrets.compare_digest(computed, expected_hex)
+        except Exception:
+            return False
+    # Legacy unsalted SHA-256 fallback (e.g. initial seeded accounts)
+    legacy = hashlib.sha256(plain_password.encode("utf-8")).hexdigest()
+    return secrets.compare_digest(legacy, stored_hash)
+
+
+def create_session(user_id: str) -> str:
+    """Persists a new cryptographically random session token in SQLite."""
+    token = f"sg_session_{secrets.token_hex(24)}"
+    now = datetime.now(timezone.utc)
+    expires = now + timedelta(hours=24)
+    conn = get_db_connection()
+    with conn:
+        conn.execute(
+            "INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+            (token, user_id, now.isoformat(), expires.isoformat())
+        )
+    return token
+
+
+def verify_session(token: str) -> Optional[Dict[str, Any]]:
+    """Validates session token expiration and returns user record if active."""
+    if not token:
+        return None
+    conn = get_db_connection()
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with conn:
+        row = conn.execute("""
+            SELECT u.id, u.email, u.full_name, u.role, s.expires_at
+            FROM sessions s
+            JOIN users u ON s.user_id = u.id
+            WHERE s.token = ? AND s.expires_at > ?
+        """, (token.strip(), now_iso)).fetchone()
+    if row:
+        return dict(row)
+    return None
 
 
 @router.post("/login")
 async def login(req: LoginRequest):
-    pwd_hash = hash_password(req.password)
     conn = get_db_connection()
     with conn:
         row = conn.execute(
-            "SELECT id, email, full_name, role FROM users WHERE email = ? AND password_hash = ?",
-            (req.email.lower().strip(), pwd_hash)
+            "SELECT id, email, password_hash, full_name, role FROM users WHERE email = ?",
+            (req.email.lower().strip(),)
         ).fetchone()
 
-    if not row:
+    if not row or not verify_password(req.password, row["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials. Verify your email and password."
         )
 
-    # In production, this issues an asymmetric signed JWT token
-    token = f"sg_session_{uuid4().hex}"
+    # Issue persistent session token
+    token = create_session(row["id"])
 
     return {
         "status": "authenticated",
@@ -79,9 +134,12 @@ async def signup(req: SignupRequest):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="An account with this email address already exists."
             )
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to register user. An internal database error occurred."
+        )
 
-    token = f"sg_session_{uuid4().hex}"
+    token = create_session(user_id)
 
     return {
         "status": "created",

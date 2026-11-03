@@ -112,12 +112,6 @@ async def rollback_policy(request: RollbackRequest):
         ).fetchone()
 
         if not target_row:
-            target_row = conn.execute(
-                "SELECT * FROM policies WHERE website_id = ? ORDER BY version DESC LIMIT 1",
-                (site_id,)
-            ).fetchone()
-
-        if not target_row:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Target policy version {request.target_version} not found in history for {request.website_id}"

@@ -388,20 +388,33 @@
       }
     }
 
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
     function createRowHtml(ev) {
       const d = new Date(ev.timestamp);
       const timeStr = d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '.' + String(d.getMilliseconds()).padStart(3, '0');
+      const safeAction = escapeHtml(ev.action);
       const badgeClass = ev.action === 'BLOCK' ? 'badge-block' : (ev.action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
-      const verbClass = 'verb-' + (ev.method || 'get').toLowerCase();
+      const verbClass = 'verb-' + (ev.method || 'get').toLowerCase().replace(/[^a-z]/g, '');
+      const safeMethod = escapeHtml(ev.method);
+      const safePath = escapeHtml(ev.path);
+      const safeIp = escapeHtml(ev.client_ip);
+      const safeRule = escapeHtml(ev.rule_triggered || 'CLEAN');
+      const safeScore = Number(ev.risk_score) || 0;
 
       return `
         <td style="color: var(--text-muted);">${timeStr}</td>
-        <td><span class="badge ${badgeClass}">${ev.action}</span></td>
-        <td><span class="${verbClass}">${ev.method}</span></td>
-        <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 2px 6px; border-radius: 4px;">${ev.path}</code></td>
-        <td style="color: var(--deep-indigo);">${ev.client_ip}</td>
-        <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600;">${ev.rule_triggered || 'CLEAN'}</span></td>
-        <td style="font-weight: 700; color: ${ev.risk_score > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${ev.risk_score}</td>
+        <td><span class="badge ${badgeClass}">${safeAction}</span></td>
+        <td><span class="${verbClass}">${safeMethod}</span></td>
+        <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 2px 6px; border-radius: 4px;">${safePath}</code></td>
+        <td style="color: var(--deep-indigo);">${safeIp}</td>
+        <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600;">${safeRule}</span></td>
+        <td style="font-weight: 700; color: ${safeScore > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${safeScore}</td>
         <td><button class="btn" style="padding: 2px 6px; font-size: 10px;" onclick="event.stopPropagation(); openForensics('${encodeURIComponent(JSON.stringify(ev))}')">Inspect</button></td>
       `;
     }

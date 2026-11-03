@@ -6,6 +6,7 @@ Author: Anup Dhokiya (@anup-dhokiya) - Lead Architect
 
 import logging
 import json
+import html
 from typing import Callable, Dict, Any, Optional
 import httpx
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -74,6 +75,8 @@ class SentinelGridASGIMiddleware(BaseHTTPMiddleware):
                 if action == "BLOCK":
                     event_id = decision.get("event_id", "N/A")
                     rule = decision.get("rule_triggered", "SECURITY-POLICY")
+                    safe_event_id = html.escape(str(event_id))
+                    safe_rule = html.escape(str(rule))
                     logger.warning(
                         "SentinelGrid BLOCKED request: ip=%s path=%s rule=%s event_id=%s",
                         client_ip, request.url.path, rule, event_id
@@ -83,7 +86,7 @@ class SentinelGridASGIMiddleware(BaseHTTPMiddleware):
                         f"<body style='font-family:sans-serif;padding:40px;text-align:center;'>"
                         f"<h2>403 Forbidden - Request Blocked by SentinelGrid WAAP</h2>"
                         f"<p>Malicious signature or policy violation detected.</p>"
-                        f"<p style='color:#666;font-family:monospace;font-size:12px;'>Event ID: {event_id} | Rule: {rule}</p>"
+                        f"<p style='color:#666;font-family:monospace;font-size:12px;'>Event ID: {safe_event_id} | Rule: {safe_rule}</p>"
                         f"</body></html>"
                     )
                     return Response(

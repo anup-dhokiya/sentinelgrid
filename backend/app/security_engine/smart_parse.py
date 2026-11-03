@@ -31,7 +31,7 @@ class SmartParse:
     """
 
     # Gate 0: Byte-level fast pre-filter regex (<0.03ms)
-    METACHAR_TRIGGER = re.compile(r"['\"<>;=\(\)\-\/#\*\\`]")
+    METACHAR_TRIGGER = re.compile(r"['\"<>;=\(\)\-\/#\*\\`,{}\[\]]")
 
     # SQL Lexical Keywords
     SQL_KEYWORDS = {

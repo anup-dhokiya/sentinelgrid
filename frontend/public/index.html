@@ -1315,6 +1315,13 @@ app.add_middleware(
   <!-- Interactive Modular JavaScript Controller -->
   <script>
     const API = "/v1";
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
     let allRecentEvents = [];
     let allWebsites = [];
     let currentDomainScope = "ALL";
@@ -1766,28 +1773,34 @@ app.add_middleware(
         }
 
         const domainObj = allWebsites.find(w => w.id === ev.website_id);
-        const domainName = domainObj ? domainObj.domain : (ev.website_id || 'Global');
+        const domainName = escapeHtml(domainObj ? domainObj.domain : (ev.website_id || 'Global'));
+        const safeId = escapeHtml(ev.id);
+        const safeIp = escapeHtml(ev.client_ip);
+        const safeMethod = escapeHtml(ev.method);
+        const safePath = escapeHtml(ev.path);
+        const safeRule = escapeHtml(ev.rule_triggered || 'Clean Request');
+        const safeScore = Number(ev.risk_score) || 0;
 
         // High-precision localized timestamp
         const t = formatTimestamp(ev.timestamp);
-        const riskColor = ev.risk_score >= 75 ? "var(--terracotta)" : (ev.risk_score >= 50 ? "var(--warm-ochre)" : "var(--sage-green)");
+        const riskColor = safeScore >= 75 ? "var(--terracotta)" : (safeScore >= 50 ? "var(--warm-ochre)" : "var(--sage-green)");
 
         return `
-          <tr class="clickable-row" onclick="openEventForensics('${ev.id}')">
-            <td title="${t.full}" style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap;">
-              <div style="font-weight: 700; color: var(--text-charcoal);">${t.time}</div>
-              <div style="color: var(--text-muted); font-size: 10px;" data-raw-ts="${ev.timestamp}">(${t.relative})</div>
+          <tr class="clickable-row" onclick="openEventForensics('${safeId}')">
+            <td title="${escapeHtml(t.full)}" style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap;">
+              <div style="font-weight: 700; color: var(--text-charcoal);">${escapeHtml(t.time)}</div>
+              <div style="color: var(--text-muted); font-size: 10px;" data-raw-ts="${escapeHtml(ev.timestamp)}">(${escapeHtml(t.relative)})</div>
             </td>
             <td style="font-family: var(--font-mono); font-weight: 700; color: var(--deep-indigo); font-size: 12px;">${domainName}</td>
-            <td style="font-family: var(--font-mono); font-weight: 600; font-size: 12px;">${ev.client_ip}</td>
-            <td><strong style="color: var(--deep-indigo);">${ev.method}</strong> <code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${ev.path}</code></td>
-            <td><strong style="color: ${riskColor}; font-family: var(--font-mono);">${ev.risk_score}</strong>/100</td>
+            <td style="font-family: var(--font-mono); font-weight: 600; font-size: 12px;">${safeIp}</td>
+            <td><strong style="color: var(--deep-indigo);">${safeMethod}</strong> <code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${safePath}</code></td>
+            <td><strong style="color: ${riskColor}; font-family: var(--font-mono);">${safeScore}</strong>/100</td>
             <td>${badge}</td>
             <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700; font-size: 12px;">
-              ${ev.rule_triggered || 'Clean Request'}
+              ${safeRule}
             </td>
             <td>
-              <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${ev.id}')">
+              <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${safeId}')">
                 🔍 Forensics
               </button>
             </td>
@@ -2103,8 +2116,8 @@ app.add_middleware(
               ${data.top_rules.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacks recorded yet.</div>' : 
                 data.top_rules.map(r => `
                   <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--stone-border-light); font-size:11px;">
-                    <strong style="font-family:var(--font-mono); color:var(--terracotta);">${r.rule}</strong>
-                    <span style="font-weight:700;">${r.count} blocks</span>
+                    <strong style="font-family:var(--font-mono); color:var(--terracotta);">${escapeHtml(r.rule)}</strong>
+                    <span style="font-weight:700;">${Number(r.count) || 0} blocks</span>
                   </div>
                 `).join('')
               }
@@ -2115,8 +2128,8 @@ app.add_middleware(
               ${data.top_ips.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacking IPs recorded.</div>' : 
                 data.top_ips.map(ip => `
                   <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--stone-border-light); font-size:11px;">
-                    <strong style="font-family:var(--font-mono);">${ip.ip}</strong>
-                    <span style="font-weight:700; color:var(--terracotta);">${ip.count} attempts</span>
+                    <strong style="font-family:var(--font-mono);">${escapeHtml(ip.ip)}</strong>
+                    <span style="font-weight:700; color:var(--terracotta);">${Number(ip.count) || 0} attempts</span>
                   </div>
                 `).join('')
               }

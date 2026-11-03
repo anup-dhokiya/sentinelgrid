@@ -36,6 +36,13 @@ class HistoricalTrafficSample(BaseModel):
     is_legitimate_crawler: bool = False
     original_action: str  # "allow", "block", "challenge"
 
+    def get_header(self, name: str, default: str = "") -> str:
+        name_lower = name.lower()
+        for k, v in self.headers.items():
+            if k.lower() == name_lower:
+                return v
+        return default
+
 
 class SimulationReport(BaseModel):
     policy_version: int
@@ -62,10 +69,10 @@ class PolicySimulationEngine:
         """Evaluates whether an individual rule criteria matches the sample traffic."""
         criteria = rule.get("criteria", {})
         
-        # Check User-Agent substring match
+        # Check User-Agent substring match (case-insensitive)
         if "user_agent_contains" in criteria:
             target = criteria["user_agent_contains"].lower()
-            ua = sample.headers.get("user-agent", "").lower()
+            ua = sample.get_header("user-agent").lower()
             if target in ua:
                 return True
 

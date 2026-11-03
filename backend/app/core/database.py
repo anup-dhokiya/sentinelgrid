@@ -125,6 +125,14 @@ def init_database():
             FOREIGN KEY (website_id) REFERENCES websites(id)
         );
 
+        CREATE TABLE IF NOT EXISTS sessions (
+            token TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+
         CREATE INDEX IF NOT EXISTS idx_events_site ON security_events(website_id, timestamp);
         CREATE INDEX IF NOT EXISTS idx_endpoints_site ON api_endpoints(website_id);
         CREATE INDEX IF NOT EXISTS idx_ip_rules_site ON ip_rules(website_id);

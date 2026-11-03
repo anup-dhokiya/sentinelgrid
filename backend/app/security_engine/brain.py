@@ -122,12 +122,12 @@ class SecurityBrain:
             score=96.0,
             pattern=re.compile(
                 r"(?:"
-                r"(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*(?:[a-zA-Z0-9_\'\"]+\s*[\*\+\-\/]\s*[a-zA-Z0-9_\'\"]+|T\s*\([A-Za-z0-9_.]+\)|new\s+[A-Za-z0-9_.]+\s*\().*?(?:\}\}|%\}|\}|%>)"
-                r"|(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*.*?(?:context|request|session|application|global|__class__|class|__mro__|mro|__globals__|globals|__subclasses__|subclasses|getRuntime|ProcessBuilder|exec|eval|system|config|lipsum|cycler).*?(?:\}\}|%\}|\}|%>)"
-                r"|\{%\s*(?:import|include|set|with|exec|from|raw)\b.*?%\}"
+                r"(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*(?:[a-zA-Z0-9_\'\"]+\s*[\*\+\-\/]\s*[a-zA-Z0-9_\'\"]+|T\s*\([A-Za-z0-9_.]+\)|new\s+[A-Za-z0-9_.]+\s*\().{0,250}?(?:\}\}|%\}|\}|%>)"
+                r"|(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*.{0,250}?(?:context|request|session|application|global|__class__|class|__mro__|mro|__globals__|globals|__subclasses__|subclasses|getRuntime|ProcessBuilder|exec|eval|system|config|lipsum|cycler).{0,250}?(?:\}\}|%\}|\}|%>)"
+                r"|\{%\s*(?:import|include|set|with|exec|from|raw)\b.{0,250}?%\}"
                 r"|<[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^>]*>"
                 r"|\[[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^\]]*\]"
-                r"|<%\s*(?:system|exec|%x|IO\.read|File\.read|require|java\.)\b.*?%>"
+                r"|<%\s*(?:system|exec|%x|IO\.read|File\.read|require|java\.)\b.{0,250}?%>"
                 r")",
                 re.IGNORECASE
             )
@@ -548,27 +548,6 @@ class SecurityBrain:
                 r"(?:"
                 r"(?:\bpowershell(?:\.exe)?\b.*?(?:Invoke-WebRequest|iwr\b|Invoke-RestMethod|irm\b|DownloadString|DownloadFile|Net\.WebClient|Start-BitsTransfer|-enc\b|-encodedcommand\b|-executionpolicy\s+bypass|-w(?:indowstyle)?\s+hidden|-nop(?:rofile)?))"
                 r"|(?:\b(?:IEX|Invoke-Expression)\s*\(?\s*(?:New-Object\s+Net\.WebClient|Invoke-WebRequest|iwr\b|Invoke-RestMethod|irm\b))"
-                r")",
-                re.IGNORECASE
-            )
-        ),
-
-        # Server-Side Template Injection (SSTI)
-        ThreatSignature(
-            rule_id="SSTI-TEMPLATE-INJECTION",
-            name="Server-Side Template Injection Probe (Jinja2, Twig, Freemarker, SpEL, ERB)",
-            category="Server-Side Template Injection",
-            owasp_id="A03:Injection",
-            severity="CRITICAL",
-            score=96.0,
-            pattern=re.compile(
-                r"(?:"
-                r"(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*(?:[a-zA-Z0-9_\'\"]+\s*[\*\+\-\/]\s*[a-zA-Z0-9_\'\"]+|T\s*\([A-Za-z0-9_.]+\)|new\s+[A-Za-z0-9_.]+\s*\().*?(?:\}\}|%\}|\}|%>)"
-                r"|(?:\{\{|\$\{|\#\{|\*\{|<%=|<%)\s*.*?(?:context|request|session|application|global|__class__|class|__mro__|mro|__globals__|globals|__subclasses__|subclasses|getRuntime|ProcessBuilder|exec|eval|system|config|lipsum|cycler).*?(?:\}\}|%\}|\}|%>)"
-                r"|\{%\s*(?:import|include|set|with|exec|from|raw)\b.*?%\}"
-                r"|<[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^>]*>"
-                r"|\[[#@]\s*(?:assign|include|import|exec|visit|recurse|macro)\b[^\]]*\]"
-                r"|<%\s*(?:system|exec|%x|IO\.read|File\.read|require|java\.)\b.*?%>"
                 r")",
                 re.IGNORECASE
             )

@@ -104,6 +104,16 @@ class SlidingWindowLimiter:
         canon_ip = self._canonicalize_ip(ip_str)
         now = time.monotonic()
         with self._q_lock:
+            # Capacity guard against OOM under spoofed flood attacks
+            if len(self._quarantine) > 10000:
+                expired = [ip for ip, data in self._quarantine.items() if data[0] <= now]
+                for ip in expired:
+                    del self._quarantine[ip]
+                if len(self._quarantine) > 10000:
+                    sorted_by_expiry = sorted(self._quarantine.items(), key=lambda item: item[1][0])
+                    for ip, _ in sorted_by_expiry[:2000]:
+                        del self._quarantine[ip]
+
             current = self._quarantine.get(canon_ip)
             if current and now < current[0]:
                 prev_expiry, level, _ = current

@@ -450,6 +450,9 @@ async def import_openapi_spec(req: ApiSpecImportRequest):
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Failed to parse specification as JSON or YAML: {e}")
 
+    if not isinstance(spec, dict):
+        raise HTTPException(status_code=400, detail="Specification root must be a valid JSON/YAML object mapping.")
+
     paths = spec.get("paths", {})
     if not paths:
         raise HTTPException(status_code=400, detail="Specification contains no 'paths' definitions.")
@@ -924,6 +927,9 @@ async def stream_live_events(request: Request):
     Server-Sent Events (SSE) live pipeline for real-time traffic observability.
     Broadcasts both clean allowed requests and intercepted threats instantaneously.
     """
+    if len(sse_subscribers) >= 100:
+        raise HTTPException(status_code=429, detail="Maximum concurrent SSE subscribers reached. Please retry later.")
+
     q: asyncio.Queue = asyncio.Queue(maxsize=100)
     sse_subscribers.append(q)
 
@@ -1090,7 +1096,14 @@ async def export_events(
         writer = csv.DictWriter(output, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
         for ev in events:
-            writer.writerow(ev)
+            # Defend against CSV Formula Injection (CWE-1236)
+            safe_ev = {}
+            for k, v in ev.items():
+                if isinstance(v, str) and v and v[0] in ("=", "+", "-", "@", "\t", "\r"):
+                    safe_ev[k] = f"'{v}"
+                else:
+                    safe_ev[k] = v
+            writer.writerow(safe_ev)
         return Response(
             content=output.getvalue(),
             media_type="text/csv",

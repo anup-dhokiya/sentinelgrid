@@ -27,9 +27,19 @@ class PolicyManagerService:
         self._active_policy_version: Dict[str, int] = {}  # website_id -> active version number
 
     def _init_master_keypair(self):
+        import os
         MASTER_KEY_DIR.mkdir(parents=True, exist_ok=True)
+        try:
+            os.chmod(MASTER_KEY_DIR, 0o700)
+        except Exception:
+            pass
+
         if MASTER_KEY_FILE.exists():
             try:
+                try:
+                    os.chmod(MASTER_KEY_FILE, 0o600)
+                except Exception:
+                    pass
                 b64_key = MASTER_KEY_FILE.read_text().strip()
                 self._private_key = Ed25519KeyManager.load_private_key_b64(b64_key)
                 self._public_key = self._private_key.public_key()
@@ -37,9 +47,11 @@ class PolicyManagerService:
             except Exception:
                 pass
 
-        # Generate and safely persist master keypair
+        # Generate and safely persist master keypair with strict permissions (0600)
         self._private_key, self._public_key = Ed25519KeyManager.generate_key_pair()
-        MASTER_KEY_FILE.write_text(Ed25519KeyManager.export_private_key_b64(self._private_key))
+        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
+        with os.fdopen(os.open(str(MASTER_KEY_FILE), flags, 0o600), "w") as f:
+            f.write(Ed25519KeyManager.export_private_key_b64(self._private_key))
         MASTER_PUB_FILE.write_text(Ed25519KeyManager.export_public_key_b64(self._public_key))
 
     @property

@@ -7,6 +7,7 @@ Author: Anup Dhokiya (@anup-dhokiya) - Lead Architect
 import io
 import json
 import logging
+import html
 import urllib3
 from typing import Dict, Any, Optional
 
@@ -90,12 +91,14 @@ class SentinelGridWSGIMiddleware:
                 if data.get("action") == "BLOCK":
                     event_id = data.get("event_id", "N/A")
                     rule = data.get("rule_triggered", "POLICY-BLOCK")
+                    safe_event_id = html.escape(str(event_id))
+                    safe_rule = html.escape(str(rule))
                     block_body = (
                         f"<!DOCTYPE html><html><head><title>403 Forbidden</title></head>"
                         f"<body style='font-family:sans-serif;padding:40px;text-align:center;'>"
                         f"<h2>403 Forbidden - Request Blocked by SentinelGrid WAAP</h2>"
                         f"<p>Malicious signature or policy violation detected.</p>"
-                        f"<p style='color:#666;font-family:monospace;font-size:12px;'>Event ID: {event_id} | Rule: {rule}</p>"
+                        f"<p style='color:#666;font-family:monospace;font-size:12px;'>Event ID: {safe_event_id} | Rule: {safe_rule}</p>"
                         f"</body></html>"
                     ).encode("utf-8")
                     start_response("403 Forbidden", [

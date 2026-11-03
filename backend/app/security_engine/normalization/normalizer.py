@@ -10,6 +10,7 @@ Enterprise-grade anti-evasion request normalization:
 
 import unicodedata
 import urllib.parse
+import posixpath
 import re
 from typing import Dict, Any, List, Tuple
 
@@ -24,10 +25,9 @@ class RequestNormalizer:
         if not input_str:
             return ""
 
-        # 1. Null-byte stripping
-        s = input_str.replace("\x00", "").replace("%00", "").replace("\\0", "")
+        s = input_str
 
-        # 2. Recursive URL decoding (up to max_depth to stop decoding loops)
+        # 1. Recursive URL decoding (up to max_depth to stop decoding loops)
         prev = ""
         depth = 0
         while prev != s and depth < max_depth:
@@ -38,6 +38,9 @@ class RequestNormalizer:
                 break
             depth += 1
 
+        # 2. Null-byte stripping (executed AFTER all URL decoding passes to prevent %2500 bypass)
+        s = s.replace("\x00", "").replace("%00", "").replace("\\0", "").replace("\\x00", "")
+
         # 3. Unicode NFKC normalization
         s = unicodedata.normalize("NFKC", s)
 
@@ -45,7 +48,7 @@ class RequestNormalizer:
 
     @classmethod
     def normalize_path(cls, path: str) -> str:
-        """Normalizes an HTTP URI path and collapses redundant slashes."""
+        """Normalizes an HTTP URI path and collapses redundant slashes while preserving traversal tokens for inspection."""
         norm = cls.normalize_string(path)
         # Standardize path backslashes to forward slashes for URI/filesystem consistency
         norm = norm.replace("\\", "/")
@@ -60,7 +63,7 @@ class RequestNormalizer:
 
     @classmethod
     def parse_query_params(cls, query_string: str) -> List[Tuple[str, str]]:
-        """Parses query string into decoded key-value pairs."""
+        """Parses query string into decoded key-value pairs without delimiter pollution."""
         if not query_string:
             return []
         
@@ -99,7 +102,8 @@ class RequestNormalizer:
             cls.normalize_string(k).lower(): cls.normalize_string(v)
             for k, v in headers.items()
         }
-        query_params = cls.parse_query_params(normalized_query)
+        # Parse query string parameters before recursive decoding to prevent & and = pollution
+        query_params = cls.parse_query_params(query)
 
         return {
             "path": normalized_path,

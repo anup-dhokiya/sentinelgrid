@@ -6,6 +6,16 @@
 
 const http = require('http');
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 class SentinelGridExpress {
   constructor(options = {}) {
     this.sentinelgridUrl = options.sentinelgridUrl || 'http://127.0.0.1:8000/v1/inspect';
@@ -76,7 +86,7 @@ class SentinelGridExpress {
                    .set('X-SentinelGrid-Action', 'BLOCK')
                    .set('X-SentinelGrid-Event-ID', eventId)
                    .set('X-SentinelGrid-Rule', rule)
-                   .send(`<h3>403 Forbidden: Blocked by SentinelGrid WAAP [${eventId}]</h3>`);
+                   .send(`<h3>403 Forbidden: Blocked by SentinelGrid WAAP [${escapeHtml(eventId)}]</h3>`);
                 return;
               }
             }
