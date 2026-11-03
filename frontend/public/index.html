@@ -783,6 +783,49 @@
       display: none;
       font-family: var(--font-mono);
     }
+    /* Universal Choreographed Animation Flow System */
+    @keyframes viewEnterTransition {
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.995);
+        filter: blur(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .view-section.active {
+      display: block;
+      animation: viewEnterTransition 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Staggered Card & Panel Cascades */
+    .panel {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .panel:hover {
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+
+    /* Live Traffic Incoming Row Slide-In Animation */
+    @keyframes rowSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+        background: rgba(56, 189, 248, 0.12);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        background: transparent;
+      }
+    }
+    #livetraffic-table-body tr.new-event {
+      animation: rowSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body>

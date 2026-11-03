@@ -4,24 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SentinelGrid // Security Operations Authentication</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg-void: #07090E;
-      --bg-surface: #0C101A;
-      --bg-card: #111726;
+      /* Obsidian Precision Dark Palette */
+      --canvas-bg: #080B10;
+      --card-bg: #111726;
+      --surface-elevated: #0C101A;
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(56, 189, 248, 0.4);
+      --border-hover: rgba(56, 189, 248, 0.4);
       --accent-cyan: #38BDF8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
       --text-primary: #F8FAFC;
-      --text-secondary: #94A3B8;
-      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'Space Mono', monospace;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      --terracotta: #EF4444;
+      --sage-green: #10B981;
+      --warm-ochre: #F59E0B;
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Mono', SFMono-Regular, Menlo, monospace;
+    }
+
+    :root[data-theme="light"] {
+      --canvas-bg: #F8F9FA;
+      --card-bg: #FFFFFF;
+      --surface-elevated: #F1EFEA;
+      --border-subtle: #E2E0D8;
+      --border-hover: #0284C7;
+      --accent-cyan: #0284C7;
+      --accent-soft: #F1F5F9;
+      --text-primary: #0F172A;
+      --text-muted: #64748B;
+      --text-subtle: #94A3B8;
+      --terracotta: #D34528;
+      --sage-green: #2E7D5B;
+      --warm-ochre: #B45309;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg-void);
+      background: var(--canvas-bg);
       color: var(--text-primary);
       font-family: var(--font-ui);
       min-height: 100vh;
@@ -30,211 +56,433 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Cyber Background Grid */
-    .bg-grid {
+    /* High-Performance 60fps Particle Mesh Canvas (No Video!) */
+    #meshCanvas {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-size: 36px 36px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
       z-index: 1;
     }
 
-    /* Animated Sweeping Radar Beam */
-    .radar-sweep-beam {
+    /* Ambient Subtle Cyber Grid */
+    .bg-grid {
       position: absolute;
-      width: 100vw;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #38BDF8, transparent);
-      opacity: 0.18;
-      animation: sweepDown 8s linear infinite;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
       z-index: 2;
+      opacity: 0.8;
     }
 
-    @keyframes sweepDown {
-      0% { top: -10px; }
-      100% { top: 100vh; }
-    }
-
-    /* 3D Glassmorphic Login Container */
-    .login-3d-card {
+    /* Orchestrated Landing Animation Container */
+    .login-container {
       position: relative;
       z-index: 10;
       width: 100%;
       max-width: 440px;
-      background: var(--bg-card);
+      padding: 20px;
+      perspective: 1200px;
+    }
+
+    .login-card {
+      background: var(--card-bg);
       border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 38px 36px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 38px 34px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
       transform-style: preserve-3d;
-      transition: transform 0.15s ease;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+      
+      /* Cascading Landing Entrance */
+      animation: cardLandIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(32px) scale(0.96);
     }
 
-    .form-group {
-      margin-bottom: 20px;
-      text-align: left;
+    @keyframes cardLandIn {
+      0% {
+        opacity: 0;
+        transform: translateY(36px) scale(0.95);
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
     }
 
+    /* Staggered Item Entrance Sequence */
+    .stagger-1 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards; opacity: 0; }
+    .stagger-2 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.28s forwards; opacity: 0; }
+    .stagger-3 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.40s forwards; opacity: 0; }
+    .stagger-4 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.52s forwards; opacity: 0; }
+
+    @keyframes itemReveal {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 3D Shield Emblem Animation */
+    .shield-emblem {
+      animation: shieldSpringIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      transform-origin: center center;
+    }
+    @keyframes shieldSpringIn {
+      0% { transform: scale(0.4) rotate(-20deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .radar-outer-ring {
+      animation: radarSpin 14s linear infinite;
+      transform-origin: 50px 50px;
+    }
+    .shield-crystal-core {
+      animation: crystalGlow 2.5s ease-in-out infinite;
+      transform-origin: 50px 50px;
+    }
+    @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes crystalGlow {
+      0%, 100% { opacity: 0.8; transform: scale(0.96); }
+      50% { opacity: 1; transform: scale(1.08); filter: drop-shadow(0 0 8px var(--accent-cyan)); }
+    }
+
+    /* Form Fields */
+    .form-group { margin-bottom: 18px; text-align: left; }
     .form-label {
       display: block;
       font-size: 11px;
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-weight: 700;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
-
-    .form-input-cyber {
+    .input-wrapper { position: relative; }
+    .form-input {
       width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
       border-radius: 8px;
       padding: 12px 14px;
       color: var(--text-primary);
-      font-size: 14px;
+      font-family: var(--font-ui);
+      font-size: 13px;
       outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.2s ease;
     }
-
-    .form-input-cyber:focus {
+    .form-input:focus {
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .toggle-pwd-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
     }
 
-    .btn-cyber-primary {
+    /* Button */
+    .btn-submit {
       width: 100%;
-      background: #0284C7;
+      background: var(--accent-cyan);
       color: #FFFFFF;
       border: none;
       border-radius: 8px;
       padding: 13px;
       font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: background 0.2s ease, transform 0.1s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    .btn-submit:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: scale(0.98); }
 
-    .btn-cyber-primary:hover {
-      background: #0369A1;
-    }
-    .btn-cyber-primary:active {
-      transform: scale(0.98);
-    }
-
-    /* Biometric Scanning Beam Overlay on Submit */
-    .scanning-line {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: #38BDF8;
-      box-shadow: 0 0 10px #38BDF8;
+    /* Animated Error Alert */
+    .error-banner {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--terracotta);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-bottom: 16px;
       display: none;
-      animation: scanCard 1.2s ease-in-out infinite alternate;
-      border-radius: 16px 16px 0 0;
+      align-items: center;
+      gap: 8px;
+      animation: shakeBanner 0.35s ease;
+    }
+    @keyframes shakeBanner {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
     }
 
-    @keyframes scanCard {
-      from { top: 0%; }
-      to { top: 100%; }
+    /* Role Clearance Preview Badges */
+    .role-pills {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .role-pill {
+      flex: 1;
+      padding: 6px 4px;
+      text-align: center;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .role-pill.active {
+      border-color: var(--accent-cyan);
+      background: var(--accent-soft);
+      color: var(--accent-cyan);
     }
 
-    .radar-outer-ring {
-      animation: radarRotate 12s linear infinite;
-      transform-origin: 50px 50px;
-    }
-    .shield-crystal-core {
-      animation: crystalPulse 2.4s ease-in-out infinite;
-      transform-origin: 50px 50px;
-    }
-    @keyframes radarRotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    @keyframes crystalPulse {
-      0%, 100% { opacity: 0.8; transform: scale(0.96); }
-      50% { opacity: 1; transform: scale(1.06); filter: drop-shadow(0 0 6px #38BDF8); }
+    /* Top Corner Theme Switcher */
+    .theme-toggle-corner {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 100;
     }
   </style>
 </head>
 <body>
+
+  <!-- 60fps Ambient Particle Mesh Canvas -->
+  <canvas id="meshCanvas"></canvas>
   <div class="bg-grid"></div>
-  <div class="radar-sweep-beam"></div>
 
-  <div class="login-3d-card" id="loginCard">
-    <div class="scanning-line" id="scanLine"></div>
+  <!-- Theme Toggle -->
+  <div class="theme-toggle-corner">
+    <button id="themeBtn" class="role-pill" style="padding: 6px 12px; font-size: 11px;" onclick="toggleTheme()">
+      🌙 OBSIDIAN
+    </button>
+  </div>
 
-    <div style="text-align: center; margin-bottom: 28px;">
-      <div style="margin: 0 auto 12px; width: 48px;">
-        <svg width="48" height="48" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" stroke-dasharray="6,4" class="radar-outer-ring"/>
-          <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="#21262D" stroke="#38BDF8" stroke-width="2"/>
-          <polygon points="50,10 88,32 50,50 12,32" fill="rgba(56, 189, 248, 0.12)"/>
-          <polygon points="88,32 88,68 50,50" fill="rgba(0, 0, 0, 0.4)"/>
-          <polygon points="12,32 50,50 12,68" fill="rgba(255, 255, 255, 0.05)"/>
-          <polygon points="50,34 64,50 50,66 36,50" fill="#38BDF8" class="shield-crystal-core"/>
-          <circle cx="50" cy="50" r="4" fill="#F0F6FC"/>
-        </svg>
-      </div>
-      <h1 style="font-size: 18px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.2px;">SentinelGrid Console</h1>
-      <p style="font-size: 11px; color: var(--text-secondary); margin: 0; font-family: monospace;">Zero-Trust L7 Threat Operations Plane</p>
-    </div>
-
-    <form onsubmit="handleCyberLogin(event)">
-      <div class="form-group">
-        <label class="form-label">Operator Email / Identity</label>
-        <input type="email" id="login-email" class="form-input-cyber" value="anupdhokiya0@gmail.com" required autocomplete="username">
+  <div class="login-container">
+    <div class="login-card" id="loginCard">
+      
+      <!-- Brand & Emblem -->
+      <div style="text-align: center; margin-bottom: 24px;" class="stagger-1">
+        <div style="margin: 0 auto 12px; width: 50px;" class="shield-emblem">
+          <svg width="50" height="50" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" stroke-dasharray="6,4" class="radar-outer-ring"/>
+            <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="#151E32" stroke="#38BDF8" stroke-width="2"/>
+            <polygon points="50,34 64,50 50,66 36,50" fill="#38BDF8" class="shield-crystal-core"/>
+            <circle cx="50" cy="50" r="4" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <h1 style="font-size: 19px; font-weight: 800; letter-spacing: -0.3px; color: var(--text-primary);">SentinelGrid SOC</h1>
+        <p style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px;">Zero-Trust L7 Threat Operations Platform</p>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Passphrase / Master Key</label>
-        <input type="password" id="login-password" class="form-input-cyber" value="admin123" required autocomplete="current-password">
+      <!-- Error Alert -->
+      <div id="errorBanner" class="error-banner">
+        <span>⚠️</span>
+        <span id="errorMessage">Invalid credentials</span>
       </div>
 
-      <button type="submit" id="login-btn" class="btn-cyber-primary" style="margin-top: 10px;">
-        <span>🔒 Authenticate Session</span>
-      </button>
-
-      <div style="text-align: center; margin-top: 16px; font-size: 12px; color: var(--text-secondary);">
-        Need an operator account? <a href="/register.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Create Account & Select Role →</a>
+      <!-- Role Selection Hint -->
+      <div class="form-label stagger-2">Select Clearance Profile</div>
+      <div class="role-pills stagger-2">
+        <div class="role-pill active" onclick="setCredentials('manager')">👑 Manager</div>
+        <div class="role-pill" onclick="setCredentials('team_leader')">🛡️ Lead</div>
+        <div class="role-pill" onclick="setCredentials('member')">🔍 Member</div>
       </div>
-    </form>
 
-    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; font-size: 11px; font-family: monospace; color: var(--text-secondary);">
-      <span>SYSTEM: SECURE</span>
-      <span>RFC 8032 Ed25519</span>
+      <!-- Login Form -->
+      <form onsubmit="handleLoginSubmit(event)">
+        <div class="form-group stagger-3">
+          <label class="form-label">Operator Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="emailInput" class="form-input" value="anupdhokiya0@gmail.com" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group stagger-3">
+          <label class="form-label">Passphrase / Master Key</label>
+          <div class="input-wrapper">
+            <input type="password" id="passwordInput" class="form-input" value="admin123" required autocomplete="current-password">
+            <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility()">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit stagger-4">
+          <span>🔒 Authenticate & Enter SOC</span>
+        </button>
+
+        <div style="text-align: center; margin-top: 18px; font-size: 12px; color: var(--text-muted);" class="stagger-4">
+          Need an operator account? <a href="/register.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Create Account & Select Role →</a>
+        </div>
+      </form>
+
+      <!-- Footer Trust Badge -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--text-subtle);" class="stagger-4">
+        <span>AUTH: RFC 8032 Ed25519</span>
+        <a href="/landing.html" style="color: var(--text-subtle); text-decoration: none;">View Product Tour ➔</a>
+      </div>
     </div>
   </div>
 
   <script>
+    // -------------------------------------------------------------------------
+    // 60fps Ambient Particle Constellation Mesh (Lightweight Pure Canvas Math)
+    // -------------------------------------------------------------------------
+    const canvas = document.getElementById("meshCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+    let particles = [];
+    const PARTICLE_COUNT = 45;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 1.8 + 1
+      });
+    }
+
+    function animateMesh() {
+      ctx.clearRect(0, 0, width, height);
+      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+      const particleColor = isDark ? "rgba(56, 189, 248, 0.4)" : "rgba(2, 132, 199, 0.35)";
+      const lineColor = isDark ? "rgba(56, 189, 248, 0.08)" : "rgba(2, 132, 199, 0.07)";
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particleColor;
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 1 - dist / 110;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateMesh);
+    }
+    animateMesh();
+
+    // -------------------------------------------------------------------------
+    // Interactive 3D Perspective Mouse Tilt
+    // -------------------------------------------------------------------------
     const card = document.getElementById("loginCard");
     document.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(1000px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
+      card.style.transform = `perspective(1000px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg)`;
     });
 
-    async function handleCyberLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-password").value;
-      const scanLine = document.getElementById("scanLine");
-      const btn = document.getElementById("login-btn");
+    // -------------------------------------------------------------------------
+    // Theme Switcher Controller
+    // -------------------------------------------------------------------------
+    function initTheme() {
+      const saved = localStorage.getItem("sg_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", saved);
+      updateThemeButton(saved);
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = cur === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("sg_theme", next);
+      updateThemeButton(next);
+    }
+    function updateThemeButton(theme) {
+      const btn = document.getElementById("themeBtn");
+      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "☀️ ALABASTER";
+    }
+    initTheme();
 
-      scanLine.style.display = "block";
-      btn.innerHTML = "<span>⚡ Cryptographic Handshake...</span>";
-      btn.style.opacity = "0.7";
+    // -------------------------------------------------------------------------
+    // Form & Role Helper Functions
+    // -------------------------------------------------------------------------
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById("passwordInput");
+      pwd.type = pwd.type === "password" ? "text" : "password";
+    }
+
+    function setCredentials(role) {
+      document.querySelectorAll(".role-pill").forEach(el => el.classList.remove("active"));
+      event.target.classList.add("active");
+      if (role === "manager") {
+        document.getElementById("emailInput").value = "anupdhokiya0@gmail.com";
+        document.getElementById("passwordInput").value = "admin123";
+      } else if (role === "team_leader") {
+        document.getElementById("emailInput").value = "lead@sentinelgrid.io";
+        document.getElementById("passwordInput").value = "lead123";
+      } else {
+        document.getElementById("emailInput").value = "analyst@sentinelgrid.io";
+        document.getElementById("passwordInput").value = "analyst123";
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Authentication Submission Handler
+    // -------------------------------------------------------------------------
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("emailInput").value.trim();
+      const password = document.getElementById("passwordInput").value;
+      const btn = document.getElementById("submitBtn");
+      const errBanner = document.getElementById("errorBanner");
+      const errMsg = document.getElementById("errorMessage");
+
+      errBanner.style.display = "none";
+      btn.innerHTML = "<span>⚡ Authenticating Ed25519 Handshake...</span>";
+      btn.style.opacity = "0.75";
+      btn.disabled = true;
 
       try {
         const res = await fetch("/v1/auth/login", {
@@ -243,25 +491,28 @@
           body: JSON.stringify({ email, password })
         });
         const data = await res.json();
+
         if (res.ok) {
           localStorage.setItem("sg_auth_token", data.token);
           localStorage.setItem("sg_auth_user", JSON.stringify(data.user));
-          btn.innerHTML = "<span>✅ Identity Verified. Entering SOC...</span>";
-          btn.style.background = "#10B981";
+          btn.innerHTML = "<span>✅ Clearance Verified. Entering SOC...</span>";
+          btn.style.background = "var(--sage-green)";
           setTimeout(() => {
             window.location.href = "/#dashboard";
-          }, 500);
+          }, 450);
         } else {
-          alert("Authentication Failed: " + (data.detail || "Invalid credentials"));
-          scanLine.style.display = "none";
-          btn.innerHTML = "<span>🔒 Authenticate Session</span>";
+          errMsg.innerText = data.detail || "Invalid credentials or unauthorized clearance";
+          errBanner.style.display = "flex";
+          btn.innerHTML = "<span>🔒 Authenticate & Enter SOC</span>";
           btn.style.opacity = "1";
+          btn.disabled = false;
         }
       } catch (err) {
-        alert("Server Unreachable: " + err);
-        scanLine.style.display = "none";
-        btn.innerHTML = "<span>🔒 Authenticate Session</span>";
+        errMsg.innerText = "Control plane unreachable. Please check backend connection.";
+        errBanner.style.display = "flex";
+        btn.innerHTML = "<span>🔒 Authenticate & Enter SOC</span>";
         btn.style.opacity = "1";
+        btn.disabled = false;
       }
     }
   </script>
