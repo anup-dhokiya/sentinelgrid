@@ -388,15 +388,47 @@
       }
     }
 
+    function createRowHtml(ev) {
+      const d = new Date(ev.timestamp);
+      const timeStr = d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '.' + String(d.getMilliseconds()).padStart(3, '0');
+      const badgeClass = ev.action === 'BLOCK' ? 'badge-block' : (ev.action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
+      const verbClass = 'verb-' + (ev.method || 'get').toLowerCase();
+
+      return `
+        <td style="color: var(--text-muted);">${timeStr}</td>
+        <td><span class="badge ${badgeClass}">${ev.action}</span></td>
+        <td><span class="${verbClass}">${ev.method}</span></td>
+        <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 2px 6px; border-radius: 4px;">${ev.path}</code></td>
+        <td style="color: var(--deep-indigo);">${ev.client_ip}</td>
+        <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600;">${ev.rule_triggered || 'CLEAN'}</span></td>
+        <td style="font-weight: 700; color: ${ev.risk_score > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${ev.risk_score}</td>
+        <td><button class="btn" style="padding: 2px 6px; font-size: 10px;" onclick="event.stopPropagation(); openForensics('${encodeURIComponent(JSON.stringify(ev))}')">Inspect</button></td>
+      `;
+    }
+
     function prependEvent(ev) {
       eventBuffer.unshift(ev);
-      if (eventBuffer.length > 250) eventBuffer.pop();
-      renderEvents();
+      if (eventBuffer.length > 100) eventBuffer.pop();
+
+      if (activeFilter === "ALL" || ev.action === activeFilter) {
+        const tbody = document.getElementById("stream-body");
+        if (tbody.children.length === 1 && tbody.children[0].innerText.includes("No events match")) {
+          tbody.innerHTML = "";
+        }
+        const tr = document.createElement("tr");
+        tr.onclick = () => openForensics(encodeURIComponent(JSON.stringify(ev)));
+        tr.innerHTML = createRowHtml(ev);
+        tbody.insertBefore(tr, tbody.firstChild);
+        if (tbody.children.length > 100) {
+          tbody.removeChild(tbody.lastChild);
+        }
+      }
+      updateCountBadge();
     }
 
     function appendEvent(ev) {
       eventBuffer.push(ev);
-      if (eventBuffer.length > 250) eventBuffer.pop();
+      if (eventBuffer.length > 100) eventBuffer.shift();
       renderEvents();
     }
 
@@ -413,23 +445,7 @@
       }
 
       tbody.innerHTML = filtered.map(ev => {
-        const d = new Date(ev.timestamp);
-        const timeStr = d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '.' + String(d.getMilliseconds()).padStart(3, '0');
-        const badgeClass = ev.action === 'BLOCK' ? 'badge-block' : (ev.action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
-        const verbClass = 'verb-' + (ev.method || 'get').toLowerCase();
-
-        return `
-          <tr onclick="openForensics('${encodeURIComponent(JSON.stringify(ev))}')">
-            <td style="color: var(--text-muted);">${timeStr}</td>
-            <td><span class="badge ${badgeClass}">${ev.action}</span></td>
-            <td><span class="${verbClass}">${ev.method}</span></td>
-            <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 2px 6px; border-radius: 4px;">${ev.path}</code></td>
-            <td style="color: var(--deep-indigo);">${ev.client_ip}</td>
-            <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600;">${ev.rule_triggered || 'CLEAN'}</span></td>
-            <td style="font-weight: 700; color: ${ev.risk_score > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${ev.risk_score}</td>
-            <td><button class="btn" style="padding: 2px 6px; font-size: 10px;" onclick="event.stopPropagation(); openForensics('${encodeURIComponent(JSON.stringify(ev))}')">Inspect</button></td>
-          </tr>
-        `;
+        return `<tr onclick="openForensics('${encodeURIComponent(JSON.stringify(ev))}')">${createRowHtml(ev)}</tr>`;
       }).join("");
 
       updateCountBadge();

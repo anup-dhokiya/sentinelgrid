@@ -1604,7 +1604,10 @@ app.add_middleware(
           updateScopeDropdown(allWebsites);
         }
 
-        const incomingEvents = data.recent_events || [];
+        let incomingEvents = data.recent_events || [];
+        if (incomingEvents.length > 100) {
+          incomingEvents = incomingEvents.slice(0, 100);
+        }
 
         // Check for newly intercepted threats to sound alert tone & show toast
         if (knownEventIds.size > 0) {
@@ -1620,6 +1623,10 @@ app.add_middleware(
         }
 
         incomingEvents.forEach(ev => knownEventIds.add(ev.id));
+        if (knownEventIds.size > 500) {
+          const arr = Array.from(knownEventIds);
+          knownEventIds = new Set(arr.slice(arr.length - 250));
+        }
         allRecentEvents = incomingEvents;
 
         applyEventFilter();

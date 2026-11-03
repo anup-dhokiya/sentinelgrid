@@ -16,6 +16,7 @@ from app.security_engine.normalization.normalizer import RequestNormalizer
 from app.security_engine.smart_parse import SmartParse, TokenType
 from app.security_engine.threat_intel import global_threat_intel, RadixIpTrie
 from app.security_engine.rate_limiter import global_rate_limiter, SlidingWindowLimiter
+from app.security_engine.threat_knowledge import get_threat_profile
 
 
 class ThreatSignature:
@@ -1309,6 +1310,10 @@ class SecurityBrain:
             max_score = 0.0  # Clean request has 0 risk score
 
         top_rule = unique_matches[0] if unique_matches else None
+        if top_rule:
+            threat_profile = get_threat_profile(top_rule["rule_id"], top_rule.get("category"), top_rule.get("cve_ref"))
+        else:
+            threat_profile = get_threat_profile("CLEAN-REQUEST-PASS")
 
         return {
             "action": action,
@@ -1316,6 +1321,7 @@ class SecurityBrain:
             "risk_score": round(max_score, 1),
             "total_matches": len(unique_matches),
             "top_match": top_rule,
+            "threat_profile": threat_profile,
             "all_matches": unique_matches,
             "is_clean": len(unique_matches) == 0,
             "normalized_path": norm["path"]
