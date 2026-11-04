@@ -12,7 +12,17 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from contextlib import contextmanager
 
-DB_PATH = Path("/run/media/anup/D/sentinelgrid/backend/sentinelgrid.db")
+import os
+from pathlib import Path
+
+# Dynamic DB resolution: uses DATA_DIR if set, D-drive if mounted, or relative to backend root
+_env_dir = os.getenv("DATA_DIR")
+if _env_dir:
+    DB_PATH = Path(_env_dir) / "sentinelgrid.db"
+elif Path("/run/media/anup/D/sentinelgrid/backend").is_dir():
+    DB_PATH = Path("/run/media/anup/D/sentinelgrid/backend/sentinelgrid.db")
+else:
+    DB_PATH = Path(__file__).resolve().parent.parent.parent / "sentinelgrid.db"
 _thread_local = threading.local()
 
 

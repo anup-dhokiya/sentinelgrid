@@ -41,7 +41,12 @@ async def health_check():
     }
 
 
-# Mount Web Console frontend static build
-static_dir = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public")
-if os.path.exists(static_dir):
+# Mount Web Console frontend static build with candidate directory discovery
+candidate_static_dirs = [
+    os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public"),
+    os.path.join(os.getcwd(), "frontend", "public"),
+    os.path.join(os.getcwd(), "public"),
+]
+static_dir = next((d for d in candidate_static_dirs if os.path.isdir(d)), None)
+if static_dir:
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
