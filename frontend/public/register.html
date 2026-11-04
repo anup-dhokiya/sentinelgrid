@@ -7,60 +7,159 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg-void: #080B11;
-      --bg-surface: #0E1422;
-      --bg-card: #151E32;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --accent-cyan: #06B6D4;
-      --text-primary: #F8FAFC;
-      --text-secondary: #94A3B8;
-      --terracotta: #EF4444;
-      --sage-green: #10B981;
-      --warm-ochre: #F59E0B;
+      /* Developer Precision Dark Palette (Carbon / GitHub Dark) */
+      --canvas-bg: #0D1117;
+      --card-bg: rgba(22, 27, 34, 0.92);
+      --surface-elevated: #21262D;
+      --border-subtle: #30363D;
+      --border-hover: rgba(47, 129, 247, 0.4);
+      --accent-cyan: #2F81F7;
+      --accent-soft: rgba(47, 129, 247, 0.12);
+      --text-primary: #E6EDF3;
+      --text-muted: #8B949E;
+      --text-subtle: #6E7681;
+      --terracotta: #F85149;
+      --sage-green: #3FB950;
+      --warm-ochre: #D29922;
       --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'Space Mono', monospace;
+      --font-mono: 'Space Mono', SFMono-Regular, Menlo, monospace;
+
+      /* Next-Gen Rounded Geometry Tokens */
+      --radius-xs: 6px;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 22px;
+      --radius-2xl: 28px;
+      --radius-pill: 9999px;
+
+      /* Soft Layered Shadows & Optical Rim */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 24px 60px -8px rgba(0, 0, 0, 0.65), 0 12px 28px -6px rgba(0, 0, 0, 0.45);
+      --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      --glass-blur: blur(20px) saturate(180%);
+    }
+
+    :root[data-theme="light"] {
+      /* Developer Precision Light Palette (Cloudflare / Linear Light) */
+      --canvas-bg: #F6F8FA;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --surface-elevated: #F3F4F6;
+      --border-subtle: #D0D7DE;
+      --border-hover: #0969DA;
+      --accent-cyan: #0969DA;
+      --accent-soft: #DDF4FF;
+      --text-primary: #1F2328;
+      --text-muted: #636C76;
+      --text-subtle: #9198A1;
+      --terracotta: #CF222E;
+      --sage-green: #1A7F37;
+      --warm-ochre: #9A6700;
+      --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      --shadow-sm: 0 1px 3px rgba(27, 31, 36, 0.06);
+      --shadow-md: 0 6px 18px rgba(27, 31, 36, 0.08);
+      --shadow-lg: 0 20px 48px rgba(27, 31, 36, 0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::selection { background: rgba(47, 129, 247, 0.3); color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
 
     body {
-      background: var(--bg-void);
+      background: var(--canvas-bg);
       color: var(--text-primary);
       font-family: var(--font-ui);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 32px 20px;
       position: relative;
       overflow-x: hidden;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Cyber Background Grid */
+    /* Ambient Subtle Cyber Grid */
     .bg-grid {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-size: 36px 36px;
+      background-size: 40px 40px;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      z-index: 2;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    /* Ambient Canvas */
+    #meshCanvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
       z-index: 1;
+    }
+
+    /* Top Corner Theme Switcher */
+    .theme-toggle-corner {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 100;
+    }
+    .theme-btn {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.18s ease;
+    }
+    .theme-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
     }
 
     .register-card {
       width: 100%;
-      max-width: 640px;
-      background: var(--bg-card);
+      max-width: 680px;
+      background: var(--card-bg);
       border: 1px solid var(--border-subtle);
-      border-radius: 18px;
-      padding: 36px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      border-radius: var(--radius-xl);
+      padding: 40px 38px;
+      box-shadow: var(--shadow-lg), var(--inner-rim);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       position: relative;
       z-index: 10;
       transform-style: preserve-3d;
-      transition: transform 0.15s ease;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+      animation: cardLandIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(32px) scale(0.97);
+    }
+
+    @keyframes cardLandIn {
+      0% {
+        opacity: 0;
+        transform: translateY(36px) scale(0.96);
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
     }
 
     .form-group { margin-bottom: 18px; text-align: left; }
@@ -69,110 +168,159 @@
       font-size: 11px;
       font-family: var(--font-mono);
       font-weight: 700;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      letter-spacing: 0.6px;
+      margin-bottom: 7px;
     }
     .form-input {
       width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 8px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
       padding: 12px 14px;
       color: var(--text-primary);
+      font-family: var(--font-ui);
       font-size: 13px;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.2s ease;
     }
     .form-input:focus {
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 0 3px rgba(6,182,212,0.2);
+      box-shadow: 0 0 0 3px var(--accent-soft);
     }
 
     /* Role Selector Grid */
     .role-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 640px) {
+      .role-grid { grid-template-columns: 1fr; }
     }
     .role-card {
-      background: var(--bg-surface);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 14px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       text-align: left;
       position: relative;
+      box-shadow: var(--shadow-sm);
     }
     .role-card:hover {
-      border-color: var(--accent-cyan);
+      border-color: var(--border-hover);
       transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
     .role-card.selected {
       border-color: var(--accent-cyan);
-      background: rgba(6, 182, 212, 0.08);
-      box-shadow: 0 0 16px rgba(6, 182, 212, 0.2);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 2px var(--accent-cyan), var(--shadow-md);
     }
     .role-title { font-size: 13px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 4px; }
-    .role-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.4; }
+    .role-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
     .role-badge {
       display: inline-block;
       font-size: 9px;
       font-family: var(--font-mono);
       font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
       background: rgba(255,255,255,0.06);
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
     .btn-submit {
       width: 100%;
-      background: #0284C7;
-      color: #FFF;
-      border: none;
-      border-radius: 8px;
-      padding: 13px;
+      background: linear-gradient(180deg, #388bfd 0%, #236dd4 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-sm);
+      padding: 14px;
       font-size: 13px;
       font-weight: 800;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(47, 129, 247, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .btn-submit:hover { background: #0369A1; }
-    .btn-submit:active { transform: scale(0.99); }
+    .btn-submit:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: scale(0.97); }
+
+    /* Animated Error Alert */
+    .error-banner {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--terracotta);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      margin-bottom: 18px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      animation: shakeBanner 0.35s ease;
+    }
+    @keyframes shakeBanner {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
   </style>
 </head>
 <body>
+  <!-- 60fps Ambient Particle Mesh Canvas -->
+  <canvas id="meshCanvas"></canvas>
   <div class="bg-grid"></div>
 
+  <!-- Theme Toggle -->
+  <div class="theme-toggle-corner">
+    <button id="themeBtn" class="theme-btn" onclick="toggleTheme()">
+      🌙 OBSIDIAN
+    </button>
+  </div>
+
   <div class="register-card" id="regCard">
-    <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); margin-bottom: 12px;">
-        <span style="font-size: 24px;">🛡️</span>
+    <div style="text-align: center; margin-bottom: 26px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--accent-soft); border: 1px solid var(--border-hover); margin-bottom: 12px; box-shadow: var(--shadow-sm);">
+        <span style="font-size: 26px;">🛡️</span>
       </div>
-      <h1 style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px;">Create SentinelGrid Account</h1>
-      <p style="font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 4px;">Role-Based Access Control (RBAC) Onboarding</p>
+      <h1 style="font-size: 21px; font-weight: 800; letter-spacing: -0.3px; color: var(--text-primary);">Create SentinelGrid Operator Account</h1>
+      <p style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px;">Zero-Trust Role-Based Access Control (RBAC) Onboarding</p>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="error-banner">
+      <span>⚠️</span>
+      <span id="errorMessage">Failed to create account</span>
     </div>
 
     <form onsubmit="handleRegister(event)">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" id="reg-name" class="form-input" placeholder="e.g. Maya Lin" required>
+          <input type="text" id="reg-name" class="form-input" placeholder="e.g. Maya Lin" required autocomplete="name">
         </div>
         <div class="form-group">
           <label class="form-label">Work Email</label>
-          <input type="email" id="reg-email" class="form-input" placeholder="operator@organization.com" required>
+          <input type="email" id="reg-email" class="form-input" placeholder="operator@organization.com" required autocomplete="email">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Password (Min 6 Characters)</label>
-        <input type="password" id="reg-pwd" class="form-input" placeholder="••••••••••••" minlength="6" required>
+        <input type="password" id="reg-pwd" class="form-input" placeholder="••••••••••••" minlength="6" required autocomplete="new-password">
       </div>
 
       <div style="margin-bottom: 8px;">
@@ -200,7 +348,7 @@
         <span>🚀 Initialize Account & Enter SOC</span>
       </button>
 
-      <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
+      <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted);">
         Already have credentials? <a href="/login.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Sign In here →</a>
       </div>
     </form>
@@ -215,6 +363,71 @@
       document.getElementById('role-' + role).classList.add('selected');
     }
 
+    // -------------------------------------------------------------------------
+    // 60fps Ambient Particle Constellation Mesh
+    // -------------------------------------------------------------------------
+    const canvas = document.getElementById("meshCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+    let particles = [];
+    const PARTICLE_COUNT = 45;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 1.8 + 1
+      });
+    }
+
+    function animateMesh() {
+      ctx.clearRect(0, 0, width, height);
+      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+      const particleColor = isDark ? "rgba(56, 189, 248, 0.4)" : "rgba(2, 132, 199, 0.35)";
+      const lineColor = isDark ? "rgba(56, 189, 248, 0.08)" : "rgba(2, 132, 199, 0.07)";
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particleColor;
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 1 - dist / 110;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateMesh);
+    }
+    animateMesh();
+
+    // -------------------------------------------------------------------------
+    // Interactive 3D Perspective Mouse Tilt
+    // -------------------------------------------------------------------------
     const card = document.getElementById("regCard");
     document.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
@@ -223,15 +436,43 @@
       card.style.transform = `perspective(1000px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg)`;
     });
 
+    // -------------------------------------------------------------------------
+    // Theme Switcher Controller
+    // -------------------------------------------------------------------------
+    function initTheme() {
+      const saved = localStorage.getItem("sg_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", saved);
+      updateThemeButton(saved);
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = cur === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("sg_theme", next);
+      updateThemeButton(next);
+    }
+    function updateThemeButton(theme) {
+      const btn = document.getElementById("themeBtn");
+      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "☀️ ALABASTER";
+    }
+    initTheme();
+
+    // -------------------------------------------------------------------------
+    // Registration Submission Handler
+    // -------------------------------------------------------------------------
     async function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-pwd').value;
       const btn = document.getElementById('submit-btn');
+      const errBanner = document.getElementById('errorBanner');
+      const errMsg = document.getElementById('errorMessage');
 
-      btn.innerText = "Provisioning Credentials...";
-      btn.style.opacity = "0.7";
+      errBanner.style.display = 'none';
+      btn.innerHTML = "<span>⚡ Provisioning Credentials...</span>";
+      btn.style.opacity = "0.75";
+      btn.disabled = true;
 
       try {
         const res = await fetch('/v1/auth/signup', {
@@ -243,18 +484,22 @@
         if (res.ok) {
           localStorage.setItem('sg_auth_token', data.token);
           localStorage.setItem('sg_auth_user', JSON.stringify(data.user));
-          btn.innerText = "✅ Success! Entering SOC Console...";
-          btn.style.background = "#10B981";
-          setTimeout(() => { window.location.href = '/#dashboard'; }, 400);
+          btn.innerHTML = "<span>✅ Clearance Provisioned. Entering SOC...</span>";
+          btn.style.background = "var(--sage-green)";
+          setTimeout(() => { window.location.href = '/#dashboard'; }, 450);
         } else {
-          alert("Registration Error: " + (data.detail || "Failed to create account"));
-          btn.innerText = "🚀 Initialize Account & Enter SOC";
+          errMsg.innerText = data.detail || "Failed to create account";
+          errBanner.style.display = 'flex';
+          btn.innerHTML = "<span>🚀 Initialize Account & Enter SOC</span>";
           btn.style.opacity = "1";
+          btn.disabled = false;
         }
       } catch (err) {
-        alert("Server Error: " + err);
-        btn.innerText = "🚀 Initialize Account & Enter SOC";
+        errMsg.innerText = "Control plane unreachable. Please check backend connection.";
+        errBanner.style.display = 'flex';
+        btn.innerHTML = "<span>🚀 Initialize Account & Enter SOC</span>";
         btn.style.opacity = "1";
+        btn.disabled = false;
       }
     }
   </script>

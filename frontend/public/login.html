@@ -12,7 +12,7 @@
     :root {
       /* Developer Precision Dark Palette (Carbon / GitHub Dark) */
       --canvas-bg: #0D1117;
-      --card-bg: #161B22;
+      --card-bg: rgba(22, 27, 34, 0.92);
       --surface-elevated: #21262D;
       --border-subtle: #30363D;
       --border-hover: rgba(47, 129, 247, 0.4);
@@ -26,12 +26,28 @@
       --warm-ochre: #D29922;
       --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'Space Mono', SFMono-Regular, Menlo, monospace;
+
+      /* Next-Gen Rounded Geometry Tokens */
+      --radius-xs: 6px;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 22px;
+      --radius-2xl: 28px;
+      --radius-pill: 9999px;
+
+      /* Soft Layered Shadows & Optical Rim */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 24px 60px -8px rgba(0, 0, 0, 0.65), 0 12px 28px -6px rgba(0, 0, 0, 0.45);
+      --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      --glass-blur: blur(20px) saturate(180%);
     }
 
     :root[data-theme="light"] {
       /* Developer Precision Light Palette (Cloudflare / Linear Light) */
       --canvas-bg: #F6F8FA;
-      --card-bg: #FFFFFF;
+      --card-bg: rgba(255, 255, 255, 0.94);
       --surface-elevated: #F3F4F6;
       --border-subtle: #D0D7DE;
       --border-hover: #0969DA;
@@ -43,9 +59,15 @@
       --terracotta: #CF222E;
       --sage-green: #1A7F37;
       --warm-ochre: #9A6700;
+      --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      --shadow-sm: 0 1px 3px rgba(27, 31, 36, 0.06);
+      --shadow-md: 0 6px 18px rgba(27, 31, 36, 0.08);
+      --shadow-lg: 0 20px 48px rgba(27, 31, 36, 0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::selection { background: rgba(47, 129, 247, 0.3); color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
 
     body {
       background: var(--canvas-bg);
@@ -94,9 +116,11 @@
     .login-card {
       background: var(--card-bg);
       border: 1px solid var(--border-subtle);
-      border-radius: 18px;
-      padding: 38px 34px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-xl);
+      padding: 40px 36px;
+      box-shadow: var(--shadow-lg), var(--inner-rim);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       transform-style: preserve-3d;
       transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
       
@@ -170,7 +194,7 @@
       width: 100%;
       background: var(--surface-elevated);
       border: 1px solid var(--border-subtle);
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       padding: 12px 14px;
       color: var(--text-primary);
       font-family: var(--font-ui);
@@ -189,6 +213,7 @@
       transform: translateY(-50%);
       background: none;
       border: none;
+      border-radius: var(--radius-xs);
       color: var(--text-muted);
       cursor: pointer;
       font-size: 14px;
@@ -197,10 +222,10 @@
     /* Button */
     .btn-submit {
       width: 100%;
-      background: var(--accent-cyan);
+      background: linear-gradient(180deg, #388bfd 0%, #236dd4 100%);
       color: #FFFFFF;
-      border: none;
-      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-sm);
       padding: 13px;
       font-size: 13px;
       font-weight: 800;
@@ -210,20 +235,21 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      box-shadow: 0 4px 14px rgba(47, 129, 247, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
       transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-submit:hover {
       filter: brightness(1.12);
       transform: translateY(-1px);
     }
-    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:active { transform: scale(0.97); }
 
     /* Animated Error Alert */
     .error-banner {
       background: rgba(239, 68, 68, 0.12);
       border: 1px solid rgba(239, 68, 68, 0.3);
       color: var(--terracotta);
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       padding: 10px 12px;
       font-size: 12px;
       margin-bottom: 16px;
@@ -241,19 +267,23 @@
     /* Role Clearance Preview Badges */
     .role-pills {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       margin-bottom: 18px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 3px;
     }
     .role-pill {
       flex: 1;
-      padding: 6px 4px;
+      padding: 6px 8px;
       text-align: center;
-      border-radius: 6px;
+      border-radius: var(--radius-pill);
       font-family: var(--font-mono);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
-      background: var(--surface-elevated);
-      border: 1px solid var(--border-subtle);
+      background: transparent;
+      border: 1px solid transparent;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s;

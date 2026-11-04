@@ -10,65 +10,99 @@
   
   <style>
     :root {
-      /* Developer-Grade Precision Dark Palette (Carbon / GitHub Dark High-Contrast) */
-      --canvas-bg: #0D1117;
-      --card-white: #161B22;
-      --sand-warm: #21262D;
-      --stone-border: #30363D;
-      --stone-border-light: rgba(240, 246, 252, 0.08);
+      /* Next-Gen Developer Precision Dark Palette (Carbon / Obsidian Glass) */
+      --canvas-bg: #0B0E14;
+      --card-white: #12171F;
+      --card-elevated: #18202C;
+      --sand-warm: #1A2230;
+      --sand-warm-hover: #222C3D;
+      --stone-border: rgba(255, 255, 255, 0.09);
+      --stone-border-light: rgba(255, 255, 255, 0.05);
+      --border-accent: rgba(56, 189, 248, 0.35);
       
       --terracotta: #F85149;
-      --terracotta-soft: rgba(248, 81, 73, 0.15);
+      --terracotta-soft: rgba(248, 81, 73, 0.14);
+      --terracotta-border: rgba(248, 81, 73, 0.3);
       --sage-green: #3FB950;
-      --sage-soft: rgba(63, 185, 80, 0.15);
-      --deep-indigo: #2F81F7;
-      --indigo-soft: rgba(47, 129, 247, 0.12);
-      --warm-ochre: #D29922;
-      --ochre-soft: rgba(210, 153, 34, 0.15);
+      --sage-soft: rgba(63, 185, 80, 0.14);
+      --sage-border: rgba(63, 185, 80, 0.3);
+      --deep-indigo: #38BDF8;
+      --indigo-soft: rgba(56, 189, 248, 0.12);
+      --indigo-border: rgba(56, 189, 248, 0.3);
+      --warm-ochre: #F59E0B;
+      --ochre-soft: rgba(245, 158, 11, 0.14);
+      --ochre-border: rgba(245, 158, 11, 0.3);
       
-      --text-charcoal: #E6EDF3;
-      --text-muted: #8B949E;
-      --text-subtle: #6E7681;
+      --text-charcoal: #F0F6FC;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
       
       --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      /* Next-Gen Rounded Corners Hierarchy */
+      --radius-xs: 6px;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 22px;
+      --radius-2xl: 28px;
+      --radius-pill: 9999px;
       
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.7);
+      /* Multi-layered Soft Diffused Depth */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
+      --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.35), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 16px 40px -6px rgba(0, 0, 0, 0.5), 0 6px 16px -2px rgba(0, 0, 0, 0.3);
+      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      --glass-blur: blur(16px) saturate(180%);
     }
 
     :root[data-theme="light"] {
-      /* Developer-Grade Clean Light Palette (Cloudflare / Linear Light) */
-      --canvas-bg: #F6F8FA;
+      /* Next-Gen Developer Precision Clean Light Palette (Cloudflare / Linear Light) */
+      --canvas-bg: #F8FAFC;
       --card-white: #FFFFFF;
-      --sand-warm: #F3F4F6;
-      --stone-border: #D0D7DE;
-      --stone-border-light: #EAECEF;
+      --card-elevated: #F1F5F9;
+      --sand-warm: #F1F5F9;
+      --sand-warm-hover: #E2E8F0;
+      --stone-border: #E2E8F0;
+      --stone-border-light: #EDF2F7;
+      --border-accent: rgba(2, 132, 199, 0.3);
       
-      --terracotta: #CF222E;
-      --terracotta-soft: #FFEBE9;
-      --sage-green: #1A7F37;
-      --sage-soft: #DAFBE1;
-      --deep-indigo: #0969DA;
-      --indigo-soft: #DDF4FF;
-      --warm-ochre: #9A6700;
-      --ochre-soft: #FFF8C5;
+      --terracotta: #DC2626;
+      --terracotta-soft: rgba(220, 38, 38, 0.08);
+      --terracotta-border: rgba(220, 38, 38, 0.2);
+      --sage-green: #16A34A;
+      --sage-soft: rgba(22, 163, 74, 0.08);
+      --sage-border: rgba(22, 163, 74, 0.2);
+      --deep-indigo: #0284C7;
+      --indigo-soft: rgba(2, 132, 199, 0.08);
+      --indigo-border: rgba(2, 132, 199, 0.2);
+      --warm-ochre: #D97706;
+      --ochre-soft: rgba(217, 119, 6, 0.08);
+      --ochre-border: rgba(217, 119, 6, 0.2);
       
-      --text-charcoal: #1F2328;
-      --text-muted: #636C76;
-      --text-subtle: #9198A1;
+      --text-charcoal: #0F172A;
+      --text-muted: #64748B;
+      --text-subtle: #94A3B8;
       
-      --shadow-sm: 0 1px 3px rgba(31, 35, 40, 0.08);
-      --shadow-md: 0 3px 8px rgba(31, 35, 40, 0.12);
-      --shadow-lg: 0 8px 24px rgba(31, 35, 40, 0.16);
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+      --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 16px 40px -6px rgba(15, 23, 42, 0.12), 0 6px 16px -2px rgba(15, 23, 42, 0.06);
+      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+      --glass-blur: blur(16px) saturate(180%);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    ::selection {
+      background: rgba(56, 189, 248, 0.3);
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--deep-indigo);
+      outline-offset: 2px;
+    }
 
     body {
       background-color: var(--canvas-bg);
@@ -79,6 +113,7 @@
       flex-direction: column;
       font-variant-numeric: tabular-nums;
       -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
     }
 
     /* Animated 3D Sentinel Shield Emblem */
@@ -105,11 +140,22 @@
       50% { opacity: 1; transform: scale(1.06); filter: drop-shadow(0 0 6px #38BDF8); }
     }
 
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--canvas-bg); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+    /* Next-Gen Pill Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-pill);
+      border: 2px solid transparent;
+      background-clip: content-box;
+      transition: background 0.2s;
+    }
+    [data-theme="light"] ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.16);
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.4); }
 
     /* Modern Flex App Layout with Left Slide Collapsible Sidebar */
     .app-layout {
@@ -225,7 +271,7 @@
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
-      transition: all 0.15s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
       position: relative;
     }
@@ -233,6 +279,7 @@
     .sidebar-item:hover {
       background: var(--sand-warm);
       color: var(--text-charcoal);
+      transform: translateX(2px);
     }
 
     .sidebar-item.active {
@@ -248,7 +295,7 @@
       top: 6px;
       bottom: 6px;
       width: 4px;
-      border-radius: 0 4px 4px 0;
+      border-radius: var(--radius-pill);
       background: var(--deep-indigo);
     }
 
@@ -307,8 +354,8 @@
       font-family: var(--font-mono);
       font-weight: 800;
       letter-spacing: 0.5px;
-      padding: 1px 6px;
-      border-radius: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
       background: rgba(255,255,255,0.06);
       border: 1px solid var(--stone-border);
       text-transform: uppercase;
@@ -337,7 +384,7 @@
       font-size: 14px;
       border-radius: var(--radius-sm);
       padding: 4px 6px;
-      transition: all 0.15s;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-logout-icon:hover {
       color: var(--terracotta);
@@ -351,7 +398,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(4px);
       z-index: 290;
     }
     .sidebar-backdrop.active {
@@ -381,8 +428,9 @@
       width: 320px;
       background: var(--card-white);
       border: 1px solid var(--deep-indigo);
-      border-radius: 12px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 16px rgba(6, 182, 212, 0.2);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg), 0 0 16px rgba(56, 189, 248, 0.2);
+      backdrop-filter: var(--glass-blur);
       padding: 14px 16px;
       font-family: var(--font-ui);
       pointer-events: none;
@@ -440,6 +488,8 @@
       top: 0;
       z-index: 100;
       box-shadow: var(--shadow-sm);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
     }
 
     .user-profile-badge {
@@ -489,7 +539,7 @@
       height: 8px;
       border-radius: 50%;
       background: var(--sage-green);
-      box-shadow: 0 0 0 0 rgba(46, 125, 91, 0.7);
+      box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7);
       animation: pulse-green 1.6s infinite;
     }
     .live-pulse.paused {
@@ -498,47 +548,90 @@
       box-shadow: none;
     }
     @keyframes pulse-green {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 91, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(46, 125, 91, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 91, 0); }
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(63, 185, 80, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
     }
 
-    /* Buttons */
+    /* Next-Gen Spring Buttons */
     .btn {
       font-family: var(--font-ui);
       font-size: 12px;
       font-weight: 700;
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: var(--radius-sm);
       border: 1px solid transparent;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      transition: all 0.15s ease;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
+      user-select: none;
     }
-    .btn-primary { background: var(--deep-indigo); color: #FFF; }
-    .btn-primary:hover { background: #0F172A; }
-    .btn-warm { background: var(--terracotta); color: #FFF; }
-    .btn-warm:hover { background: #B9381E; }
-    .btn-subtle { background: var(--sand-warm); color: var(--text-charcoal); border-color: var(--stone-border); }
-    .btn-subtle:hover { background: #E6E3DB; }
-    .btn-sage { background: var(--sage-green); color: #FFF; }
-    .btn-sage:hover { background: #236348; }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: linear-gradient(180deg, #3B82F6 0%, #2563EB 100%);
+      color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    .btn-warm {
+      background: linear-gradient(180deg, #EF4444 0%, #DC2626 100%);
+      color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .btn-warm:hover {
+      background: linear-gradient(180deg, #F87171 0%, #EF4444 100%);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    .btn-subtle {
+      background: var(--sand-warm);
+      color: var(--text-charcoal);
+      border-color: var(--stone-border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .btn-subtle:hover {
+      background: var(--sand-warm-hover);
+      border-color: var(--border-accent);
+      color: var(--text-charcoal);
+      transform: translateY(-1px);
+    }
+    .btn-sage {
+      background: linear-gradient(180deg, #22C55E 0%, #16A34A 100%);
+      color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(22, 163, 74, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .btn-sage:hover {
+      background: linear-gradient(180deg, #4ADE80 0%, #22C55E 100%);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
 
     /* Panels & Containers */
     .panel {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm), var(--inner-rim);
       overflow: hidden;
       margin-bottom: 22px;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, border-color 0.2s;
+    }
+    .panel:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-md), var(--inner-rim);
     }
 
     .panel-header {
-      padding: 15px 22px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--stone-border);
       background: var(--sand-warm);
       display: flex;
@@ -549,33 +642,37 @@
       color: var(--text-charcoal);
     }
 
-    .panel-body { padding: 20px 22px; }
+    .panel-body { padding: 20px; }
 
-    /* Clean Tables */
-    .table-clean { width: 100%; border-collapse: collapse; font-size: 13px; }
+    /* Clean Rounded Tables */
+    .table-clean {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
     .table-clean th {
       text-align: left;
-      padding: 11px 16px;
+      padding: 12px 18px;
       background: var(--sand-warm);
       color: var(--text-muted);
       font-size: 11px;
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.5px;
       border-bottom: 1px solid var(--stone-border);
     }
     .table-clean td {
-      padding: 12px 16px;
+      padding: 12px 18px;
       border-bottom: 1px solid var(--stone-border-light);
       vertical-align: middle;
       color: var(--text-charcoal);
+      transition: background 0.15s ease;
     }
-    .table-clean tbody tr:hover { background: var(--sand-warm); }
+    .table-clean tbody tr:hover td { background: var(--sand-warm-hover); }
     .table-clean tbody tr.clickable-row {
       cursor: pointer;
-      transition: background 0.12s ease;
     }
-    .table-clean tbody tr.clickable-row:hover { background: var(--sand-warm); }
 
     /* Metric KPI Grid */
     .metric-grid {
@@ -587,15 +684,29 @@
     .metric-card {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       padding: 18px 20px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-sm), var(--inner-rim);
       position: relative;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, border-color 0.2s;
     }
-    .metric-card.terracotta { border-top: 3px solid var(--terracotta); }
-    .metric-card.sage { border-top: 3px solid var(--sage-green); }
-    .metric-card.indigo { border-top: 3px solid var(--deep-indigo); }
-    .metric-card.ochre { border-top: 3px solid var(--warm-ochre); }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md), var(--inner-rim);
+    }
+    .metric-card.terracotta::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--terracotta);
+    }
+    .metric-card.sage::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--sage-green);
+    }
+    .metric-card.indigo::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--deep-indigo);
+    }
+    .metric-card.ochre::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--warm-ochre);
+    }
 
     .metric-val {
       font-size: 28px;
@@ -605,23 +716,26 @@
       letter-spacing: -0.5px;
     }
 
-    /* Badges */
+    /* Next-Gen Pill Badges */
     .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
       font-size: 11px;
       font-weight: 700;
       font-family: var(--font-mono);
-      letter-spacing: 0.2px;
+      letter-spacing: 0.3px;
+      border: 1px solid transparent;
     }
-    .badge-allow { background: var(--sage-soft); color: var(--sage-green); }
-    .badge-block { background: var(--terracotta-soft); color: var(--terracotta); }
-    .badge-challenge { background: var(--ochre-soft); color: var(--warm-ochre); }
-    .badge-ratelimit { background: #FEF3C7; color: #B45309; }
-    .badge-shadow { background: #FCE7F3; color: #9D174D; }
-    .badge-online { background: #DCFCE7; color: #166534; }
-    .badge-offline { background: #FEE2E2; color: #991B1B; }
+    .badge-allow { background: var(--sage-soft); color: var(--sage-green); border-color: var(--sage-border); }
+    .badge-block { background: var(--terracotta-soft); color: var(--terracotta); border-color: var(--terracotta-border); }
+    .badge-challenge { background: var(--ochre-soft); color: var(--warm-ochre); border-color: var(--ochre-border); }
+    .badge-ratelimit { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border-color: rgba(245, 158, 11, 0.3); }
+    .badge-shadow { background: rgba(236, 72, 153, 0.15); color: #EC4899; border-color: rgba(236, 72, 153, 0.3); }
+    .badge-online { background: var(--sage-soft); color: var(--sage-green); border-color: var(--sage-border); }
+    .badge-offline { background: var(--terracotta-soft); color: var(--terracotta); border-color: var(--terracotta-border); }
 
     /* Domain Cards Grid */
     .domain-cards-grid {
@@ -633,29 +747,30 @@
     .domain-card {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm), var(--inner-rim);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, border-color 0.2s;
     }
     .domain-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-md), var(--inner-rim);
     }
     .feature-chip-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      gap: 6px;
       margin: 12px 0;
     }
     .feature-chip {
       font-size: 10px;
       font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 4px;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
       background: var(--sand-warm);
       color: var(--deep-indigo);
       border: 1px solid var(--stone-border);
@@ -668,14 +783,17 @@
       color: var(--text-charcoal);
       border: 1px solid var(--stone-border);
       border-radius: var(--radius-sm);
-      padding: 9px 12px;
+      padding: 10px 14px;
       font-family: var(--font-ui);
       font-size: 13px;
-      margin: 5px 0 12px;
+      margin: 6px 0 14px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .form-input:focus { border-color: var(--deep-indigo); }
+    .form-input:focus {
+      border-color: var(--deep-indigo);
+      box-shadow: 0 0 0 3px var(--indigo-soft);
+    }
 
     .filter-bar {
       display: flex;
@@ -689,8 +807,9 @@
     .drawer-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.4);
-      backdrop-filter: blur(2px);
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
       display: none;
     }
@@ -703,12 +822,14 @@
       max-width: 95vw;
       background: var(--card-white);
       border-left: 1px solid var(--stone-border);
+      border-radius: var(--radius-2xl) 0 0 var(--radius-2xl);
       box-shadow: var(--shadow-lg);
       z-index: 1001;
       display: flex;
       flex-direction: column;
       transform: translateX(100%);
-      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
     }
     .drawer-panel.open { transform: translateX(0); }
 
@@ -737,18 +858,19 @@
 
     /* Forensic Monospace Code Snippet Box */
     .forensic-code-block {
-      background: #0F172A;
+      background: #090D14;
       color: #38BDF8;
       font-family: var(--font-mono);
       font-size: 11px;
-      line-height: 1.5;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
+      line-height: 1.6;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--stone-border);
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-all;
       position: relative;
-      margin: 6px 0 14px;
+      margin: 8px 0 16px;
     }
 
     /* Threat Toast Alert */
@@ -761,11 +883,13 @@
       padding: 14px 20px;
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-lg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       display: flex;
       align-items: center;
       gap: 12px;
       z-index: 9999;
-      animation: slideUp 0.2s ease-out;
+      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       font-size: 13px;
     }
     @keyframes slideUp {
@@ -776,17 +900,34 @@
     /* Histogram hover tooltip */
     .hist-tooltip {
       position: absolute;
-      background: var(--deep-indigo);
-      color: #FFF;
+      background: var(--card-white);
+      color: var(--text-charcoal);
+      border: 1px solid var(--deep-indigo);
       font-size: 11px;
       padding: 6px 10px;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       pointer-events: none;
       z-index: 100;
       box-shadow: var(--shadow-md);
       display: none;
       font-family: var(--font-mono);
+      backdrop-filter: var(--glass-blur);
     }
+
+    /* Modern Rounded Keyboard Shortcut Badge */
+    kbd {
+      background: var(--sand-warm);
+      border: 1px solid var(--stone-border);
+      padding: 3px 8px;
+      border-radius: var(--radius-xs);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-charcoal);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+    }
+
     /* Universal Choreographed Animation Flow System */
     @keyframes viewEnterTransition {
       0% {
@@ -931,12 +1072,12 @@
         </div>
 
         <!-- Live Precision System Clock -->
-        <div id="topbar-system-clock" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 5px 14px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
+        <div id="topbar-system-clock" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 5px 14px; border-radius: var(--radius-pill); border: 1px solid var(--stone-border);">
           <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--sage-green); box-shadow: 0 0 6px var(--sage-green);"></span>
           <span id="clock-date-str" style="color: var(--text-muted); font-weight: 600;">--</span>
           <span style="color: var(--stone-border);">|</span>
           <span id="clock-time-str" style="color: var(--text-charcoal); font-weight: 700; letter-spacing: 0.5px;">--:--:--</span>
-          <span id="clock-tz-badge" style="font-size: 9px; padding: 1px 6px; border-radius: 3px; background: var(--card-white); border: 1px solid var(--stone-border); color: var(--deep-indigo); font-weight: 800;">IST</span>
+          <span id="clock-tz-badge" style="font-size: 9px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--card-white); border: 1px solid var(--stone-border); color: var(--deep-indigo); font-weight: 800;">IST</span>
         </div>
 
         <!-- Controls & User Badge -->
@@ -945,9 +1086,9 @@
           <div style="position: relative;">
             <button id="notificationBellBtn" class="btn btn-subtle" style="font-size: 12px; padding: 6px 10px; position: relative;" onclick="toggleNotificationPopover()" title="Recent Mitigated Threats">
               🔔
-              <span id="notificationBadge" style="position: absolute; top: -4px; right: -4px; background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 10px; display: none;">0</span>
+              <span id="notificationBadge" style="position: absolute; top: -4px; right: -4px; background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: var(--radius-pill); display: none;">0</span>
             </button>
-            <div id="notificationPopover" style="display: none; position: absolute; right: 0; top: 125%; width: 340px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1000; padding: 14px;">
+            <div id="notificationPopover" style="display: none; position: absolute; right: 0; top: 125%; width: 340px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1000; padding: 14px; backdrop-filter: var(--glass-blur);">
               <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 8px; margin-bottom: 10px;">
                 <span style="font-size: 11px; font-weight: 800; font-family: var(--font-mono); color: var(--text-charcoal);">⚡ RECENT MITIGATIONS</span>
                 <span id="notif-clear-btn" style="font-size: 10px; color: var(--text-muted); cursor: pointer;" onclick="clearNotifications()">Clear</span>
@@ -998,7 +1139,7 @@
     <section id="view-dashboard" class="view-section active">
 
       <!-- Live Stream Controls & Scope Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 12px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); padding: 14px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm), var(--inner-rim); flex-wrap: wrap; gap: 12px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 11px; font-weight: 800; color: var(--deep-indigo); letter-spacing: 0.5px;">
             🛡️ ACTIVE SITE SCOPE:
@@ -1011,10 +1152,10 @@
 
         <div style="display: flex; align-items: center; gap: 10px;">
           <!-- Live Polling Radar & Countdown -->
-          <div style="display: flex; align-items: center; gap: 8px; background: var(--sand-warm); padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
+          <div style="display: flex; align-items: center; gap: 8px; background: var(--sand-warm); padding: 6px 14px; border-radius: var(--radius-pill); border: 1px solid var(--stone-border);">
             <span class="live-pulse" id="live-pulse-indicator"></span>
             <span id="live-indicator-text" style="font-size: 11px; font-weight: 800; color: var(--sage-green);">LIVE STREAMING (2s)</span>
-            <span id="sync-countdown-badge" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); background: var(--card-white); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--stone-border);">Next: 2s</span>
+            <span id="sync-countdown-badge" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); background: var(--card-white); padding: 2px 8px; border-radius: var(--radius-pill); border: 1px solid var(--stone-border);">Next: 2s</span>
           </div>
 
           <!-- Stream Speed Selector -->
@@ -1037,7 +1178,7 @@
       <!-- ===================================================================== -->
       <!-- 3D ISOMETRIC SECURITY PIPELINE TOPOLOGY & INTERACTIVE PARTICLE ENGINE -->
       <!-- ===================================================================== -->
-      <div class="panel topology-card" id="topology3dCard" style="margin-bottom: 22px; padding: 18px 22px; position: relative; overflow: hidden; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); transform-style: preserve-3d; transition: transform 0.15s ease;">
+      <div class="panel topology-card" id="topology3dCard" style="margin-bottom: 22px; padding: 20px 24px; position: relative; overflow: hidden; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); transform-style: preserve-3d; transition: transform 0.15s ease;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.8px; color: var(--deep-indigo); text-transform: uppercase;">
@@ -1067,8 +1208,8 @@
         </div>
 
         <div style="position: relative; width: 100%; min-height: 220px;">
-          <canvas id="interactive-3d-pipeline-canvas" width="1100" height="220" style="width: 100%; height: 220px; display: block; border-radius: 8px; background: var(--sand-warm); cursor: crosshair;"></canvas>
-          <div id="canvas-node-hud" style="position: absolute; display: none; background: rgba(17, 23, 38, 0.95); border: 1px solid var(--deep-indigo); border-radius: 8px; padding: 8px 12px; color: #FFF; font-size: 11px; font-family: var(--font-mono); pointer-events: none; z-index: 50; box-shadow: 0 4px 16px rgba(0,0,0,0.6);"></div>
+          <canvas id="interactive-3d-pipeline-canvas" width="1100" height="220" style="width: 100%; height: 220px; display: block; border-radius: var(--radius-md); background: var(--sand-warm); cursor: crosshair;"></canvas>
+          <div id="canvas-node-hud" style="position: absolute; display: none; background: rgba(17, 23, 38, 0.95); border: 1px solid var(--deep-indigo); border-radius: var(--radius-md); padding: 8px 12px; color: #FFF; font-size: 11px; font-family: var(--font-mono); pointer-events: none; z-index: 50; box-shadow: var(--shadow-lg); backdrop-filter: var(--glass-blur);"></div>
         </div>
       </div>
 
@@ -1249,7 +1390,7 @@
       </div>
 
       <!-- Add Domain Box (Collapsible) -->
-      <div id="add-domain-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: var(--radius-md); margin-bottom: 22px; border: 1px solid var(--stone-border);">
+      <div id="add-domain-box" style="display: none; background: var(--sand-warm); padding: 22px; border-radius: var(--radius-lg); margin-bottom: 22px; border: 1px solid var(--stone-border); box-shadow: var(--shadow-sm);">
         <h4 style="font-size: 13px; margin-bottom: 12px; font-weight: 800;">Register New Domain for Protection</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
           <div>
@@ -1313,7 +1454,7 @@
           </div>
         </div>
         <div class="panel-body">
-          <div id="spec-import-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: var(--radius-sm); margin-bottom: 22px;">
+          <div id="spec-import-box" style="display: none; background: var(--sand-warm); padding: 22px; border-radius: var(--radius-lg); margin-bottom: 22px; border: 1px solid var(--stone-border); box-shadow: var(--shadow-sm);">
             <h4 style="font-size: 13px; margin-bottom: 8px;">Import OpenAPI 3.0 / Swagger Contract</h4>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
               Paste your OpenAPI specification (JSON or YAML) below. All defined routes will be cataloged as 'documented', allowing automatic detection of undocumented 'shadow' APIs.
@@ -1354,7 +1495,7 @@
           <button class="btn btn-warm" onclick="toggleAddIpRule()">+ Add IP Rule</button>
         </div>
         <div class="panel-body">
-          <div id="add-iprule-box" style="display: none; background: var(--sand-warm); padding: 20px; border-radius: var(--radius-sm); margin-bottom: 22px;">
+          <div id="add-iprule-box" style="display: none; background: var(--sand-warm); padding: 22px; border-radius: var(--radius-lg); margin-bottom: 22px; border: 1px solid var(--stone-border); box-shadow: var(--shadow-sm);">
             <h4 style="font-size: 13px; margin-bottom: 12px;">Add Dynamic IP / CIDR Access Rule</h4>
             <div style="display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 12px; align-items: flex-end;">
               <div>
@@ -1464,7 +1605,7 @@
             ⚡ Fire In-Line Inspection Request
           </button>
 
-          <div id="attack-output" style="display: none; margin-top: 20px; padding: 16px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 12px; background: #F8F7F4; border: 1px solid var(--stone-border);"></div>
+          <div id="attack-output" style="display: none; margin-top: 20px; padding: 18px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 12px; background: var(--sand-warm); border: 1px solid var(--stone-border);"></div>
         </div>
       </div>
     </section>
@@ -1493,7 +1634,7 @@
             📈 Replay Historical Traffic Samples
           </button>
 
-          <div id="sim-output" style="display: none; margin-top: 20px; padding: 16px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 12px; background: #F8F7F4; border: 1px solid var(--stone-border);"></div>
+          <div id="sim-output" style="display: none; margin-top: 20px; padding: 18px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 12px; background: var(--sand-warm); border: 1px solid var(--stone-border);"></div>
         </div>
       </div>
     </section>
@@ -1514,10 +1655,10 @@
           </p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
-            <div style="background: var(--sand-warm); padding: 16px; border-radius: var(--radius-sm);">
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border-light);">
               <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option A: Nginx Reverse Proxy</h4>
               <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Use <code>auth_request</code> or <code>proxy_pass</code> to validate requests before passing to upstream.</p>
-              <pre style="background: var(--card-white); padding: 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">location /api/ {
+              <pre style="background: var(--card-white); padding: 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; overflow-x: auto; border: 1px solid var(--stone-border);">location /api/ {
     auth_request /_sentinel_check;
     proxy_pass http://upstream_app;
 }
@@ -1528,10 +1669,10 @@ location = /_sentinel_check {
 }</pre>
             </div>
 
-            <div style="background: var(--sand-warm); padding: 16px; border-radius: var(--radius-sm);">
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border-light);">
               <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option B: Python ASGI Middleware</h4>
               <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Drop-in middleware for FastAPI, Starlette, or Django ASGI applications.</p>
-              <pre style="background: var(--card-white); padding: 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; overflow-x: auto;">from sentinelgrid.middleware import SentinelGridMiddleware
+              <pre style="background: var(--card-white); padding: 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; overflow-x: auto; border: 1px solid var(--stone-border);">from sentinelgrid.middleware import SentinelGridMiddleware
 
 app = FastAPI()
 app.add_middleware(
@@ -1542,7 +1683,7 @@ app.add_middleware(
             </div>
           </div>
 
-          <div style="background: var(--canvas-bg); border: 1px solid var(--stone-border); padding: 14px; border-radius: var(--radius-sm); font-size: 12px;">
+          <div style="background: var(--sand-warm); border: 1px solid var(--stone-border); padding: 16px; border-radius: var(--radius-md); font-size: 12px;">
             <strong>Full Observation Guide Documentation:</strong><br>
             Production integration guide authored on your D drive at:<br>
             <code>/run/media/anup/D/sentinelgrid/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.md</code>
@@ -1562,7 +1703,7 @@ app.add_middleware(
   <div id="event-drawer" class="drawer-panel">
     <div class="drawer-header">
       <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--terracotta-soft); color: var(--terracotta); display: flex; align-items: center; justify-content: center; font-weight: 800;">
+        <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: var(--terracotta-soft); color: var(--terracotta); display: flex; align-items: center; justify-content: center; font-weight: 800;">
           🔍
         </div>
         <div>
@@ -1594,7 +1735,7 @@ app.add_middleware(
       <!-- Detection Signature Details -->
       <div style="margin-bottom: 18px;">
         <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 6px;">Detection Signature & Classification</h4>
-        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-sm); padding: 12px;">
+        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 14px;">
           <div style="margin-bottom: 6px;">
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Triggered Rule:</span>
             <strong style="color: var(--terracotta); font-family: var(--font-mono); margin-left: 6px;" id="drawer-rule">SP-SQL-BOUNDARY-BREAKOUT</strong>
@@ -1613,7 +1754,7 @@ app.add_middleware(
       <!-- Network & Target Metadata -->
       <div style="margin-bottom: 18px;">
         <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 6px;">Target Route & Client Provenance</h4>
-        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-sm); padding: 12px;">
+        <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 14px;">
           <div style="margin-bottom: 6px; display: flex; justify-content: space-between;">
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Client IP:</span>
             <strong style="font-family: var(--font-mono); color: var(--deep-indigo);" id="drawer-ip">127.0.0.1</strong>
@@ -1624,7 +1765,7 @@ app.add_middleware(
           </div>
           <div>
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">URI Path:</span>
-            <code style="font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 3px 6px; border-radius: 4px; display: block; margin-top: 4px;" id="drawer-path">/search?q=' OR 1=1--</code>
+            <code style="font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 4px 8px; border-radius: var(--radius-xs); display: block; margin-top: 4px;" id="drawer-path">/search?q=' OR 1=1--</code>
           </div>
         </div>
       </div>
@@ -1662,7 +1803,7 @@ app.add_middleware(
   <!-- MODAL 2: DOMAIN DEEP SECURITY PROFILE MODAL -->
   <!-- ======================================================================= -->
   <div id="domain-modal-backdrop" class="drawer-backdrop" onclick="closeDomainModal()"></div>
-  <div id="domain-stats-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 840px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1002; max-height: 90vh; overflow-y: auto;">
+  <div id="domain-stats-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 840px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; max-height: 90vh; overflow-y: auto;">
     <div style="padding: 20px 24px; border-bottom: 1px solid var(--stone-border); background: var(--sand-warm); display: flex; justify-content: space-between; align-items: center;">
       <div>
         <div style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);" id="domain-modal-title">Domain Security Profile</div>
@@ -1680,7 +1821,7 @@ app.add_middleware(
   <!-- MODAL 3: OPERATOR PROFILE & RBAC GOVERNANCE HUD MODAL -->
   <!-- ======================================================================= -->
   <div id="user-profile-backdrop" class="drawer-backdrop" onclick="closeUserProfileModal()"></div>
-  <div id="user-profile-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
+  <div id="user-profile-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--stone-border-light); padding-bottom: 16px;">
       <div style="display: flex; align-items: center; gap: 14px;">
         <div class="avatar-circle" id="prof-modal-avatar" style="width: 48px; height: 48px; font-size: 18px; font-weight: 800;">OP</div>
@@ -1693,11 +1834,11 @@ app.add_middleware(
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-      <div style="background: var(--sand-warm); padding: 12px 14px; border-radius: 8px;">
+      <div style="background: var(--sand-warm); padding: 14px; border-radius: var(--radius-md);">
         <div style="font-size: 10px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">ASSIGNED ROLE</div>
         <div style="margin-top: 4px;"><span class="role-badge" id="prof-modal-role" style="font-size: 11px; padding: 2px 8px;">MEMBER</span></div>
       </div>
-      <div style="background: var(--sand-warm); padding: 12px 14px; border-radius: 8px;">
+      <div style="background: var(--sand-warm); padding: 14px; border-radius: var(--radius-md);">
         <div style="font-size: 10px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">CLEARANCE TIER</div>
         <div style="font-size: 12px; font-weight: 800; color: var(--sage-green); margin-top: 4px;" id="prof-modal-clearance">TIER 3 (READ-ONLY)</div>
       </div>
@@ -1711,7 +1852,7 @@ app.add_middleware(
       </div>
     </div>
 
-    <div style="background: var(--sand-warm); border: 1px solid var(--stone-border-light); border-radius: 8px; padding: 14px; margin-bottom: 22px;">
+    <div style="background: var(--sand-warm); border: 1px solid var(--stone-border-light); border-radius: var(--radius-md); padding: 16px; margin-bottom: 22px;">
       <div style="font-size: 11px; font-weight: 700; color: var(--text-charcoal); margin-bottom: 8px;">Role Capabilities & Governance:</div>
       <div id="prof-modal-capabilities" style="font-size: 11px; color: var(--text-muted); line-height: 1.6; font-family: var(--font-mono);">
         • Telemetry & Event Stream Inspection<br>
@@ -1730,7 +1871,7 @@ app.add_middleware(
   <!-- MODAL 4: OPERATOR KEYBOARD SHORTCUTS CHEAT SHEET -->
   <!-- ======================================================================= -->
   <div id="shortcuts-modal-backdrop" class="drawer-backdrop" onclick="closeShortcutsModal()"></div>
-  <div id="shortcuts-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 480px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
+  <div id="shortcuts-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 480px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 12px; margin-bottom: 18px;">
       <h3 style="font-size: 15px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
         <span>⌨️</span> Operator Keyboard Shortcuts
@@ -1738,21 +1879,21 @@ app.add_middleware(
       <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 13px;" onclick="closeShortcutsModal()">✕</button>
     </div>
     <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 10px 14px; border-radius: var(--radius-sm);">
         <span style="color: var(--text-charcoal); font-weight: 600;">Pause / Resume Live Telemetry Stream</span>
-        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">Space</kbd>
+        <kbd>Space</kbd>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 10px 14px; border-radius: var(--radius-sm);">
         <span style="color: var(--text-charcoal); font-weight: 600;">Switch Operations View (Tabs 1–9)</span>
-        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">1 - 9</kbd>
+        <kbd>1 - 9</kbd>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 10px 14px; border-radius: var(--radius-sm);">
         <span style="color: var(--text-charcoal); font-weight: 600;">Toggle Keyboard Shortcuts Cheat Sheet</span>
-        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">?</kbd>
+        <kbd>?</kbd>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 10px 14px; border-radius: var(--radius-sm);">
         <span style="color: var(--text-charcoal); font-weight: 600;">Close Active Drawer / Modal / Popover</span>
-        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">Esc</kbd>
+        <kbd>Esc</kbd>
       </div>
     </div>
   </div>
@@ -2163,7 +2304,7 @@ app.add_middleware(
         <td style="color: var(--text-muted); font-family: var(--font-mono); font-size: 11px;">${ts.time}</td>
         <td><span class="badge ${badgeClass}">${safeAction}</span></td>
         <td><span style="font-weight: 700; font-family: var(--font-mono); color: var(--deep-indigo);">${safeMethod}</span></td>
-        <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 2px 6px; border-radius: 4px; font-size: 11px;">${safePath}</code></td>
+        <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${safePath}</code></td>
         <td style="color: var(--deep-indigo); font-family: var(--font-mono); font-size: 11px;" data-telemetry-hud="client-ip" data-telemetry-id="${safeIp}">${safeIp}</td>
         <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600; font-size: 11px; font-family: var(--font-mono);">${safeRule}</span></td>
         <td style="font-weight: 700; font-family: var(--font-mono); color: ${safeScore > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${safeScore.toFixed(1)}</td>
@@ -2312,7 +2453,7 @@ app.add_middleware(
           hud.innerHTML = `
             <div style="font-weight: 800; color: ${hovered.color}; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
               <span>${escapeHtml(hovered.label)}</span>
-              <span style="font-size: 9px; padding: 1px 4px; background: rgba(255,255,255,0.1); border-radius: 3px;">${hovered.badge}</span>
+              <span style="font-size: 9px; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: var(--radius-pill);">${hovered.badge}</span>
             </div>
             <div style="font-size: 10px; color: #CBD5E1; margin-bottom: 6px;">${escapeHtml(hovered.desc)}</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 9px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
@@ -3080,8 +3221,8 @@ app.add_middleware(
               <strong style="color: var(--deep-indigo);">${d.category}</strong>
               <span style="font-family: var(--font-mono); font-weight: 700;">${d.count} (${pct}%)</span>
             </div>
-            <div style="width: 100%; height: 6px; background: var(--sand-warm); border-radius: 3px; overflow: hidden;">
-              <div style="width: ${pct}%; height: 100%; background: var(--terracotta); border-radius: 3px;"></div>
+            <div style="width: 100%; height: 6px; background: var(--sand-warm); border-radius: var(--radius-pill); overflow: hidden;">
+              <div style="width: ${pct}%; height: 100%; background: var(--terracotta); border-radius: var(--radius-pill);"></div>
             </div>
           </div>
         `;
@@ -3153,7 +3294,7 @@ app.add_middleware(
             </td>
             <td style="font-family: var(--font-mono); font-weight: 700; color: var(--deep-indigo); font-size: 12px;">${domainName}</td>
             <td style="font-family: var(--font-mono); font-weight: 600; font-size: 12px;">${safeIp}</td>
-            <td><strong style="color: var(--deep-indigo);">${safeMethod}</strong> <code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${safePath}</code></td>
+            <td><strong style="color: var(--deep-indigo);">${safeMethod}</strong> <code style="background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${safePath}</code></td>
             <td><strong style="color: ${riskColor}; font-family: var(--font-mono);">${safeScore}</strong>/100</td>
             <td>${badge}</td>
             <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700; font-size: 12px;">
@@ -3372,21 +3513,21 @@ app.add_middleware(
                   </span>
                 </div>
 
-                <div style="background: var(--sand-warm); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 11px; font-family: var(--font-mono);">
+                <div style="background: var(--sand-warm); padding: 12px; border-radius: var(--radius-sm); margin: 10px 0; font-size: 11px; font-family: var(--font-mono);">
                   <div>🌐 <strong>Gateway:</strong> <a href="http://192.168.122.1:${gatewayPort}" target="_blank" style="color: var(--deep-indigo);">http://192.168.122.1:${gatewayPort}</a></div>
                   <div style="margin-top: 3px;">🎯 <strong>Origin:</strong> ${originPort}</div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; text-align: center; margin: 12px 0;">
-                  <div style="background: var(--canvas-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--stone-border);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; margin: 12px 0;">
+                  <div style="background: var(--canvas-bg); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
                     <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">ROUTES</div>
                     <div style="font-size: 15px; font-weight: 800; font-family: var(--font-mono);">${d.endpoint_count || 0}</div>
                   </div>
-                  <div style="background: var(--canvas-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--stone-border);">
+                  <div style="background: var(--canvas-bg); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
                     <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">SHADOW</div>
                     <div style="font-size: 15px; font-weight: 800; font-family: var(--font-mono); color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'};">${d.shadow_count || 0}</div>
                   </div>
-                  <div style="background: var(--canvas-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--stone-border);">
+                  <div style="background: var(--canvas-bg); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
                     <div style="font-size: 9px; color: var(--text-muted); font-weight: 700;">EVENTS</div>
                     <div style="font-size: 15px; font-weight: 800; font-family: var(--font-mono);">${d.event_count || 0}</div>
                   </div>
@@ -3452,26 +3593,26 @@ app.add_middleware(
         const content = document.getElementById("domain-modal-content");
         content.innerHTML = `
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px;">
-            <div style="background: var(--sand-warm); padding: 14px; border-radius: 8px;">
+            <div style="background: var(--sand-warm); padding: 14px; border-radius: var(--radius-md);">
               <div style="font-size: 10px; font-weight: 700; color: var(--text-muted);">TOTAL INVOCATIONS</div>
               <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); margin-top: 3px;">${metrics.total_events}</div>
             </div>
-            <div style="background: var(--terracotta-soft); padding: 14px; border-radius: 8px;">
+            <div style="background: var(--terracotta-soft); padding: 14px; border-radius: var(--radius-md);">
               <div style="font-size: 10px; font-weight: 700; color: var(--terracotta);">BLOCKED ATTACKS</div>
               <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--terracotta); margin-top: 3px;">${metrics.blocked_events}</div>
             </div>
-            <div style="background: var(--sage-soft); padding: 14px; border-radius: 8px;">
+            <div style="background: var(--sage-soft); padding: 14px; border-radius: var(--radius-md);">
               <div style="font-size: 10px; font-weight: 700; color: var(--sage-green);">CLEAN REQUESTS</div>
               <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--sage-green); margin-top: 3px;">${metrics.allow_events}</div>
             </div>
-            <div style="background: var(--ochre-soft); padding: 14px; border-radius: 8px;">
+            <div style="background: var(--ochre-soft); padding: 14px; border-radius: var(--radius-md);">
               <div style="font-size: 10px; font-weight: 700; color: var(--warm-ochre);">BLOCK RATE</div>
               <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--warm-ochre); margin-top: 3px;">${metrics.block_rate_percent}%</div>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
-            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 8px; padding: 16px;">
+            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 16px;">
               <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 10px;">Top Mitigated Signatures</h4>
               ${data.top_rules.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacks recorded yet.</div>' : 
                 data.top_rules.map(r => `
@@ -3483,7 +3624,7 @@ app.add_middleware(
               }
             </div>
 
-            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: 8px; padding: 16px;">
+            <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 16px;">
               <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 10px;">Top Attacking Client IPs</h4>
               ${data.top_ips.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacking IPs recorded.</div>' : 
                 data.top_ips.map(ip => `
@@ -3496,7 +3637,7 @@ app.add_middleware(
             </div>
           </div>
 
-          <div style="background: var(--sand-warm); padding: 14px; border-radius: 8px; font-size: 11px;">
+          <div style="background: var(--sand-warm); padding: 14px; border-radius: var(--radius-md); font-size: 11px;">
             <div style="font-weight:700; margin-bottom:3px;">Asymmetric Cryptographic Verification</div>
             <div style="font-family:var(--font-mono); color:var(--text-muted);">Policy: ${policy.name || 'Standard WAAP'} | Version: v${policy.version || 1} | Signature: ${policy.signature || 'RFC 8032 Verified'}</div>
           </div>
@@ -3664,7 +3805,7 @@ app.add_middleware(
               <td>${badge}</td>
               <td style="font-family: var(--font-mono); font-size: 11px;">${ep.website_id}</td>
               <td><strong style="color: var(--deep-indigo);">${ep.method}</strong></td>
-              <td><code style="background: var(--sand-warm); padding: 2px 5px; border-radius: 4px; font-size: 11px;">${ep.path}</code></td>
+              <td><code style="background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${ep.path}</code></td>
               <td>${riskBadge}</td>
               <td title="${tSeen.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
                 ${tSeen.time} (${tSeen.relative})
