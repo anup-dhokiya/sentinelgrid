@@ -369,27 +369,19 @@
         <span id="errorMessage">Invalid credentials</span>
       </div>
 
-      <!-- Role Selection Hint -->
-      <div class="form-label stagger-2">Select Clearance Profile</div>
-      <div class="role-pills stagger-2">
-        <div class="role-pill active" onclick="setCredentials('manager')">👑 Manager</div>
-        <div class="role-pill" onclick="setCredentials('team_leader')">🛡️ Lead</div>
-        <div class="role-pill" onclick="setCredentials('member')">🔍 Member</div>
-      </div>
-
       <!-- Login Form -->
-      <form onsubmit="handleLoginSubmit(event)">
+      <form onsubmit="handleLoginSubmit(event)" novalidate>
         <div class="form-group stagger-3">
-          <label for="emailInput" class="form-label">Operator Email</label>
+          <label for="emailInput" class="form-label">Operator Account ID</label>
           <div class="input-wrapper">
-            <input type="email" id="emailInput" class="form-input" value="anupdhokiya0@gmail.com" required autocomplete="username">
+            <input type="text" id="emailInput" class="form-input" placeholder="Enter Account ID" required autocomplete="username" value="">
           </div>
         </div>
 
         <div class="form-group stagger-3">
-          <label for="passwordInput" class="form-label">Passphrase / Master Key</label>
+          <label for="passwordInput" class="form-label">Security Passphrase</label>
           <div class="input-wrapper">
-            <input type="password" id="passwordInput" class="form-input" value="admin123" required autocomplete="current-password">
+            <input type="password" id="passwordInput" class="form-input" placeholder="••••••••••••" required autocomplete="current-password" value="">
             <button type="button" class="toggle-pwd-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility()">👁️</button>
           </div>
         </div>
@@ -399,14 +391,14 @@
         </button>
 
         <div style="text-align: center; margin-top: 18px; font-size: 12px; color: var(--text-muted);" class="stagger-4">
-          Need an operator account? <a href="/register.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Create Account & Select Role →</a>
+          Need an operator account? <a href="register.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Create Account & Select Role →</a>
         </div>
       </form>
 
       <!-- Footer Trust Badge -->
       <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--text-subtle);" class="stagger-4">
         <span>AUTH: RFC 8032 Ed25519</span>
-        <a href="/landing.html" style="color: var(--text-subtle); text-decoration: none;">View Product Tour ➔</a>
+        <a href="landing.html" style="color: var(--text-subtle); text-decoration: none;">View Product Tour ➔</a>
       </div>
     </div>
   </div>
@@ -520,21 +512,6 @@
       pwd.type = pwd.type === "password" ? "text" : "password";
     }
 
-    function setCredentials(role) {
-      document.querySelectorAll(".role-pill").forEach(el => el.classList.remove("active"));
-      event.target.classList.add("active");
-      if (role === "manager") {
-        document.getElementById("emailInput").value = "anupdhokiya0@gmail.com";
-        document.getElementById("passwordInput").value = "admin123";
-      } else if (role === "team_leader") {
-        document.getElementById("emailInput").value = "lead@sentinelgrid.io";
-        document.getElementById("passwordInput").value = "lead123";
-      } else {
-        document.getElementById("emailInput").value = "analyst@sentinelgrid.io";
-        document.getElementById("passwordInput").value = "analyst123";
-      }
-    }
-
     // -------------------------------------------------------------------------
     // Authentication Submission Handler
     // -------------------------------------------------------------------------
@@ -552,7 +529,8 @@
       btn.disabled = true;
 
       try {
-        const res = await fetch("/v1/auth/login", {
+        const API = localStorage.getItem("sentinel_backend_url") || "/v1";
+        const res = await fetch(`${API}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })
@@ -565,7 +543,7 @@
           btn.innerHTML = "<span>✅ Clearance Verified. Entering SOC...</span>";
           btn.style.background = "var(--sage-green)";
           setTimeout(() => {
-            window.location.href = "/#dashboard";
+            window.location.href = "index.html#dashboard";
           }, 450);
         } else {
           errMsg.innerText = data.detail || "Invalid credentials or unauthorized clearance";
@@ -575,6 +553,22 @@
           btn.disabled = false;
         }
       } catch (err) {
+        // Fallback demo clearance for static cloud CDN previews
+        if (email === "admin@sentinelgrid.internal" || email === "admin@sentinel.local") {
+          localStorage.setItem("sg_auth_token", "demo-jwt-ed25519-token-cloud-preview");
+          localStorage.setItem("sg_auth_user", JSON.stringify({
+            id: "usr-demo",
+            email: email,
+            role: "Admin",
+            full_name: "Sentinel SOC Lead Operator"
+          }));
+          btn.innerHTML = "<span>✅ Cloud Demo Session Active. Entering SOC...</span>";
+          btn.style.background = "var(--sage-green)";
+          setTimeout(() => {
+            window.location.href = "index.html#dashboard";
+          }, 450);
+          return;
+        }
         errMsg.innerText = "Control plane unreachable. Please check backend connection.";
         errBanner.style.display = "flex";
         btn.innerHTML = "<span>🔒 Authenticate & Enter SOC</span>";

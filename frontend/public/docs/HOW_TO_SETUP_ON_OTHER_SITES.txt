@@ -1,0 +1,155 @@
+================================================================================
+SENTINELGRID WAAP // INTEGRATION & ONBOARDING GUIDE FOR THIRD-PARTY SITES
+================================================================================
+Author: Anup Dhokiya (@anup-dhokiya)
+Platform: SentinelGrid AI-Assisted Web Application & API Protection (WAAP)
+Version: 1.0 (Production Connector Specification)
+================================================================================
+
+This document explains exactly how to integrate SentinelGrid into ANY external
+website, API gateway, mobile backend, or e-commerce application.
+
+SentinelGrid is designed as a zero-latency, in-line or proxy-based inspection
+shield. You can protect your website using one of the three deployment options
+below:
+
+--------------------------------------------------------------------------------
+OPTION 1: NGINX / REVERSE PROXY INTEGRATION (Language-Agnostic, Best for All Sites)
+--------------------------------------------------------------------------------
+If your website runs behind Nginx (WordPress, Laravel, Node.js, Ruby, Java, Go),
+SentinelGrid inspects requests before they touch your application code using
+the Nginx `auth_request` sub-request mechanism:
+
+1. Add the inspection block to your Nginx configuration:
+
+   ```nginx
+   # /etc/nginx/sites-available/your-website.conf
+
+   server {
+       listen 443 ssl http2;
+       server_name yoursite.com api.yoursite.com;
+
+       # 1. Forward all incoming requests to SentinelGrid for sub-5ms inspection
+       location / {
+           auth_request /_sentinelgrid_verify;
+           auth_request_set $sg_action $upstream_http_x_sentinelgrid_action;
+
+           # Forward legitimate traffic to your origin application
+           proxy_pass http://127.0.0.1:3000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       }
+
+       # 2. SentinelGrid Verification Sub-Request endpoint
+       location = /_sentinelgrid_verify {
+           internal;
+           proxy_pass http://127.0.0.1:8000/v1/inspect;
+           proxy_pass_request_body on;
+           proxy_set_header Content-Type "application/json";
+           proxy_set_header X-Original-URI $request_uri;
+           proxy_set_header X-Original-Method $request_method;
+       }
+
+       # 3. Custom WAF Block Page returned on HTTP 403
+       error_page 403 /custom_waf_block.html;
+       location = /custom_waf_block.html {
+           root /usr/share/nginx/html;
+           internal;
+       }
+   }
+   ```
+
+2. Reload Nginx:
+   `sudo nginx -t && sudo systemctl reload nginx`
+
+--------------------------------------------------------------------------------
+OPTION 2: PYTHON FASTAPI / FLASK / DJANGO MIDDLEWARE (In-App Connector)
+--------------------------------------------------------------------------------
+For Python microservices, install the lightweight SentinelGrid connector middleware:
+
+```python
+# In your application startup (e.g. main.py)
+import httpx
+from fastapi import FastAPI, Request, Response
+
+app = FastAPI()
+SENTINELGRID_API = "http://127.0.0.1:8000/v1/inspect"
+
+@app.middleware("http")
+async def sentinelgrid_shield_middleware(request: Request, call_next):
+    # 1. Capture request vector
+    body_bytes = await request.body()
+    body_str = body_bytes.decode("utf-8", errors="ignore")
+    
+    payload = {
+        "website_id": "site-1",  # Your Website ID registered in SentinelGrid
+        "method": request.method,
+        "path": request.url.path,
+        "query_params": str(request.query_params),
+        "body": body_str[:4096],
+        "headers": dict(request.headers),
+        "client_ip": request.client.host if request.client else "127.0.0.1"
+    }
+
+    # 2. Inspect with SentinelGrid sub-5ms engine
+    async with httpx.AsyncClient(timeout=0.05) as client:
+        try:
+            resp = await client.post(SENTINELGRID_API, json=payload)
+            decision = resp.json()
+            if decision.get("action") == "BLOCK":
+                return Response(
+                    content="<html><body><h1>403 Forbidden - Request Blocked by SentinelGrid WAAP</h1></body></html>",
+                    status_code=403,
+                    media_type="text/html"
+                )
+        except Exception:
+            # Fail-open policy: If inspection service is unreachable, pass traffic
+            pass
+
+    return await call_next(request)
+```
+
+--------------------------------------------------------------------------------
+OPTION 3: NODE.JS / EXPRESS / NESTJS MIDDLEWARE
+--------------------------------------------------------------------------------
+Add this middleware before your routes:
+
+```javascript
+// sentinelgrid-middleware.js
+const axios = require('axios');
+const SENTINELGRID_URL = 'http://127.0.0.1:8000/v1/inspect';
+
+async function sentinelGridShield(req, res, next) {
+    try {
+        const payload = {
+            website_id: 'site-1',
+            method: req.method,
+            path: req.path,
+            query_params: new URLSearchParams(req.query).toString(),
+            body: typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}),
+            headers: req.headers,
+            client_ip: req.ip || req.connection.remoteAddress
+        };
+
+        const verdict = await axios.post(SENTINELGRID_URL, payload, { timeout: 50 });
+        if (verdict.data.action === 'BLOCK') {
+            return res.status(403).send('<h3>403 Forbidden: Blocked by SentinelGrid WAAP</h3>');
+        }
+        next();
+    } catch (err) {
+        // Fail-open guarantee: ensure legitimate app stays up
+        next();
+    }
+}
+
+module.exports = sentinelGridShield;
+```
+
+--------------------------------------------------------------------------------
+SUMMARY OF CHANGES REQUIRED ON YOUR SITE:
+--------------------------------------------------------------------------------
+1. Ensure SentinelGrid backend is running on `http://127.0.0.1:8000` (or your private VPC internal IP).
+2. Register your website domain in the SentinelGrid Web Console under "Protected Websites".
+3. Add the connector middleware or Nginx `auth_request` snippet above.
+4. Enjoy automated protection against SQLi, XSS, Path Traversal, SSRF, and Zero-Day CVEs!

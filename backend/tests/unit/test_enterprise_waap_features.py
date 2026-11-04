@@ -14,6 +14,7 @@ sys.path.insert(0, "/run/media/anup/D/sentinelgrid/backend")
 
 from fastapi.testclient import TestClient
 from app.main import app
+from app.security_engine.rate_limiter import global_rate_limiter
 
 
 class TestEnterpriseWAAPFeatures(unittest.TestCase):
@@ -21,6 +22,9 @@ class TestEnterpriseWAAPFeatures(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = TestClient(app)
+
+    def setUp(self):
+        global_rate_limiter.clear_all_quarantine()
 
     def test_01_domain_lifecycle(self):
         """Tests domain creation, listing, updating, status toggling, and cascading deletion."""
@@ -236,12 +240,12 @@ class TestEnterpriseWAAPFeatures(unittest.TestCase):
             "client_ip": "172.16.0.42"
         })
 
-        # Generate an allowed event
+        # Generate an allowed event from a clean IP
         self.client.post("/v1/inspect", json={
             "website_id": site_id,
             "method": "GET",
             "path": "/about-us",
-            "client_ip": "172.16.0.42"
+            "client_ip": "172.16.0.99"
         })
 
         # Filter by action='BLOCK'

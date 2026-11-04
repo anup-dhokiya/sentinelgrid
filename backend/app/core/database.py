@@ -175,21 +175,20 @@ def init_database():
         CREATE INDEX IF NOT EXISTS idx_connectors_site ON connectors(website_id);
         """)
 
-        # Ensure default administrator exists with 'manager' role and 'admin123' password
+        # Ensure single master administrator exists with 'manager' role and 'anup@5212' password
         cur = conn.cursor()
-        cur.execute("SELECT count(*) FROM users WHERE email = 'anupdhokiya0@gmail.com'")
         now = datetime.now(timezone.utc).isoformat()
-        admin123_hash = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"  # SHA-256 of "admin123"
+        admin_pwd_hash = "4459e7230b6833797dae7f90cda556b5eef40def095a99e83ec9dbadff7080cf"  # SHA-256 of "anup@5212"
+        cur.execute("SELECT count(*) FROM users WHERE email = 'a@123'")
         if cur.fetchone()[0] == 0:
             cur.execute("""
             INSERT INTO users (id, email, password_hash, full_name, role, created_at)
-            VALUES ('usr-admin', 'anupdhokiya0@gmail.com', ?, 'Anup Dhokiya', 'manager', ?)
-            """, (admin123_hash, now))
+            VALUES ('usr-admin', 'a@123', ?, 'System Administrator', 'manager', ?)
+            """, (admin_pwd_hash, now))
         else:
-            # Synchronize password hash and role for existing seed
             cur.execute("""
-            UPDATE users SET password_hash = ?, role = 'manager' WHERE email = 'anupdhokiya0@gmail.com'
-            """, (admin123_hash,))
+            UPDATE users SET password_hash = ?, role = 'manager' WHERE email = 'a@123'
+            """, (admin_pwd_hash,))
 
 
 init_database()

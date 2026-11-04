@@ -668,10 +668,12 @@ async def register_connector_heartbeat(req: ConnectorHeartbeatRequest):
 async def inspect_live_request(req: WafTestRequest):
     """
     Sub-1.5ms in-line request inspection engine:
-    1. Checks dynamic IP Access Control Lists (Allowlist / Blacklist)
-    2. Evaluates adversarial payloads via target-aware SecurityBrain
-    3. Dynamically discovers undocumented routes as 'shadow' APIs
-    4. Records event telemetry with forensic signature triggers
+    1. Pre-flight check: Autonomous dynamic IP quarantine (instant drop <0.05ms)
+    2. Dynamic IP Access Control Lists (Allowlist / Blacklist from database)
+    3. Sliding-window rate limiting (Flood & volumetric abuse prevention)
+    4. Target-aware SecurityBrain adversarial payload evaluation
+    5. Autonomous auto-quarantine trigger upon severe threat detection
+    6. Shadow API cataloging & real-time SSE telemetry
     """
     import time
     start_time = time.perf_counter()
@@ -679,6 +681,53 @@ async def inspect_live_request(req: WafTestRequest):
     conn = get_db_connection()
     site_id = get_or_create_website(conn, req.website_id)
     now = datetime.now(timezone.utc).isoformat()
+    client_ip = req.client_ip or "127.0.0.1"
+
+    # Step 0: Fast Autonomous Dynamic IP Quarantine Check (<0.05ms)
+    is_quarantined, remaining_sec, q_reason = global_rate_limiter.check_quarantine(client_ip)
+    if is_quarantined:
+        elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
+        event_id = f"ev-{uuid4().hex[:8]}"
+
+        with conn:
+            conn.execute("""
+            INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                event_id, site_id, now, client_ip, req.method, req.path,
+                "BLOCK", 100.0, "AUTONOMOUS-IP-QUARANTINE", "A01:Broken Access Control",
+                f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)"
+            ))
+
+        event_payload = {
+            "id": event_id,
+            "website_id": site_id,
+            "timestamp": now,
+            "client_ip": client_ip,
+            "method": req.method,
+            "path": req.path,
+            "action": "BLOCK",
+            "risk_score": 100.0,
+            "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
+            "owasp_category": "A01:Broken Access Control",
+            "details": f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)",
+            "latency_ms": elapsed_ms
+        }
+        broadcast_sse_event(event_payload)
+
+        return {
+            "event_id": event_id,
+            "action": "BLOCK",
+            "risk_score": 100.0,
+            "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
+            "owasp_category": "A01:Broken Access Control",
+            "cve_reference": None,
+            "total_matches": 1,
+            "all_matches": [{"rule_id": "AUTONOMOUS-IP-QUARANTINE", "name": f"IP Quarantined: {q_reason}"}],
+            "timestamp": now,
+            "retry_after_seconds": remaining_sec,
+            "execution_latency_ms": elapsed_ms
+        }
 
     # Step 1: Check IP Access Rules
     with conn:
@@ -688,7 +737,7 @@ async def inspect_live_request(req: WafTestRequest):
         ).fetchall()
 
     for rule in ip_rules:
-        if ip_in_rule(req.client_ip, rule["ip_or_cidr"]):
+        if ip_in_rule(client_ip, rule["ip_or_cidr"]):
             rule_action = rule["action"].upper()
             elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
             event_id = f"ev-{uuid4().hex[:8]}"
@@ -698,7 +747,7 @@ async def inspect_live_request(req: WafTestRequest):
                 INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    event_id, site_id, now, req.client_ip, req.method, req.path,
+                    event_id, site_id, now, client_ip, req.method, req.path,
                     rule_action, 100.0 if rule_action == "BLOCK" else 0.0,
                     f"IP-{rule_action}-LIST", "A01:Broken Access Control",
                     f"Rule: {rule['ip_or_cidr']} ({rule['description'] or 'Custom ACL'})"
@@ -717,14 +766,45 @@ async def inspect_live_request(req: WafTestRequest):
                 "execution_latency_ms": elapsed_ms
             }
 
-    # Step 2: Target-Aware Threat Brain Evaluation
+    # Step 2: Sliding-Window Rate Limiting (Flood Prevention: 180 req/min default per client IP)
+    rate_verdict = global_rate_limiter.evaluate_rate(client_ip, limit=180, window_seconds=60.0)
+    if not rate_verdict["allowed"]:
+        global_rate_limiter.trigger_violation(client_ip, severity="HIGH", reason="Volumetric Flood Rate Exceeded")
+        elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
+        event_id = f"ev-{uuid4().hex[:8]}"
+
+        with conn:
+            conn.execute("""
+            INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                event_id, site_id, now, client_ip, req.method, req.path,
+                "BLOCK", 90.0, "RATE-LIMIT-FLOOD-EXCEEDED", "A04:Rate Limiting & Abuse",
+                f"Rate exceeded: {rate_verdict.get('current_count', 0)} reqs in 60s"
+            ))
+
+        return {
+            "event_id": event_id,
+            "action": "BLOCK",
+            "risk_score": 90.0,
+            "rule_triggered": "RATE-LIMIT-FLOOD-EXCEEDED",
+            "owasp_category": "A04:Rate Limiting & Abuse",
+            "cve_reference": None,
+            "total_matches": 1,
+            "all_matches": [{"rule_id": "RATE-LIMIT-FLOOD-EXCEEDED", "name": "Rate limit exceeded"}],
+            "timestamp": now,
+            "retry_after_seconds": rate_verdict.get("retry_after", 60),
+            "execution_latency_ms": elapsed_ms
+        }
+
+    # Step 3: Target-Aware Threat Brain Evaluation
     eval_result = SecurityBrain.evaluate(
         path=req.path,
         method=req.method,
         query=req.query_params,
         body=req.body,
         headers=req.headers,
-        client_ip=req.client_ip
+        client_ip=client_ip
     )
 
     action = eval_result["action"]
@@ -735,7 +815,20 @@ async def inspect_live_request(req: WafTestRequest):
     owasp = top_match["owasp_id"] if top_match else "None"
     cve_ref = top_match.get("cve_ref") if top_match else None
 
-    # Step 3: Automated Shadow API Discovery (Only for clean, allowed requests)
+    # Step 4: Autonomous IP Quarantine Escalation (Ban offender for severe threats)
+    if action == "BLOCK":
+        global_rate_limiter.trigger_violation(
+            client_ip,
+            severity=top_match.get("severity", "CRITICAL") if top_match else "CRITICAL",
+            reason=f"Triggered {rule_id} ({owasp})"
+        )
+        with conn:
+            conn.execute("""
+            INSERT OR REPLACE INTO ip_rules (id, website_id, ip_or_cidr, action, description, created_at)
+            VALUES (?, ?, ?, 'BLOCK', ?, ?)
+            """, (f"auto-{uuid4().hex[:8]}", site_id, client_ip, f"Auto-Banned: {rule_id}", now))
+
+    # Step 5: Automated Shadow API Discovery (Only for clean, allowed requests)
     clean_path = req.path.split("?")[0].strip() if req.path else "/"
     if not clean_path.startswith("/"):
         clean_path = "/" + clean_path
@@ -762,7 +855,7 @@ async def inspect_live_request(req: WafTestRequest):
                 (f"ep-{uuid4().hex[:8]}", site_id, clean_path, req.method.upper(), now)
             )
 
-    # Step 4: Record Event Telemetry
+    # Step 6: Record Event Telemetry & SSE Broadcast
     event_id = f"ev-{uuid4().hex[:8]}"
     elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
@@ -771,10 +864,26 @@ async def inspect_live_request(req: WafTestRequest):
         INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            event_id, site_id, now, req.client_ip, req.method, req.path,
+            event_id, site_id, now, client_ip, req.method, req.path,
             action, risk_score, rule_id, owasp,
             f"CVE: {cve_ref or 'N/A'} | Headers: {req.headers.get('user-agent', 'None')[:60]} | Payload: {req.body[:80]}"
         ))
+
+    event_payload = {
+        "id": event_id,
+        "website_id": site_id,
+        "timestamp": now,
+        "client_ip": client_ip,
+        "method": req.method,
+        "path": req.path,
+        "action": action,
+        "risk_score": risk_score,
+        "rule_triggered": rule_id,
+        "owasp_category": owasp,
+        "details": f"CVE: {cve_ref or 'N/A'} | Payload: {req.body[:80]}",
+        "latency_ms": elapsed_ms
+    }
+    broadcast_sse_event(event_payload)
 
     return {
         "event_id": event_id,

