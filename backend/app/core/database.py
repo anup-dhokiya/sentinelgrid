@@ -239,5 +239,12 @@ def init_database():
             ('rule-trusted-noc', 'site-agispro', '10.0.0.0/8', 'ALLOW', 'Internal Trusted Operations Subnet', ?)
             """, (now, now))
 
+        # Always purge any accidental loopback blocks and guarantee localhost whitelist
+        cur.execute("DELETE FROM ip_rules WHERE ip_or_cidr IN ('127.0.0.1', '::1', 'localhost', 'unknown', 'unknown-client') AND action = 'BLOCK'")
+        cur.execute("""
+        INSERT OR REPLACE INTO ip_rules (id, website_id, ip_or_cidr, action, description, created_at)
+        VALUES ('rule-whitelist-loopback', 'site-agispro', '127.0.0.1', 'ALLOW', 'System Localhost Loopback', ?)
+        """, (now,))
+
 
 init_database()

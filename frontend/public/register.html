@@ -513,7 +513,12 @@
       btn.disabled = true;
 
       try {
-        const API = localStorage.getItem("sentinel_backend_url") || (window.location.hostname.endsWith("github.io") ? "https://sentinelgrid-one.vercel.app/v1" : "/v1");
+        let storedBackend = localStorage.getItem("sentinel_backend_url");
+        if (storedBackend && (storedBackend.includes("localhost") || storedBackend.includes("127.0.0.1") || storedBackend.includes("onrender.com"))) {
+          localStorage.removeItem("sentinel_backend_url");
+          storedBackend = null;
+        }
+        const API = storedBackend || (window.location.hostname.endsWith("github.io") ? "https://sentinelgrid-one.vercel.app/v1" : "/v1");
         const res = await fetch(`${API}/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

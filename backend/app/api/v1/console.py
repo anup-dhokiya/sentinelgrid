@@ -661,6 +661,17 @@ async def register_connector_heartbeat(req: ConnectorHeartbeatRequest):
     }
 
 
+def is_public_bannable_ip(ip: str) -> bool:
+    """Strictly prevents banning loopback, private subnets, or unknown clients."""
+    if not ip or ip in ("127.0.0.1", "::1", "localhost", "unknown", "unknown-client"):
+        return False
+    try:
+        addr = ipaddress.ip_address(ip)
+        return not (addr.is_private or addr.is_loopback or addr.is_reserved or addr.is_link_local)
+    except Exception:
+        return False
+
+
 # -----------------------------------------------------------------------------
 # Real-Time In-Line Inspection (<1.5ms budget)
 # -----------------------------------------------------------------------------
@@ -816,8 +827,8 @@ async def inspect_live_request(req: WafTestRequest):
     owasp = top_match["owasp_id"] if top_match else "None"
     cve_ref = top_match.get("cve_ref") if top_match else None
 
-    # Step 4: Autonomous IP Quarantine Escalation (Ban offender for severe threats)
-    if action == "BLOCK":
+    # Step 4: Autonomous IP Quarantine Escalation (Ban offender for severe threats, exempting loopback & private nets)
+    if action == "BLOCK" and is_public_bannable_ip(client_ip):
         global_rate_limiter.trigger_violation(
             client_ip,
             severity=top_match.get("severity", "CRITICAL") if top_match else "CRITICAL",
