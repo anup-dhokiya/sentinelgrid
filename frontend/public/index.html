@@ -405,6 +405,27 @@
       display: block;
     }
 
+    /* Global Viewport & Base Protection */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    /* Prevent iOS Safari 16px auto-zoom */
+    @media (max-width: 768px) {
+      .form-input, input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+
     /* Screen Reader Only Utility */
     .sr-only {
       position: absolute;
@@ -445,6 +466,67 @@
       margin-bottom: 22px;
     }
 
+    .responsive-filter-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 2fr auto;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .sandbox-workbench-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .modal-stats-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .modal-stats-charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .modal-dialog {
+      max-width: 95vw !important;
+      max-height: 90vh !important;
+      max-height: 90dvh !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Topbar Layout & Compact Mode */
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex-shrink: 1;
+    }
+
+    .topbar-breadcrumb {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-charcoal);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
     /* Tablet & Small Desktop (<= 1024px) */
     @media (max-width: 1024px) {
       .metric-grid {
@@ -457,6 +539,25 @@
 
     /* Mobile Landscape & Tablet Portrait (<= 900px) */
     @media (max-width: 900px) {
+      .btn-text-label {
+        display: none !important;
+      }
+      .topbar-btn-secondary {
+        display: none !important;
+      }
+      .topbar-btn-compact {
+        padding: 6px 8px !important;
+        font-size: 14px !important;
+        min-width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .app-topbar {
+        height: 54px;
+        padding: 0 12px;
+      }
       .app-sidebar {
         position: fixed;
         left: 0;
@@ -475,13 +576,16 @@
       .integration-grid {
         grid-template-columns: 1fr !important;
       }
+      .sandbox-workbench-grid {
+        grid-template-columns: 1fr !important;
+      }
     }
 
     /* Mobile Phablet & Phone (<= 768px) */
     @media (max-width: 768px) {
       .app-topbar {
-        padding: 10px 14px;
-        gap: 8px;
+        padding: 0 10px;
+        gap: 6px;
       }
       #topbar-system-clock {
         display: none !important;
@@ -511,7 +615,19 @@
       .modal-dialog {
         width: 95vw !important;
         max-width: 95vw !important;
-        padding: 20px 16px !important;
+        max-height: 88dvh !important;
+        padding: 18px 14px !important;
+        border-radius: var(--radius-lg) !important;
+      }
+      .responsive-filter-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      .modal-stats-kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      .modal-stats-charts-grid {
+        grid-template-columns: 1fr !important;
       }
     }
 
@@ -533,8 +649,15 @@
       .btn {
         min-height: 40px;
       }
-      .topbar-brand-title {
-        display: none;
+      .topbar-breadcrumb span:first-child,
+      .topbar-breadcrumb span:nth-child(2) {
+        display: none !important;
+      }
+      #sound-toggle-btn {
+        display: none !important;
+      }
+      .modal-stats-kpi-grid {
+        grid-template-columns: 1fr !important;
       }
     }
 
@@ -1191,11 +1314,11 @@
     <div class="content-wrapper">
       <!-- Top Bar -->
       <header class="app-topbar">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Toggle Sidebar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" aria-label="Toggle Sidebar" title="Toggle Sidebar">
             <span>☰</span>
           </button>
-          <div style="font-size: 13px; font-weight: 700; color: var(--text-charcoal); display: flex; align-items: center; gap: 6px;">
+          <div class="topbar-breadcrumb">
             <span style="color: var(--text-muted);">SentinelGrid</span>
             <span style="color: var(--stone-border);">/</span>
             <span id="topbar-current-view" style="color: var(--deep-indigo);">Dashboard</span>
@@ -1212,12 +1335,12 @@
         </div>
 
         <!-- Controls & User Badge -->
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="topbar-actions">
           <!-- Live Threat Mitigations Bell -->
           <div style="position: relative;">
-            <button id="notificationBellBtn" class="btn btn-subtle" style="font-size: 12px; padding: 6px 10px; position: relative;" onclick="toggleNotificationPopover()" title="Recent Mitigated Threats">
+            <button id="notificationBellBtn" class="btn btn-subtle topbar-btn-compact" onclick="toggleNotificationPopover()" aria-label="Notifications" title="Recent Mitigated Threats">
               🔔
-              <span id="notificationBadge" style="position: absolute; top: -4px; right: -4px; background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: var(--radius-pill); display: none;">0</span>
+              <span id="notificationBadge" style="position: absolute; top: -3px; right: -3px; background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: var(--radius-pill); display: none;">0</span>
             </button>
             <div id="notificationPopover" style="display: none; position: absolute; right: 0; top: 125%; width: 340px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1000; padding: 14px; backdrop-filter: var(--glass-blur);">
               <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 8px; margin-bottom: 10px;">
@@ -1231,31 +1354,34 @@
           </div>
 
           <!-- Shortcuts Modal Helper (?) -->
-          <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; font-weight: 800; font-family: var(--font-mono);" onclick="openShortcutsModal()" title="Keyboard Shortcuts (?)">
+          <button class="btn btn-subtle topbar-btn-compact topbar-btn-secondary" onclick="openShortcutsModal()" title="Keyboard Shortcuts (?)">
             ?
           </button>
 
           <!-- Theme Switcher Toggle -->
-          <button id="theme-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleThemePreference()">
-            🌙 Theme: OBSIDIAN
+          <button id="theme-toggle-btn" class="btn btn-subtle topbar-btn-compact" onclick="toggleThemePreference()" aria-label="Toggle Theme" title="Switch Theme">
+            <span id="theme-btn-icon">🌙</span>
+            <span class="btn-text-label" id="theme-btn-label" style="margin-left: 4px;">Theme: OBSIDIAN</span>
           </button>
 
           <!-- Timezone Switcher Toggle -->
-          <button id="tz-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleTimezonePreference()">
-            🌐 TZ: LOCAL (IST)
+          <button id="tz-toggle-btn" class="btn btn-subtle topbar-btn-compact" onclick="toggleTimezonePreference()" aria-label="Toggle Timezone" title="Switch Timezone">
+            <span>🌐</span>
+            <span class="btn-text-label" id="tz-btn-label" style="margin-left: 4px;">TZ: IST</span>
           </button>
 
           <!-- Synthesizer Audio Alerts Toggle -->
-          <button id="sound-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleSoundAlerts()">
-            🔇 Sound: OFF
+          <button id="sound-toggle-btn" class="btn btn-subtle topbar-btn-compact" onclick="toggleSoundAlerts()" aria-label="Toggle Sound" title="Sound Alerts">
+            <span id="sound-btn-icon">🔇</span>
+            <span class="btn-text-label" id="sound-btn-label" style="margin-left: 4px;">Sound: OFF</span>
           </button>
 
-          <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; display: flex; align-items: center; gap: 6px;" onclick="openUserProfileModal()" title="View Operator Profile & Clearance">
-            <span class="avatar-circle" id="topbar-user-avatar" style="width: 16px; height: 16px; font-size: 9px; line-height: 16px;">OP</span>
-            <span id="topbar-user-role" style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: var(--deep-indigo);">PROFILE</span>
+          <button class="btn btn-subtle topbar-btn-compact" onclick="openUserProfileModal()" aria-label="Operator Profile" title="View Operator Profile & Clearance">
+            <span class="avatar-circle" id="topbar-user-avatar" style="width: 18px; height: 18px; font-size: 9px; line-height: 18px;">OP</span>
+            <span class="btn-text-label" id="topbar-user-role" style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: var(--deep-indigo); margin-left: 4px;">PROFILE</span>
           </button>
 
-          <a href="/register.html" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; text-decoration: none;" title="Add Team Operator">
+          <a href="/register.html" class="btn btn-subtle topbar-btn-secondary" style="font-size: 11px; padding: 6px 10px; text-decoration: none;" title="Add Team Operator">
             ➕ New Operator
           </a>
         </div>
@@ -1526,7 +1652,7 @@
       <!-- Add Domain Box (Collapsible) -->
       <div id="add-domain-box" style="display: none; background: var(--sand-warm); padding: 22px; border-radius: var(--radius-lg); margin-bottom: 22px; border: 1px solid var(--stone-border); box-shadow: var(--shadow-sm);">
         <h4 style="font-size: 13px; margin-bottom: 12px; font-weight: 800;">Register New Domain for Protection</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+        <div class="responsive-filter-grid">
           <div>
             <label style="font-size: 11px; font-weight: 700;">Domain FQDN / Hostname</label>
             <input type="text" id="new-domain-input" class="form-input" placeholder="e.g. portal.company.com" style="margin-bottom: 0;">
@@ -1635,7 +1761,7 @@
         <div class="panel-body">
           <div id="add-iprule-box" style="display: none; background: var(--sand-warm); padding: 22px; border-radius: var(--radius-lg); margin-bottom: 22px; border: 1px solid var(--stone-border); box-shadow: var(--shadow-sm);">
             <h4 style="font-size: 13px; margin-bottom: 12px;">Add Dynamic IP / CIDR Access Rule</h4>
-            <div style="display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 12px; align-items: flex-end;">
+            <div class="responsive-filter-grid">
               <div>
                 <label style="font-size: 11px; font-weight: 700;">IP Address or CIDR Block</label>
                 <input type="text" id="ip-rule-addr" class="form-input" placeholder="e.g. 198.51.100.42 or 10.0.0.0/8" style="margin-bottom: 0;">
@@ -1945,7 +2071,7 @@ app.add_middleware(
   <!-- MODAL 2: DOMAIN DEEP SECURITY PROFILE MODAL -->
   <!-- ======================================================================= -->
   <div id="domain-modal-backdrop" class="drawer-backdrop" onclick="closeDomainModal()"></div>
-  <div id="domain-stats-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 840px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; max-height: 90vh; overflow-y: auto;">
+  <div id="domain-stats-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="domain-modal-title" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 840px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002;">
     <div style="padding: 20px 24px; border-bottom: 1px solid var(--stone-border); background: var(--sand-warm); display: flex; justify-content: space-between; align-items: center;">
       <div>
         <div style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);" id="domain-modal-title">Domain Security Profile</div>
@@ -1963,7 +2089,7 @@ app.add_middleware(
   <!-- MODAL 3: OPERATOR PROFILE & RBAC GOVERNANCE HUD MODAL -->
   <!-- ======================================================================= -->
   <div id="user-profile-backdrop" class="drawer-backdrop" onclick="closeUserProfileModal()"></div>
-  <div id="user-profile-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
+  <div id="user-profile-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="prof-modal-name" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--stone-border-light); padding-bottom: 16px;">
       <div style="display: flex; align-items: center; gap: 14px;">
         <div class="avatar-circle" id="prof-modal-avatar" style="width: 48px; height: 48px; font-size: 18px; font-weight: 800;">OP</div>
@@ -2013,9 +2139,9 @@ app.add_middleware(
   <!-- MODAL 4: OPERATOR KEYBOARD SHORTCUTS CHEAT SHEET -->
   <!-- ======================================================================= -->
   <div id="shortcuts-modal-backdrop" class="drawer-backdrop" onclick="closeShortcutsModal()"></div>
-  <div id="shortcuts-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 480px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
+  <div id="shortcuts-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 480px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 12px; margin-bottom: 18px;">
-      <h3 style="font-size: 15px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
+      <h3 id="shortcuts-modal-title" style="font-size: 15px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
         <span>⌨️</span> Operator Keyboard Shortcuts
       </h3>
       <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 13px;" onclick="closeShortcutsModal()">✕</button>
@@ -2555,6 +2681,36 @@ app.add_middleware(
 
       const ctx = canvas.getContext("2d");
 
+      function resizePipelineCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width > 0) {
+          canvas.width = rect.width;
+          canvas.height = 220;
+        }
+      }
+      window.addEventListener("resize", resizePipelineCanvas);
+      window.addEventListener("orientationchange", () => setTimeout(resizePipelineCanvas, 150));
+      resizePipelineCanvas();
+
+      // Touch inspection support for mobile screens
+      canvas.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches[0]) {
+          const t = e.touches[0];
+          const fake = new MouseEvent("mousemove", { clientX: t.clientX, clientY: t.clientY });
+          canvas.dispatchEvent(fake);
+        }
+      }, { passive: true });
+      canvas.addEventListener("touchmove", (e) => {
+        if (e.touches && e.touches[0]) {
+          const t = e.touches[0];
+          const fake = new MouseEvent("mousemove", { clientX: t.clientX, clientY: t.clientY });
+          canvas.dispatchEvent(fake);
+        }
+      }, { passive: true });
+      canvas.addEventListener("touchend", () => {
+        if (hud) hud.style.display = "none";
+      }, { passive: true });
+
       // Perspective tilt listener on container
       card.addEventListener("mousemove", (e) => {
         const rect = card.getBoundingClientRect();
@@ -3025,7 +3181,12 @@ app.add_middleware(
       consoleTimezone = consoleTimezone === "LOCAL" ? "UTC" : "LOCAL";
       localStorage.setItem("sg_tz_pref", consoleTimezone);
       const btn = document.getElementById("tz-toggle-btn");
-      btn.innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
+      const label = document.getElementById("tz-btn-label");
+      if (label) {
+        label.innerText = consoleTimezone === "LOCAL" ? "TZ: IST" : "TZ: UTC";
+      } else if (btn) {
+        btn.innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
+      }
       updateSystemClock();
       updateAllRelativeTimestamps();
       applyEventFilter();
@@ -3037,7 +3198,14 @@ app.add_middleware(
       soundAlertsEnabled = !soundAlertsEnabled;
       localStorage.setItem("sg_sound_alerts", soundAlertsEnabled);
       const btn = document.getElementById("sound-toggle-btn");
-      btn.innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+      const icon = document.getElementById("sound-btn-icon");
+      const label = document.getElementById("sound-btn-label");
+      if (icon && label) {
+        icon.innerText = soundAlertsEnabled ? "🔊" : "🔇";
+        label.innerText = soundAlertsEnabled ? "Sound: ON" : "Sound: OFF";
+      } else if (btn) {
+        btn.innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+      }
       if (soundAlertsEnabled) playThreatTone(90);
     }
 
@@ -3089,12 +3257,18 @@ app.add_middleware(
     let currentTheme = localStorage.getItem("sg_theme") || "dark";
     function applyTheme() {
       const btn = document.getElementById("theme-toggle-btn");
+      const icon = document.getElementById("theme-btn-icon");
+      const label = document.getElementById("theme-btn-label");
       if (currentTheme === "light") {
         document.documentElement.setAttribute("data-theme", "light");
-        if (btn) btn.innerHTML = "🌾 Theme: DARK CREAM";
+        if (icon) icon.innerText = "🌾";
+        if (label) label.innerText = "Theme: DARK CREAM";
+        if (!icon && btn) btn.innerHTML = "🌾 Theme: DARK CREAM";
       } else {
         document.documentElement.removeAttribute("data-theme");
-        if (btn) btn.innerHTML = "🌙 Theme: OBSIDIAN";
+        if (icon) icon.innerText = "🌙";
+        if (label) label.innerText = "Theme: OBSIDIAN";
+        if (!icon && btn) btn.innerHTML = "🌙 Theme: OBSIDIAN";
       }
     }
     function toggleThemePreference() {
@@ -3742,7 +3916,7 @@ app.add_middleware(
 
         const content = document.getElementById("domain-modal-content");
         content.innerHTML = `
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px;">
+          <div class="modal-stats-kpi-grid" style="margin-bottom: 22px;">
             <div style="background: var(--sand-warm); padding: 14px; border-radius: var(--radius-md);">
               <div style="font-size: 10px; font-weight: 700; color: var(--text-muted);">TOTAL INVOCATIONS</div>
               <div style="font-size: 22px; font-weight: 800; font-family: var(--font-mono); margin-top: 3px;">${metrics.total_events}</div>
@@ -3761,7 +3935,7 @@ app.add_middleware(
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+          <div class="modal-stats-charts-grid" style="margin-bottom: 20px;">
             <div style="background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); padding: 16px;">
               <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo); margin-bottom: 10px;">Top Mitigated Signatures</h4>
               ${data.top_rules.length === 0 ? '<div style="color:var(--text-muted); font-size:11px;">No attacks recorded yet.</div>' : 

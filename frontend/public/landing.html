@@ -66,12 +66,20 @@
     ::selection { background: rgba(56, 189, 248, 0.3); color: inherit; }
     :focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
 
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
     body {
       background: var(--canvas-bg);
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
-      overflow-x: hidden;
+      min-height: 100dvh;
       line-height: 1.6;
       transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
       font-variant-numeric: tabular-nums;
@@ -300,8 +308,8 @@
       .brand-badge { display: none; }
       .hero-title { font-size: 28px !important; letter-spacing: -0.5px; }
       .hero-sub { font-size: 14px; }
-      .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
-      .hero-actions .btn { width: 100%; }
+      .hero-cta { flex-direction: column; width: 100%; gap: 10px; }
+      .hero-cta .btn { width: 100%; }
       .metrics-bar { grid-template-columns: 1fr !important; gap: 12px; }
       .demo-left, .demo-right { padding: 18px 14px !important; border-right: none; }
       .demo-presets { gap: 6px; }
