@@ -41,6 +41,8 @@ def get_db_connection() -> sqlite3.Connection:
         conn.execute("PRAGMA synchronous = NORMAL")
         conn.execute("PRAGMA cache_size = -64000")
         conn.execute("PRAGMA temp_store = MEMORY")
+        conn.execute("PRAGMA mmap_size = 268435456")
+        conn.execute("PRAGMA journal_size_limit = 67108864")
         conn.execute("PRAGMA foreign_keys = ON")
         conn.execute("PRAGMA wal_autocheckpoint = 1000")
         _thread_local.conn = conn
@@ -156,6 +158,8 @@ def init_database():
         );
 
         CREATE INDEX IF NOT EXISTS idx_events_site ON security_events(website_id, timestamp);
+        CREATE INDEX IF NOT EXISTS idx_events_action_ts ON security_events(action, timestamp);
+        CREATE INDEX IF NOT EXISTS idx_events_ip_ts ON security_events(client_ip, timestamp);
         CREATE INDEX IF NOT EXISTS idx_endpoints_site ON api_endpoints(website_id);
         CREATE INDEX IF NOT EXISTS idx_ip_rules_site ON ip_rules(website_id);
         CREATE INDEX IF NOT EXISTS idx_connectors_site ON connectors(website_id);

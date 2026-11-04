@@ -10,58 +10,62 @@
   
   <style>
     :root {
-      /* Default Theme: Industrial Dark Obsidian (No purple, glare-free, cyber titanium) */
-      --canvas-bg: #080B10;
-      --card-white: #111726;
-      --sand-warm: #0C101A;
-      --stone-border: rgba(255, 255, 255, 0.08);
-      --stone-border-light: rgba(255, 255, 255, 0.04);
+      /* Developer-Grade Precision Dark Palette (Carbon / GitHub Dark High-Contrast) */
+      --canvas-bg: #0D1117;
+      --card-white: #161B22;
+      --sand-warm: #21262D;
+      --stone-border: #30363D;
+      --stone-border-light: rgba(240, 246, 252, 0.08);
       
-      --terracotta: #EF4444;
-      --terracotta-soft: rgba(239, 68, 68, 0.15);
-      --sage-green: #10B981;
-      --sage-soft: rgba(16, 185, 129, 0.15);
-      --deep-indigo: #38BDF8;
-      --indigo-soft: rgba(56, 189, 248, 0.12);
-      --warm-ochre: #F59E0B;
-      --ochre-soft: rgba(245, 158, 11, 0.15);
+      --terracotta: #F85149;
+      --terracotta-soft: rgba(248, 81, 73, 0.15);
+      --sage-green: #3FB950;
+      --sage-soft: rgba(63, 185, 80, 0.15);
+      --deep-indigo: #2F81F7;
+      --indigo-soft: rgba(47, 129, 247, 0.12);
+      --warm-ochre: #D29922;
+      --ochre-soft: rgba(210, 153, 34, 0.15);
       
-      --text-charcoal: #F8FAFC;
-      --text-muted: #94A3B8;
-      --text-subtle: #64748B;
+      --text-charcoal: #E6EDF3;
+      --text-muted: #8B949E;
+      --text-subtle: #6E7681;
       
       --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       
       --radius-sm: 6px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
       
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.6);
-      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.8);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.7);
     }
 
     :root[data-theme="light"] {
-      --canvas-bg: #F8F9FA;
+      /* Developer-Grade Clean Light Palette (Cloudflare / Linear Light) */
+      --canvas-bg: #F6F8FA;
       --card-white: #FFFFFF;
-      --sand-warm: #F1EFEA;
-      --stone-border: #E2E0D8;
-      --stone-border-light: #ECEAE4;
-      --terracotta: #D34528;
-      --terracotta-soft: #FDF2E9;
-      --sage-green: #2E7D5B;
-      --sage-soft: #EDF7F2;
-      --deep-indigo: #1E293B;
-      --indigo-soft: #F1F5F9;
-      --warm-ochre: #B45309;
-      --ochre-soft: #FEF3C7;
-      --text-charcoal: #0F172A;
-      --text-muted: #64748B;
-      --text-subtle: #94A3B8;
-      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-      --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.07);
-      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+      --sand-warm: #F3F4F6;
+      --stone-border: #D0D7DE;
+      --stone-border-light: #EAECEF;
+      
+      --terracotta: #CF222E;
+      --terracotta-soft: #FFEBE9;
+      --sage-green: #1A7F37;
+      --sage-soft: #DAFBE1;
+      --deep-indigo: #0969DA;
+      --indigo-soft: #DDF4FF;
+      --warm-ochre: #9A6700;
+      --ochre-soft: #FFF8C5;
+      
+      --text-charcoal: #1F2328;
+      --text-muted: #636C76;
+      --text-subtle: #9198A1;
+      
+      --shadow-sm: 0 1px 3px rgba(31, 35, 40, 0.08);
+      --shadow-md: 0 3px 8px rgba(31, 35, 40, 0.12);
+      --shadow-lg: 0 8px 24px rgba(31, 35, 40, 0.16);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -926,8 +930,39 @@
           </div>
         </div>
 
+        <!-- Live Precision System Clock -->
+        <div id="topbar-system-clock" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 5px 14px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--sage-green); box-shadow: 0 0 6px var(--sage-green);"></span>
+          <span id="clock-date-str" style="color: var(--text-muted); font-weight: 600;">--</span>
+          <span style="color: var(--stone-border);">|</span>
+          <span id="clock-time-str" style="color: var(--text-charcoal); font-weight: 700; letter-spacing: 0.5px;">--:--:--</span>
+          <span id="clock-tz-badge" style="font-size: 9px; padding: 1px 6px; border-radius: 3px; background: var(--card-white); border: 1px solid var(--stone-border); color: var(--deep-indigo); font-weight: 800;">IST</span>
+        </div>
+
         <!-- Controls & User Badge -->
         <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- Live Threat Mitigations Bell -->
+          <div style="position: relative;">
+            <button id="notificationBellBtn" class="btn btn-subtle" style="font-size: 12px; padding: 6px 10px; position: relative;" onclick="toggleNotificationPopover()" title="Recent Mitigated Threats">
+              🔔
+              <span id="notificationBadge" style="position: absolute; top: -4px; right: -4px; background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 10px; display: none;">0</span>
+            </button>
+            <div id="notificationPopover" style="display: none; position: absolute; right: 0; top: 125%; width: 340px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1000; padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 8px; margin-bottom: 10px;">
+                <span style="font-size: 11px; font-weight: 800; font-family: var(--font-mono); color: var(--text-charcoal);">⚡ RECENT MITIGATIONS</span>
+                <span id="notif-clear-btn" style="font-size: 10px; color: var(--text-muted); cursor: pointer;" onclick="clearNotifications()">Clear</span>
+              </div>
+              <div id="notificationList" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <div style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 12px;">No active blocked events</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shortcuts Modal Helper (?) -->
+          <button class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px; font-weight: 800; font-family: var(--font-mono);" onclick="openShortcutsModal()" title="Keyboard Shortcuts (?)">
+            ?
+          </button>
+
           <!-- Theme Switcher Toggle -->
           <button id="theme-toggle-btn" class="btn btn-subtle" style="font-size: 11px; padding: 6px 10px;" onclick="toggleThemePreference()">
             🌙 Theme: OBSIDIAN
@@ -1692,6 +1727,37 @@ app.add_middleware(
   </div>
 
   <!-- ======================================================================= -->
+  <!-- MODAL 4: OPERATOR KEYBOARD SHORTCUTS CHEAT SHEET -->
+  <!-- ======================================================================= -->
+  <div id="shortcuts-modal-backdrop" class="drawer-backdrop" onclick="closeShortcutsModal()"></div>
+  <div id="shortcuts-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 480px; max-width: 95vw; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 12px; margin-bottom: 18px;">
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
+        <span>⌨️</span> Operator Keyboard Shortcuts
+      </h3>
+      <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 13px;" onclick="closeShortcutsModal()">✕</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+        <span style="color: var(--text-charcoal); font-weight: 600;">Pause / Resume Live Telemetry Stream</span>
+        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">Space</kbd>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+        <span style="color: var(--text-charcoal); font-weight: 600;">Switch Operations View (Tabs 1–9)</span>
+        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">1 - 9</kbd>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+        <span style="color: var(--text-charcoal); font-weight: 600;">Toggle Keyboard Shortcuts Cheat Sheet</span>
+        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">?</kbd>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--sand-warm); padding: 8px 12px; border-radius: var(--radius-sm);">
+        <span style="color: var(--text-charcoal); font-weight: 600;">Close Active Drawer / Modal / Popover</span>
+        <kbd style="background: var(--card-white); border: 1px solid var(--stone-border); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;">Esc</kbd>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
   <!-- CONTEXTUAL TELEMETRY HUD (1.2s–3.0s CURSOR HOLD INSPECTOR) -->
   <!-- ======================================================================= -->
   <div id="contextualTelemetryHud" class="contextual-hud">
@@ -1994,6 +2060,9 @@ app.add_middleware(
           try {
             const ev = JSON.parse(e.data);
             if (ev.type === "init") return;
+            if (ev.action === "BLOCK") {
+              recordBlockedNotification(ev);
+            }
             prependLiveTrafficEvent(ev);
           } catch (err) {
             console.error("SSE parse error:", err);
@@ -2557,11 +2626,125 @@ app.add_middleware(
       };
     }
 
+    // -------------------------------------------------------------------------
+    // Real-Time System Clock (Updates Every 1,000ms)
+    // -------------------------------------------------------------------------
+    function updateSystemClock() {
+      const now = new Date();
+      const dateEl = document.getElementById("clock-date-str");
+      const timeEl = document.getElementById("clock-time-str");
+      const tzBadge = document.getElementById("clock-tz-badge");
+
+      if (!timeEl) return;
+
+      const pad = (n, len = 2) => String(n).padStart(len, "0");
+
+      if (consoleTimezone === "UTC") {
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const dayName = days[now.getUTCDay()];
+        const monthName = months[now.getUTCMonth()];
+        const dayNum = pad(now.getUTCDate());
+        const year = now.getUTCFullYear();
+        if (dateEl) dateEl.innerText = `${dayName}, ${dayNum} ${monthName} ${year}`;
+        timeEl.innerText = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+        if (tzBadge) tzBadge.innerText = "UTC (GMT+0)";
+      } else {
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+        if (dateEl) dateEl.innerText = now.toLocaleDateString(undefined, options);
+        let hours = now.getHours();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        timeEl.innerText = `${pad(hours)}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${ampm}`;
+        if (tzBadge) tzBadge.innerText = "IST (UTC+05:30)";
+      }
+    }
+    setInterval(updateSystemClock, 1000);
+
+    // Auto-update all relative timestamps across the DOM every 4 seconds
+    function updateAllRelativeTimestamps() {
+      document.querySelectorAll("[data-raw-ts]").forEach(el => {
+        const raw = el.getAttribute("data-raw-ts");
+        if (raw) {
+          const t = formatTimestamp(raw);
+          el.innerText = `(${t.relative})`;
+        }
+      });
+    }
+    setInterval(updateAllRelativeTimestamps, 4000);
+
+    // Live Threat Notification Dropdown Popover
+    let blockedNotifications = [];
+    function recordBlockedNotification(ev) {
+      if (!ev) return;
+      blockedNotifications.unshift(ev);
+      if (blockedNotifications.length > 25) blockedNotifications.pop();
+      updateNotificationUI();
+    }
+    function updateNotificationUI() {
+      const badge = document.getElementById("notificationBadge");
+      const list = document.getElementById("notificationList");
+      if (badge) {
+        if (blockedNotifications.length > 0) {
+          badge.style.display = "block";
+          badge.innerText = blockedNotifications.length;
+        } else {
+          badge.style.display = "none";
+        }
+      }
+      if (list && blockedNotifications.length > 0) {
+        list.innerHTML = blockedNotifications.slice(0, 8).map(n => `
+          <div style="background: var(--sand-warm); padding: 8px 10px; border-radius: var(--radius-sm); border-left: 3px solid var(--terracotta); font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+              <span style="font-weight: 700; color: var(--terracotta); font-family: var(--font-mono); font-size: 10px;">${escapeHtml(n.rule_triggered || 'THREAT-BLOCK')}</span>
+              <span style="color: var(--text-muted); font-size: 10px;">${escapeHtml(formatTimestamp(n.timestamp).relative)}</span>
+            </div>
+            <div style="color: var(--text-charcoal); font-family: var(--font-mono); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              ${escapeHtml(n.method)} ${escapeHtml(n.path)}
+            </div>
+            <div style="color: var(--text-muted); font-size: 9px; margin-top: 2px;">Client IP: ${escapeHtml(n.client_ip)}</div>
+          </div>
+        `).join("");
+      }
+    }
+    function toggleNotificationPopover() {
+      const popover = document.getElementById("notificationPopover");
+      if (popover) {
+        popover.style.display = (popover.style.display === "none" || popover.style.display === "") ? "block" : "none";
+      }
+    }
+    function clearNotifications() {
+      blockedNotifications = [];
+      updateNotificationUI();
+      const list = document.getElementById("notificationList");
+      if (list) list.innerHTML = `<div style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 12px;">No active blocked events</div>`;
+    }
+
+    // Keyboard Shortcuts Modal Controller
+    function openShortcutsModal() {
+      const modal = document.getElementById("shortcuts-modal");
+      const backdrop = document.getElementById("shortcuts-modal-backdrop");
+      if (modal && backdrop) {
+        modal.style.display = "block";
+        backdrop.classList.add("active");
+      }
+    }
+    function closeShortcutsModal() {
+      const modal = document.getElementById("shortcuts-modal");
+      const backdrop = document.getElementById("shortcuts-modal-backdrop");
+      if (modal && backdrop) {
+        modal.style.display = "none";
+        backdrop.classList.remove("active");
+      }
+    }
+
     function toggleTimezonePreference() {
       consoleTimezone = consoleTimezone === "LOCAL" ? "UTC" : "LOCAL";
       localStorage.setItem("sg_tz_pref", consoleTimezone);
       const btn = document.getElementById("tz-toggle-btn");
       btn.innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
+      updateSystemClock();
+      updateAllRelativeTimestamps();
       applyEventFilter();
       loadEndpoints();
       loadConnectors();
@@ -3764,7 +3947,15 @@ app.add_middleware(
     // Keyboard Shortcuts
     window.addEventListener("keydown", (e) => {
       if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
-      if (e.code === "Space") {
+      if (e.key === "?" || (e.shiftKey && e.key === "/")) {
+        e.preventDefault();
+        const modal = document.getElementById("shortcuts-modal");
+        if (modal && modal.style.display === "block") {
+          closeShortcutsModal();
+        } else {
+          openShortcutsModal();
+        }
+      } else if (e.code === "Space") {
         e.preventDefault();
         toggleStreamPause();
       } else if (e.key >= "1" && e.key <= "9") {
@@ -3775,9 +3966,13 @@ app.add_middleware(
         closeEventForensics();
         closeDomainModal();
         closeUserProfileModal();
+        closeShortcutsModal();
+        const popover = document.getElementById("notificationPopover");
+        if (popover) popover.style.display = "none";
       }
     });
 
+    updateSystemClock();
     setupAutoRefreshEngine();
   </script>
 </body>

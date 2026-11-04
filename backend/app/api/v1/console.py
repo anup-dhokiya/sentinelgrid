@@ -14,6 +14,7 @@ from uuid import uuid4
 from datetime import datetime, timezone
 import json
 import time
+import threading
 import ipaddress
 import yaml
 import asyncio
@@ -137,9 +138,21 @@ def get_or_create_website(conn, website_id: Optional[str]) -> str:
 # Core WAAP Endpoints
 # -----------------------------------------------------------------------------
 
+# In-memory high-throughput overview cache
+_OVERVIEW_CACHE: Dict[str, Any] = {}
+_OVERVIEW_CACHE_LOCK = threading.Lock()
+_OVERVIEW_CACHE_TTL = 1.5  # seconds
+
 @router.get("/overview")
 async def get_overview(website_id: Optional[str] = None):
     """Returns aggregated metrics for the central WAAP operations console, optionally scoped to a domain."""
+    cache_key = website_id or "ALL"
+    now_time = time.time()
+    with _OVERVIEW_CACHE_LOCK:
+        cached = _OVERVIEW_CACHE.get(cache_key)
+        if cached and (now_time - cached["cached_at"] < _OVERVIEW_CACHE_TTL):
+            return cached["data"]
+
     conn = get_db_connection()
     with conn:
         websites_count = conn.execute("SELECT COUNT(*) FROM websites").fetchone()[0]
@@ -223,7 +236,7 @@ async def get_overview(website_id: Optional[str] = None):
             dict(row) for row in conn.execute("SELECT * FROM connectors ORDER BY last_heartbeat DESC").fetchall()
         ]
 
-    return {
+    result = {
         "websites_count": websites_count,
         "selected_website_id": website_id or "ALL",
         "endpoints_count": endpoints_count,
@@ -239,6 +252,11 @@ async def get_overview(website_id: Optional[str] = None):
         "traffic_timeline": traffic_timeline,
         "avg_latency_ms": 0.38
     }
+
+    with _OVERVIEW_CACHE_LOCK:
+        _OVERVIEW_CACHE[cache_key] = {"data": result, "cached_at": time.time()}
+
+    return result
 
 
 # -----------------------------------------------------------------------------
