@@ -3,6 +3,14 @@ SentinelGrid - Central Control Plane & Management API Server
 Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
 """
 
+import sys
+from pathlib import Path
+
+# Ensure backend root is always in sys.path regardless of execution context
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -17,10 +25,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Standard CORS configuration
+# Standard Cloud & Local CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+)(:\d+)?$",
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|.*\.vercel\.app|.*\.github\.io|.*\.onrender\.com)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

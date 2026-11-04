@@ -529,7 +529,7 @@
       btn.disabled = true;
 
       try {
-        const API = localStorage.getItem("sentinel_backend_url") || "/v1";
+        const API = localStorage.getItem("sentinel_backend_url") || (window.location.hostname.endsWith("github.io") ? "https://sentinelgrid-one.vercel.app/v1" : "/v1");
         const res = await fetch(`${API}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

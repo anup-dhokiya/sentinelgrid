@@ -2199,7 +2199,7 @@ app.add_middleware(
 
   <!-- Interactive Modular JavaScript Controller -->
   <script>
-    const API = localStorage.getItem("sentinel_backend_url") || "/v1";
+    const API = localStorage.getItem("sentinel_backend_url") || (window.location.hostname.endsWith("github.io") ? "https://sentinelgrid-one.vercel.app/v1" : "/v1");
 
     // -------------------------------------------------------------------------
     // Session Authentication Guard & RBAC Initializer

@@ -84,3 +84,4 @@ references/coreruleset/
 shared/security-rulesets/
 
 .keys/
+.vercel

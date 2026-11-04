@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional
 from contextlib import contextmanager
 
 import os
+import tempfile
 from pathlib import Path
 
 # Dynamic DB resolution: uses DATA_DIR if set, D-drive if mounted, or relative to backend root
@@ -22,7 +23,8 @@ if _env_dir:
 elif Path("/run/media/anup/D/sentinelgrid/backend").is_dir():
     DB_PATH = Path("/run/media/anup/D/sentinelgrid/backend/sentinelgrid.db")
 else:
-    DB_PATH = Path(__file__).resolve().parent.parent.parent / "sentinelgrid.db"
+    _base_dir = Path(__file__).resolve().parent.parent.parent
+    DB_PATH = _base_dir / "sentinelgrid.db" if os.access(_base_dir, os.W_OK) else Path(tempfile.gettempdir()) / "sentinelgrid.db"
 _thread_local = threading.local()
 
 
@@ -189,6 +191,20 @@ def init_database():
             cur.execute("""
             UPDATE users SET password_hash = ?, role = 'manager' WHERE email = 'a@123'
             """, (admin_pwd_hash,))
+
+        # Ensure default website for aegispro.vercel.app exists
+        cur.execute("SELECT count(*) FROM websites WHERE id = 'site-agispro' OR domain = 'aegispro.vercel.app'")
+        if cur.fetchone()[0] == 0:
+            cur.execute("""
+            INSERT INTO websites (id, domain, name, created_at, status, risk_score)
+            VALUES ('site-agispro', 'aegispro.vercel.app', 'AegisPro Vercel Platform', ?, 'active', 0.0)
+            """, (now,))
+            cur.execute("""
+            INSERT INTO policies (id, website_id, version, name, threshold_block, threshold_challenge, status, created_at)
+            VALUES ('pol-agispro-v1', 'site-agispro', 1, 'Production NextGen Edge Security Policy', 75, 50, 'active', ?)
+            """, (now,))
+        else:
+            cur.execute("UPDATE websites SET domain = 'aegispro.vercel.app' WHERE id = 'site-agispro'")
 
 
 init_database()

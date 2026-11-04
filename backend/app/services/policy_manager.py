@@ -3,6 +3,8 @@ SentinelGrid - Central Policy Management & Versioning Service
 Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
 """
 
+import os
+import tempfile
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,7 +12,14 @@ from uuid import uuid4
 from app.core.crypto import AsymmetricPolicySigner, Ed25519KeyManager
 from app.services.simulation import PolicyPayload, SimulationReport, PolicySimulationEngine, HistoricalTrafficSample
 
-MASTER_KEY_DIR = Path("/run/media/anup/D/sentinelgrid/backend/.keys")
+if os.getenv("DATA_DIR"):
+    MASTER_KEY_DIR = Path(os.getenv("DATA_DIR")) / ".keys"
+elif Path("/run/media/anup/D/sentinelgrid/backend").is_dir():
+    MASTER_KEY_DIR = Path("/run/media/anup/D/sentinelgrid/backend/.keys")
+else:
+    _base = Path(__file__).resolve().parent.parent.parent
+    MASTER_KEY_DIR = _base / ".keys" if os.access(_base, os.W_OK) else Path(tempfile.gettempdir()) / "sentinelgrid_keys"
+
 MASTER_KEY_FILE = MASTER_KEY_DIR / "ed25519_master.key"
 MASTER_PUB_FILE = MASTER_KEY_DIR / "ed25519_master.pub"
 
