@@ -662,8 +662,8 @@ async def register_connector_heartbeat(req: ConnectorHeartbeatRequest):
 
 
 def is_public_bannable_ip(ip: str) -> bool:
-    """Strictly prevents banning loopback, private subnets, or unknown clients."""
-    if not ip or ip in ("127.0.0.1", "::1", "localhost", "unknown", "unknown-client"):
+    """Strictly prevents banning loopback, private subnets, or test/internal clients."""
+    if not ip or ip in ("127.0.0.1", "::1", "localhost", "unknown", "unknown-client", "sandbox-client", "browser-client"):
         return False
     try:
         addr = ipaddress.ip_address(ip)
@@ -695,51 +695,56 @@ async def inspect_live_request(req: WafTestRequest):
     now = datetime.now(timezone.utc).isoformat()
     client_ip = req.client_ip or "127.0.0.1"
 
+    is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
+                  req.headers.get("x-sentinelgrid-sandbox") == "true" or
+                  client_ip in ("sandbox-client", "127.0.0.1", "::1", "browser-client"))
+
     # Step 0: Fast Autonomous Dynamic IP Quarantine Check (<0.05ms)
-    is_quarantined, remaining_sec, q_reason = global_rate_limiter.check_quarantine(client_ip)
-    if is_quarantined:
-        elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
-        event_id = f"ev-{uuid4().hex[:8]}"
+    if not is_sandbox:
+        is_quarantined, remaining_sec, q_reason = global_rate_limiter.check_quarantine(client_ip)
+        if is_quarantined:
+            elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            event_id = f"ev-{uuid4().hex[:8]}"
 
-        with conn:
-            conn.execute("""
-            INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                event_id, site_id, now, client_ip, req.method, req.path,
-                "BLOCK", 100.0, "AUTONOMOUS-IP-QUARANTINE", "A01:Broken Access Control",
-                f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)"
-            ))
+            with conn:
+                conn.execute("""
+                INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    event_id, site_id, now, client_ip, req.method, req.path,
+                    "BLOCK", 100.0, "AUTONOMOUS-IP-QUARANTINE", "A01:Broken Access Control",
+                    f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)"
+                ))
 
-        event_payload = {
-            "id": event_id,
-            "website_id": site_id,
-            "timestamp": now,
-            "client_ip": client_ip,
-            "method": req.method,
-            "path": req.path,
-            "action": "BLOCK",
-            "risk_score": 100.0,
-            "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
-            "owasp_category": "A01:Broken Access Control",
-            "details": f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)",
-            "latency_ms": elapsed_ms
-        }
-        broadcast_sse_event(event_payload)
+            event_payload = {
+                "id": event_id,
+                "website_id": site_id,
+                "timestamp": now,
+                "client_ip": client_ip,
+                "method": req.method,
+                "path": req.path,
+                "action": "BLOCK",
+                "risk_score": 100.0,
+                "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
+                "owasp_category": "A01:Broken Access Control",
+                "details": f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)",
+                "latency_ms": elapsed_ms
+            }
+            broadcast_sse_event(event_payload)
 
-        return {
-            "event_id": event_id,
-            "action": "BLOCK",
-            "risk_score": 100.0,
-            "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
-            "owasp_category": "A01:Broken Access Control",
-            "cve_reference": None,
-            "total_matches": 1,
-            "all_matches": [{"rule_id": "AUTONOMOUS-IP-QUARANTINE", "name": f"IP Quarantined: {q_reason}"}],
-            "timestamp": now,
-            "retry_after_seconds": remaining_sec,
-            "execution_latency_ms": elapsed_ms
-        }
+            return {
+                "event_id": event_id,
+                "action": "BLOCK",
+                "risk_score": 100.0,
+                "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
+                "owasp_category": "A01:Broken Access Control",
+                "cve_reference": None,
+                "total_matches": 1,
+                "all_matches": [{"rule_id": "AUTONOMOUS-IP-QUARANTINE", "name": f"IP Quarantined: {q_reason}"}],
+                "timestamp": now,
+                "retry_after_seconds": remaining_sec,
+                "execution_latency_ms": elapsed_ms
+            }
 
     # Step 1: Check IP Access Rules (Bypass for explicit Sandbox / testbed requests)
     is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
@@ -783,35 +788,36 @@ async def inspect_live_request(req: WafTestRequest):
                 }
 
     # Step 2: Sliding-Window Rate Limiting (Flood Prevention: 180 req/min default per client IP)
-    rate_verdict = global_rate_limiter.evaluate_rate(client_ip, limit=180, window_seconds=60.0)
-    if not rate_verdict["allowed"]:
-        global_rate_limiter.trigger_violation(client_ip, severity="HIGH", reason="Volumetric Flood Rate Exceeded")
-        elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
-        event_id = f"ev-{uuid4().hex[:8]}"
+    if not is_sandbox:
+        rate_verdict = global_rate_limiter.evaluate_rate(client_ip, limit=180, window_seconds=60.0)
+        if not rate_verdict["allowed"]:
+            global_rate_limiter.trigger_violation(client_ip, severity="HIGH", reason="Volumetric Flood Rate Exceeded")
+            elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            event_id = f"ev-{uuid4().hex[:8]}"
 
-        with conn:
-            conn.execute("""
-            INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                event_id, site_id, now, client_ip, req.method, req.path,
-                "BLOCK", 90.0, "RATE-LIMIT-FLOOD-EXCEEDED", "A04:Rate Limiting & Abuse",
-                f"Rate exceeded: {rate_verdict.get('current_count', 0)} reqs in 60s"
-            ))
+            with conn:
+                conn.execute("""
+                INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    event_id, site_id, now, client_ip, req.method, req.path,
+                    "BLOCK", 90.0, "RATE-LIMIT-FLOOD-EXCEEDED", "A04:Rate Limiting & Abuse",
+                    f"Rate exceeded: {rate_verdict.get('current_count', 0)} reqs in 60s"
+                ))
 
-        return {
-            "event_id": event_id,
-            "action": "BLOCK",
-            "risk_score": 90.0,
-            "rule_triggered": "RATE-LIMIT-FLOOD-EXCEEDED",
-            "owasp_category": "A04:Rate Limiting & Abuse",
-            "cve_reference": None,
-            "total_matches": 1,
-            "all_matches": [{"rule_id": "RATE-LIMIT-FLOOD-EXCEEDED", "name": "Rate limit exceeded"}],
-            "timestamp": now,
-            "retry_after_seconds": rate_verdict.get("retry_after", 60),
-            "execution_latency_ms": elapsed_ms
-        }
+            return {
+                "event_id": event_id,
+                "action": "BLOCK",
+                "risk_score": 90.0,
+                "rule_triggered": "RATE-LIMIT-FLOOD-EXCEEDED",
+                "owasp_category": "A04:Rate Limiting & Abuse",
+                "cve_reference": None,
+                "total_matches": 1,
+                "all_matches": [{"rule_id": "RATE-LIMIT-FLOOD-EXCEEDED", "name": "Rate limit exceeded"}],
+                "timestamp": now,
+                "retry_after_seconds": rate_verdict.get("retry_after", 60),
+                "execution_latency_ms": elapsed_ms
+            }
 
     # Step 3: Target-Aware Threat Brain Evaluation
     eval_result = SecurityBrain.evaluate(
@@ -831,8 +837,8 @@ async def inspect_live_request(req: WafTestRequest):
     owasp = top_match["owasp_id"] if top_match else "None"
     cve_ref = top_match.get("cve_ref") if top_match else None
 
-    # Step 4: Autonomous IP Quarantine Escalation (Ban offender for severe threats, exempting loopback & private nets)
-    if action == "BLOCK" and is_public_bannable_ip(client_ip):
+    # Step 4: Autonomous IP Quarantine Escalation (Ban offender for severe threats, exempting sandbox & loopback)
+    if action == "BLOCK" and not is_sandbox and is_public_bannable_ip(client_ip):
         global_rate_limiter.trigger_violation(
             client_ip,
             severity=top_match.get("severity", "CRITICAL") if top_match else "CRITICAL",
