@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SentinelGrid // Autonomous In-Process WAAP & Zero-Trust Origin Defense</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,22 +44,22 @@
     }
 
     [data-theme="light"] {
-      /* Light Mode Palette (Developer Precision Cloudflare / Linear) */
-      --canvas-bg: #F8FAFC;
-      --card-bg: #FFFFFF;
-      --card-secondary: #F1F5F9;
-      --card-secondary-hover: #E2E8F0;
-      --border-color: #E2E8F0;
-      --border-accent: rgba(2, 132, 199, 0.3);
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --accent-cyan: #0284C7;
-      --accent-indigo: #0284C7;
-      --accent-green: #16A34A;
-      --accent-red: #DC2626;
-      --accent-gold: #D97706;
-      --shadow-glow: 0 16px 40px -8px rgba(15, 23, 42, 0.12);
-      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
+      --canvas-bg: #F5EFEB;
+      --card-bg: #FAF7F2;
+      --card-secondary: #EBE3D5;
+      --card-secondary-hover: #DFD5C3;
+      --border-color: #D8CEBE;
+      --border-accent: rgba(29, 78, 216, 0.35);
+      --text-main: #241D17;
+      --text-muted: #655A4E;
+      --accent-cyan: #1D4ED8;
+      --accent-indigo: #1D4ED8;
+      --accent-green: #166534;
+      --accent-red: #B91C1C;
+      --accent-gold: #9A3412;
+      --shadow-glow: 0 16px 40px -8px rgba(44, 36, 29, 0.14);
+      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -99,7 +99,7 @@
       z-index: 100;
     }
     [data-theme="light"] .navbar {
-      background: rgba(248, 250, 252, 0.85);
+      background: rgba(245, 239, 235, 0.88);
     }
 
     .brand {
@@ -288,6 +288,25 @@
       .demo-body { grid-template-columns: 1fr; }
       .metrics-bar { grid-template-columns: 1fr 1fr; }
       .hero-title { font-size: 34px; }
+    }
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 640px) {
+      .navbar { height: 62px; }
+      .container { padding: 0 16px; }
+      .navbar .nav-actions .btn { padding: 6px 10px; font-size: 11px; }
+      .brand-title { font-size: 15px; }
+      .brand-badge { display: none; }
+      .hero-title { font-size: 28px !important; letter-spacing: -0.5px; }
+      .hero-sub { font-size: 14px; }
+      .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+      .hero-actions .btn { width: 100%; }
+      .metrics-bar { grid-template-columns: 1fr !important; gap: 12px; }
+      .demo-left, .demo-right { padding: 18px 14px !important; border-right: none; }
+      .demo-presets { gap: 6px; }
+      .preset-chip { font-size: 10px; padding: 4px 8px; }
+      .features-grid { grid-template-columns: 1fr !important; gap: 16px; margin: 36px 0; }
     }
 
     .demo-left {
@@ -488,13 +507,13 @@
             </div>
 
             <div style="margin-bottom: 14px;">
-              <label style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">REQUEST URI PATH</label>
-              <input type="text" id="demo-path" class="btn btn-secondary" style="width: 100%; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text;" value="/api/v1/auth/login">
+              <label for="demo-path" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">REQUEST URI PATH</label>
+              <input type="text" id="demo-path" aria-label="Target HTTP Route" class="btn btn-secondary" style="width: 100%; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text;" value="/api/v1/auth/login">
             </div>
 
             <div style="margin-bottom: 18px;">
-              <label style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">PAYLOAD BODY (JSON / FORM)</label>
-              <textarea id="demo-body" class="btn btn-secondary" style="width: 100%; height: 90px; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text; resize: vertical;">user=admin' OR '1'='1'--&pass=x</textarea>
+              <label for="demo-body" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">PAYLOAD BODY (JSON / FORM)</label>
+              <textarea id="demo-body" aria-label="Simulated Request Body Payload" class="btn btn-secondary" style="width: 100%; height: 90px; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text; resize: vertical;">user=admin' OR '1'='1'--&pass=x</textarea>
             </div>
 
             <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="runLiveInspection()">
@@ -647,17 +666,24 @@
       }
     }
 
+    function updateThemeBtnText(theme) {
+      const btn = document.getElementById("theme-btn");
+      if (btn) btn.innerHTML = theme === "light" ? "🌾 DARK CREAM" : "🌙 OBSIDIAN";
+    }
+
     function toggleLandingTheme() {
       const html = document.documentElement;
       const current = html.getAttribute("data-theme") || "dark";
       const next = current === "dark" ? "light" : "dark";
       html.setAttribute("data-theme", next);
       localStorage.setItem("sg_theme", next);
+      updateThemeBtnText(next);
     }
 
     // Restore theme preference
     const savedTheme = localStorage.getItem("sg_theme") || "dark";
     document.documentElement.setAttribute("data-theme", savedTheme);
+    updateThemeBtnText(savedTheme);
   </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SentinelGrid // Security Operations Authentication</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,24 +45,24 @@
     }
 
     :root[data-theme="light"] {
-      /* Developer Precision Light Palette (Cloudflare / Linear Light) */
-      --canvas-bg: #F6F8FA;
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --surface-elevated: #F3F4F6;
-      --border-subtle: #D0D7DE;
-      --border-hover: #0969DA;
-      --accent-cyan: #0969DA;
-      --accent-soft: #DDF4FF;
-      --text-primary: #1F2328;
-      --text-muted: #636C76;
-      --text-subtle: #9198A1;
-      --terracotta: #CF222E;
-      --sage-green: #1A7F37;
-      --warm-ochre: #9A6700;
+      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
+      --canvas-bg: #F5EFEB;
+      --card-bg: rgba(250, 247, 242, 0.94);
+      --surface-elevated: #EBE3D5;
+      --border-subtle: #D8CEBE;
+      --border-hover: #1D4ED8;
+      --accent-cyan: #1D4ED8;
+      --accent-soft: rgba(29, 78, 216, 0.12);
+      --text-primary: #241D17;
+      --text-muted: #655A4E;
+      --text-subtle: #716558;
+      --terracotta: #B91C1C;
+      --sage-green: #166534;
+      --warm-ochre: #9A3412;
       --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-      --shadow-sm: 0 1px 3px rgba(27, 31, 36, 0.06);
-      --shadow-md: 0 6px 18px rgba(27, 31, 36, 0.08);
-      --shadow-lg: 0 20px 48px rgba(27, 31, 36, 0.12);
+      --shadow-sm: 0 1px 3px rgba(44, 36, 29, 0.05);
+      --shadow-md: 0 4px 16px -2px rgba(44, 36, 29, 0.08);
+      --shadow-lg: 0 16px 40px -6px rgba(44, 36, 29, 0.14);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -294,6 +294,13 @@
       color: var(--accent-cyan);
     }
 
+    @media (max-width: 480px) {
+      .login-container { padding: 12px; }
+      .login-card { padding: 26px 20px !important; border-radius: var(--radius-lg) !important; }
+      .theme-toggle-corner { top: 12px; right: 12px; }
+      .role-pill { font-size: 9px; padding: 6px 4px; }
+    }
+
     /* Top Corner Theme Switcher */
     .theme-toggle-corner {
       position: absolute;
@@ -350,17 +357,17 @@
       <!-- Login Form -->
       <form onsubmit="handleLoginSubmit(event)">
         <div class="form-group stagger-3">
-          <label class="form-label">Operator Email</label>
+          <label for="emailInput" class="form-label">Operator Email</label>
           <div class="input-wrapper">
             <input type="email" id="emailInput" class="form-input" value="anupdhokiya0@gmail.com" required autocomplete="username">
           </div>
         </div>
 
         <div class="form-group stagger-3">
-          <label class="form-label">Passphrase / Master Key</label>
+          <label for="passwordInput" class="form-label">Passphrase / Master Key</label>
           <div class="input-wrapper">
             <input type="password" id="passwordInput" class="form-input" value="admin123" required autocomplete="current-password">
-            <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility()">👁️</button>
+            <button type="button" class="toggle-pwd-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility()">👁️</button>
           </div>
         </div>
 
@@ -472,7 +479,7 @@
     }
     function updateThemeButton(theme) {
       const btn = document.getElementById("themeBtn");
-      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "☀️ ALABASTER";
+      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "🌾 DARK CREAM";
     }
     initTheme();
 

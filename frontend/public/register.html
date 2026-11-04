@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SentinelGrid // Create Operator Account & Select Role</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,24 +45,24 @@
     }
 
     :root[data-theme="light"] {
-      /* Developer Precision Light Palette (Cloudflare / Linear Light) */
-      --canvas-bg: #F6F8FA;
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --surface-elevated: #F3F4F6;
-      --border-subtle: #D0D7DE;
-      --border-hover: #0969DA;
-      --accent-cyan: #0969DA;
-      --accent-soft: #DDF4FF;
-      --text-primary: #1F2328;
-      --text-muted: #636C76;
-      --text-subtle: #9198A1;
-      --terracotta: #CF222E;
-      --sage-green: #1A7F37;
-      --warm-ochre: #9A6700;
+      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
+      --canvas-bg: #F5EFEB;
+      --card-bg: rgba(250, 247, 242, 0.94);
+      --surface-elevated: #EBE3D5;
+      --border-subtle: #D8CEBE;
+      --border-hover: #1D4ED8;
+      --accent-cyan: #1D4ED8;
+      --accent-soft: rgba(29, 78, 216, 0.12);
+      --text-primary: #241D17;
+      --text-muted: #655A4E;
+      --text-subtle: #716558;
+      --terracotta: #B91C1C;
+      --sage-green: #166534;
+      --warm-ochre: #9A3412;
       --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-      --shadow-sm: 0 1px 3px rgba(27, 31, 36, 0.06);
-      --shadow-md: 0 6px 18px rgba(27, 31, 36, 0.08);
-      --shadow-lg: 0 20px 48px rgba(27, 31, 36, 0.12);
+      --shadow-sm: 0 1px 3px rgba(44, 36, 29, 0.05);
+      --shadow-md: 0 4px 16px -2px rgba(44, 36, 29, 0.08);
+      --shadow-lg: 0 16px 40px -6px rgba(44, 36, 29, 0.14);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -197,8 +197,18 @@
       gap: 12px;
       margin-bottom: 24px;
     }
+    .form-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
     @media (max-width: 640px) {
       .role-grid { grid-template-columns: 1fr; }
+      .form-row-2col { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .register-card { padding: 24px 18px !important; border-radius: var(--radius-lg) !important; }
+      .theme-toggle-corner { top: 12px; right: 12px; }
     }
     .role-card {
       background: var(--surface-elevated);
@@ -307,19 +317,19 @@
     </div>
 
     <form onsubmit="handleRegister(event)">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+      <div class="form-row-2col">
         <div class="form-group">
-          <label class="form-label">Full Name</label>
+          <label for="reg-name" class="form-label">Full Name</label>
           <input type="text" id="reg-name" class="form-input" placeholder="e.g. Maya Lin" required autocomplete="name">
         </div>
         <div class="form-group">
-          <label class="form-label">Work Email</label>
+          <label for="reg-email" class="form-label">Work Email</label>
           <input type="email" id="reg-email" class="form-input" placeholder="operator@organization.com" required autocomplete="email">
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Password (Min 6 Characters)</label>
+        <label for="reg-pwd" class="form-label">Password (Min 6 Characters)</label>
         <input type="password" id="reg-pwd" class="form-input" placeholder="••••••••••••" minlength="6" required autocomplete="new-password">
       </div>
 
@@ -453,7 +463,7 @@
     }
     function updateThemeButton(theme) {
       const btn = document.getElementById("themeBtn");
-      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "☀️ ALABASTER";
+      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "🌾 DARK CREAM";
     }
     initTheme();
 

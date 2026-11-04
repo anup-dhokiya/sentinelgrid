@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SentinelGrid // Enterprise WAAP Operations & Threat Control Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,37 +58,37 @@
     }
 
     :root[data-theme="light"] {
-      /* Next-Gen Developer Precision Clean Light Palette (Cloudflare / Linear Light) */
-      --canvas-bg: #F8FAFC;
-      --card-white: #FFFFFF;
-      --card-elevated: #F1F5F9;
-      --sand-warm: #F1F5F9;
-      --sand-warm-hover: #E2E8F0;
-      --stone-border: #E2E8F0;
-      --stone-border-light: #EDF2F7;
-      --border-accent: rgba(2, 132, 199, 0.3);
+      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
+      --canvas-bg: #F5EFEB;
+      --card-white: #FAF7F2;
+      --card-elevated: #EFE8DC;
+      --sand-warm: #EBE3D5;
+      --sand-warm-hover: #DFD5C3;
+      --stone-border: #D8CEBE;
+      --stone-border-light: #E7DFD2;
+      --border-accent: rgba(29, 78, 216, 0.35);
       
-      --terracotta: #DC2626;
-      --terracotta-soft: rgba(220, 38, 38, 0.08);
-      --terracotta-border: rgba(220, 38, 38, 0.2);
-      --sage-green: #16A34A;
-      --sage-soft: rgba(22, 163, 74, 0.08);
-      --sage-border: rgba(22, 163, 74, 0.2);
-      --deep-indigo: #0284C7;
-      --indigo-soft: rgba(2, 132, 199, 0.08);
-      --indigo-border: rgba(2, 132, 199, 0.2);
-      --warm-ochre: #D97706;
-      --ochre-soft: rgba(217, 119, 6, 0.08);
-      --ochre-border: rgba(217, 119, 6, 0.2);
+      --terracotta: #B91C1C;
+      --terracotta-soft: rgba(185, 28, 28, 0.09);
+      --terracotta-border: rgba(185, 28, 28, 0.25);
+      --sage-green: #166534;
+      --sage-soft: rgba(22, 101, 52, 0.09);
+      --sage-border: rgba(22, 101, 52, 0.25);
+      --deep-indigo: #1D4ED8;
+      --indigo-soft: rgba(29, 78, 216, 0.09);
+      --indigo-border: rgba(29, 78, 216, 0.25);
+      --warm-ochre: #9A3412;
+      --ochre-soft: rgba(154, 52, 18, 0.09);
+      --ochre-border: rgba(154, 52, 18, 0.25);
       
-      --text-charcoal: #0F172A;
-      --text-muted: #64748B;
-      --text-subtle: #94A3B8;
+      --text-charcoal: #241D17;
+      --text-muted: #655A4E;
+      --text-subtle: #716558;
       
-      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
-      --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-      --shadow-lg: 0 16px 40px -6px rgba(15, 23, 42, 0.12), 0 6px 16px -2px rgba(15, 23, 42, 0.06);
-      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+      --shadow-sm: 0 1px 3px rgba(44, 36, 29, 0.05), 0 1px 2px rgba(44, 36, 29, 0.03);
+      --shadow-md: 0 4px 16px -2px rgba(44, 36, 29, 0.08), 0 2px 6px -1px rgba(44, 36, 29, 0.04);
+      --shadow-lg: 0 16px 40px -6px rgba(44, 36, 29, 0.12), 0 6px 16px -2px rgba(44, 36, 29, 0.06);
+      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
       --glass-blur: blur(16px) saturate(180%);
     }
 
@@ -405,6 +405,57 @@
       display: block;
     }
 
+    /* Screen Reader Only Utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* =========================================================================
+       RESPONSIVE WEB DESIGN (RWD) ARCHITECTURE
+       Breakpoints: Mobile (< 480px, < 768px), Tablet (768px - 1024px),
+       Desktop (1024px - 1440px), Large SOC Wallboard (> 1440px)
+       ========================================================================= */
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-md);
+    }
+
+    .chart-overview-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .integration-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    /* Tablet & Small Desktop (<= 1024px) */
+    @media (max-width: 1024px) {
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      .app-main {
+        padding: 20px 18px;
+      }
+    }
+
+    /* Mobile Landscape & Tablet Portrait (<= 900px) */
     @media (max-width: 900px) {
       .app-sidebar {
         position: fixed;
@@ -417,6 +468,86 @@
       }
       .app-sidebar.mobile-open {
         transform: translateX(0);
+      }
+      .chart-overview-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .integration-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Mobile Phablet & Phone (<= 768px) */
+    @media (max-width: 768px) {
+      .app-topbar {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+      #topbar-system-clock {
+        display: none !important;
+      }
+      .drawer-panel {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-radius: 0 !important;
+      }
+      .app-main {
+        padding: 14px 10px;
+      }
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-bar select,
+      .filter-bar input {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .modal-dialog {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        padding: 20px 16px !important;
+      }
+    }
+
+    /* Small Phone (<= 480px) */
+    @media (max-width: 480px) {
+      .metric-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .domain-cards-grid {
+        grid-template-columns: 1fr !important;
+      }
+      #notificationPopover {
+        position: fixed !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        top: 60px !important;
+      }
+      .btn {
+        min-height: 40px;
+      }
+      .topbar-brand-title {
+        display: none;
+      }
+    }
+
+    /* Ultra-Wide Wallboard Screens (>= 1600px) */
+    @media (min-width: 1600px) {
+      .content-wrapper {
+        max-width: 1840px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .metric-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 20px;
       }
     }
 
@@ -740,7 +871,7 @@
     /* Domain Cards Grid */
     .domain-cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
       gap: 18px;
       margin-bottom: 22px;
     }
@@ -1131,7 +1262,8 @@
       </header>
 
   <!-- Main View Router -->
-  <main class="app-main">
+  <main class="app-main" id="main-content">
+    <h1 class="sr-only">SentinelGrid SOC Operations Console</h1>
 
     <!-- ===================================================================== -->
     <!-- TAB 1: LIVE DASHBOARD -->
@@ -1238,7 +1370,7 @@
       </div>
 
       <!-- NEW: Visual SOC Intelligence Widgets Row -->
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-bottom: 22px;">
+      <div class="chart-overview-grid">
         <!-- Real-Time Traffic Velocity Histogram (SVG Dual-Series) -->
         <div class="panel" style="margin-bottom: 0;">
           <div class="panel-header">
@@ -1302,23 +1434,25 @@
           </div>
         </div>
 
-        <table class="table-clean">
-          <thead>
-            <tr>
-              <th>Timestamp (Accurate)</th>
-              <th>Protected Site</th>
-              <th>Client IP</th>
-              <th>Method & URI</th>
-              <th>Risk Score</th>
-              <th>Verdict</th>
-              <th>Detection Signature</th>
-              <th>Forensics</th>
-            </tr>
-          </thead>
-          <tbody id="telemetry-body">
-            <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">Connecting to SentinelGrid WAAP Telemetry stream...</td></tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table-clean">
+            <thead>
+              <tr>
+                <th>Timestamp (Accurate)</th>
+                <th>Protected Site</th>
+                <th>Client IP</th>
+                <th>Method & URI</th>
+                <th>Risk Score</th>
+                <th>Verdict</th>
+                <th>Detection Signature</th>
+                <th>Forensics</th>
+              </tr>
+            </thead>
+            <tbody id="telemetry-body">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">Connecting to SentinelGrid WAAP Telemetry stream...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -1347,7 +1481,7 @@
       </div>
 
       <div class="panel" style="padding: 0; overflow: hidden;">
-        <div style="max-height: 72vh; overflow-y: auto;">
+        <div class="table-responsive" style="max-height: 72vh; overflow-y: auto;">
           <table class="table-clean">
             <thead>
               <tr>
@@ -1419,24 +1553,26 @@
           <span>Protected Domain Fleet Directory</span>
           <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px;" onclick="loadDomains()">🔄 Reload Registry</button>
         </div>
-        <div class="panel-body">
-          <table class="table-clean">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Domain Hostname</th>
-                <th>Application Name</th>
-                <th>Documented Routes</th>
-                <th>Shadow APIs</th>
-                <th>Total Invocations</th>
-                <th>Registered Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="domains-table-body">
-              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading protected domain registry...</td></tr>
-            </tbody>
-          </table>
+        <div class="panel-body" style="padding: 0;">
+          <div class="table-responsive">
+            <table class="table-clean">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Domain Hostname</th>
+                  <th>Application Name</th>
+                  <th>Documented Routes</th>
+                  <th>Shadow APIs</th>
+                  <th>Total Invocations</th>
+                  <th>Registered Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="domains-table-body">
+                <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading protected domain registry...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -1466,21 +1602,23 @@
             </div>
           </div>
 
-          <table class="table-clean">
-            <thead>
-              <tr>
-                <th>Classification</th>
-                <th>Target Domain</th>
-                <th>HTTP Method</th>
-                <th>Route Path</th>
-                <th>Risk Severity</th>
-                <th>Last Observed (Accurate)</th>
-              </tr>
-            </thead>
-            <tbody id="endpoints-body">
-              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No endpoints cataloged yet. Paste your OpenAPI specification above or route traffic through SentinelGrid.</td></tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table-clean">
+              <thead>
+                <tr>
+                  <th>Classification</th>
+                  <th>Target Domain</th>
+                  <th>HTTP Method</th>
+                  <th>Route Path</th>
+                  <th>Risk Severity</th>
+                  <th>Last Observed (Accurate)</th>
+                </tr>
+              </thead>
+              <tbody id="endpoints-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No endpoints cataloged yet. Paste your OpenAPI specification above or route traffic through SentinelGrid.</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -1520,20 +1658,22 @@
             </div>
           </div>
 
-          <table class="table-clean">
-            <thead>
-              <tr>
-                <th>Action</th>
-                <th>IP / CIDR Pattern</th>
-                <th>Description</th>
-                <th>Created At (Accurate)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="iprules-table-body">
-              <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No IP access rules configured. Click '+ Add IP Rule' above.</td></tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table-clean">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>IP / CIDR Pattern</th>
+                  <th>Description</th>
+                  <th>Created At (Accurate)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="iprules-table-body">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No IP access rules configured. Click '+ Add IP Rule' above.</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -1547,22 +1687,24 @@
           <span>Active Edge Gateways & In-Line Observation Nodes</span>
           <button class="btn btn-primary" onclick="loadConnectors()">Refresh Fleet Status</button>
         </div>
-        <div class="panel-body">
-          <table class="table-clean">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Gateway Node Name</th>
-                <th>Type</th>
-                <th>Associated Domain</th>
-                <th>Inspection Latency</th>
-                <th>Last Heartbeat (Accurate)</th>
-              </tr>
-            </thead>
-            <tbody id="connectors-table-body">
-              <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading connected edge gateway nodes...</td></tr>
-            </tbody>
-          </table>
+        <div class="panel-body" style="padding: 0;">
+          <div class="table-responsive">
+            <table class="table-clean">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Gateway Node Name</th>
+                  <th>Type</th>
+                  <th>Associated Domain</th>
+                  <th>Inspection Latency</th>
+                  <th>Last Heartbeat (Accurate)</th>
+                </tr>
+              </thead>
+              <tbody id="connectors-table-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading connected edge gateway nodes...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -1654,7 +1796,7 @@
             SentinelGrid inspects requests in-line with a <strong>&lt; 0.4ms latency budget</strong>. Connect any site via Nginx Reverse Proxy, Python ASGI Middleware, Node.js Express, or Go reverse proxy.
           </p>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
+          <div class="integration-grid">
             <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border-light);">
               <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option A: Nginx Reverse Proxy</h4>
               <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Use <code>auth_request</code> or <code>proxy_pass</code> to validate requests before passing to upstream.</p>
@@ -2949,7 +3091,7 @@ app.add_middleware(
       const btn = document.getElementById("theme-toggle-btn");
       if (currentTheme === "light") {
         document.documentElement.setAttribute("data-theme", "light");
-        if (btn) btn.innerHTML = "☀️ Theme: LIGHT";
+        if (btn) btn.innerHTML = "🌾 Theme: DARK CREAM";
       } else {
         document.documentElement.removeAttribute("data-theme");
         if (btn) btn.innerHTML = "🌙 Theme: OBSIDIAN";
@@ -2965,6 +3107,14 @@ app.add_middleware(
     // Tab Navigation Controller (with URL Hash & LocalStorage Sync)
     // -------------------------------------------------------------------------
     function switchTab(tabId, updateUrl = true) {
+      // Auto-dismiss off-canvas sidebar on mobile navigation
+      if (window.innerWidth <= 900) {
+        const sidebar = document.getElementById("appSidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        if (sidebar) sidebar.classList.remove("mobile-open");
+        if (backdrop) backdrop.classList.remove("active");
+      }
+
       document.querySelectorAll(".view-section").forEach(el => el.classList.remove("active"));
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
 
