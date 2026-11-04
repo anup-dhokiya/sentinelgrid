@@ -390,6 +390,10 @@
           <span>🔒 Authenticate & Enter SOC</span>
         </button>
 
+        <button type="button" id="quickMasterBtn" onclick="quickFillMaster()" style="width: 100%; margin-top: 12px; padding: 11px; background: rgba(56, 189, 248, 0.12); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: var(--radius-md); color: var(--accent-cyan); font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;" class="stagger-4">
+          ⚡ Instant Master Access (a@123 / anup@5212)
+        </button>
+
         <div style="text-align: center; margin-top: 18px; font-size: 12px; color: var(--text-muted);" class="stagger-4">
           Need an operator account? <a href="register.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Create Account & Select Role →</a>
         </div>
@@ -510,6 +514,12 @@
     function togglePasswordVisibility() {
       const pwd = document.getElementById("passwordInput");
       pwd.type = pwd.type === "password" ? "text" : "password";
+    }
+
+    function quickFillMaster() {
+      document.getElementById("emailInput").value = "a@123";
+      document.getElementById("passwordInput").value = "anup@5212";
+      document.querySelector("form").dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
     }
 
     // -------------------------------------------------------------------------
