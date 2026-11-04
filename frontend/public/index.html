@@ -4582,14 +4582,21 @@ app.add_middleware(
       try {
         const res = await fetch(`${API}/inspect`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "X-SentinelGrid-Sandbox": "true"
+          },
           body: JSON.stringify({
-            client_ip: "127.0.0.1",
+            client_ip: "sandbox-client",
             method: method,
             path: path,
             query: method === "GET" ? payload : "",
             body: method === "POST" ? payload : "",
-            headers: { "Host": "aegis-pro.security.internal", "User-Agent": "SentinelGrid-Sandbox/2.4" }
+            headers: { 
+              "Host": "aegis-pro.security.internal", 
+              "User-Agent": "SentinelGrid-Sandbox/2.4",
+              "X-SentinelGrid-Sandbox": "true"
+            }
           })
         });
         const d = await res.json();

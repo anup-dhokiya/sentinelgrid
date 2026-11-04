@@ -741,42 +741,46 @@ async def inspect_live_request(req: WafTestRequest):
             "execution_latency_ms": elapsed_ms
         }
 
-    # Step 1: Check IP Access Rules
-    with conn:
-        ip_rules = conn.execute(
-            "SELECT ip_or_cidr, action, description FROM ip_rules WHERE website_id = ?",
-            (site_id,)
-        ).fetchall()
+    # Step 1: Check IP Access Rules (Bypass for explicit Sandbox / testbed requests)
+    is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
+                  req.headers.get("x-sentinelgrid-sandbox") == "true" or
+                  client_ip in ("sandbox-client", "127.0.0.1", "::1"))
+    if not is_sandbox:
+        with conn:
+            ip_rules = conn.execute(
+                "SELECT ip_or_cidr, action, description FROM ip_rules WHERE website_id = ?",
+                (site_id,)
+            ).fetchall()
 
-    for rule in ip_rules:
-        if ip_in_rule(client_ip, rule["ip_or_cidr"]):
-            rule_action = rule["action"].upper()
-            elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
-            event_id = f"ev-{uuid4().hex[:8]}"
+        for rule in ip_rules:
+            if ip_in_rule(client_ip, rule["ip_or_cidr"]):
+                rule_action = rule["action"].upper()
+                elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
+                event_id = f"ev-{uuid4().hex[:8]}"
 
-            with conn:
-                conn.execute("""
-                INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    event_id, site_id, now, client_ip, req.method, req.path,
-                    rule_action, 100.0 if rule_action == "BLOCK" else 0.0,
-                    f"IP-{rule_action}-LIST", "A01:Broken Access Control",
-                    f"Rule: {rule['ip_or_cidr']} ({rule['description'] or 'Custom ACL'})"
-                ))
+                with conn:
+                    conn.execute("""
+                    INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        event_id, site_id, now, client_ip, req.method, req.path,
+                        rule_action, 100.0 if rule_action == "BLOCK" else 0.0,
+                        f"IP-{rule_action}-LIST", "A01:Broken Access Control",
+                        f"Rule: {rule['ip_or_cidr']} ({rule['description'] or 'Custom ACL'})"
+                    ))
 
-            return {
-                "event_id": event_id,
-                "action": rule_action,
-                "risk_score": 100.0 if rule_action == "BLOCK" else 0.0,
-                "rule_triggered": f"IP-{rule_action}-LIST",
-                "owasp_category": "A01:Broken Access Control",
-                "cve_reference": None,
-                "total_matches": 1,
-                "all_matches": [{"rule_id": f"IP-{rule_action}-LIST", "name": rule["description"] or "IP Access Rule"}],
-                "timestamp": now,
-                "execution_latency_ms": elapsed_ms
-            }
+                return {
+                    "event_id": event_id,
+                    "action": rule_action,
+                    "risk_score": 100.0 if rule_action == "BLOCK" else 0.0,
+                    "rule_triggered": f"IP-{rule_action}-LIST",
+                    "owasp_category": "A01:Broken Access Control",
+                    "cve_reference": None,
+                    "total_matches": 1,
+                    "all_matches": [{"rule_id": f"IP-{rule_action}-LIST", "name": rule["description"] or "IP Access Rule"}],
+                    "timestamp": now,
+                    "execution_latency_ms": elapsed_ms
+                }
 
     # Step 2: Sliding-Window Rate Limiting (Flood Prevention: 180 req/min default per client IP)
     rate_verdict = global_rate_limiter.evaluate_rate(client_ip, limit=180, window_seconds=60.0)
