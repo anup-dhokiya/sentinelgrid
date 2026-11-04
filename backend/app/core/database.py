@@ -206,5 +206,38 @@ def init_database():
         else:
             cur.execute("UPDATE websites SET domain = 'aegispro.vercel.app' WHERE id = 'site-agispro'")
 
+        # Seed baseline online connectors if empty
+        cur.execute("SELECT count(*) FROM connectors")
+        if cur.fetchone()[0] == 0:
+            cur.execute("""
+            INSERT INTO connectors (id, website_id, name, connector_type, status, last_heartbeat, latency_ms)
+            VALUES 
+            ('conn-edge-vercel', 'site-agispro', 'Vercel Global Edge Interceptor (Anycast)', 'edge-middleware', 'online', ?, 0.18),
+            ('conn-cloud-waap', 'site-agispro', 'SentinelGrid NextGen WAAP Core', 'python-asgi-serverless', 'online', ?, 0.32)
+            """, (now, now))
+
+        # Seed documented and shadow API endpoints if empty
+        cur.execute("SELECT count(*) FROM api_endpoints")
+        if cur.fetchone()[0] == 0:
+            cur.execute("""
+            INSERT INTO api_endpoints (id, website_id, path, method, status, risk_level, last_seen)
+            VALUES
+            ('ep-root', 'site-agispro', '/', 'GET', 'documented', 'LOW', ?),
+            ('ep-login', 'site-agispro', '/login', 'POST', 'documented', 'MEDIUM', ?),
+            ('ep-dashboard', 'site-agispro', '/dashboard', 'GET', 'documented', 'LOW', ?),
+            ('ep-google-auth', 'site-agispro', '/api/auth/google', 'POST', 'shadow', 'MEDIUM', ?),
+            ('ep-inspect', 'site-agispro', '/v1/inspect', 'POST', 'documented', 'LOW', ?)
+            """, (now, now, now, now, now))
+
+        # Seed initial IP rules if empty
+        cur.execute("SELECT count(*) FROM ip_rules")
+        if cur.fetchone()[0] == 0:
+            cur.execute("""
+            INSERT INTO ip_rules (id, website_id, ip_or_cidr, action, description, created_at)
+            VALUES
+            ('rule-scanner-quarantine', 'site-agispro', '198.51.100.42', 'BLOCK', 'Known Automated Vulnerability Scanner', ?),
+            ('rule-trusted-noc', 'site-agispro', '10.0.0.0/8', 'ALLOW', 'Internal Trusted Operations Subnet', ?)
+            """, (now, now))
+
 
 init_database()
