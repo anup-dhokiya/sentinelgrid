@@ -10,7 +10,8 @@ backend/sentinelgrid.db
 shared/
 references/
 plans/
-docs/
+/docs/
+!frontend/public/docs/
 infrastructure/
 security-tests/
 connectors/
