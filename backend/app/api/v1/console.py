@@ -11,7 +11,7 @@ Enterprise-grade WAAP Control Plane:
 
 from typing import List, Dict, Any, Optional, Union
 from uuid import uuid4
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
 import time
 import threading
@@ -19,7 +19,10 @@ import ipaddress
 import sqlite3
 import yaml
 import asyncio
+import logging
 from fastapi import APIRouter, HTTPException, status, Query, Request
+
+logger = logging.getLogger("sentinelgrid.console")
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -161,6 +164,18 @@ async def get_overview(website_id: Optional[str] = None):
         where_site = "WHERE website_id = ?" if (website_id and website_id != "ALL") else "WHERE 1=1"
         site_params = [website_id] if (website_id and website_id != "ALL") else []
 
+        # 24-Hour Rolling Retention Policy:
+        # Prunes routine clean requests older than 24 hours.
+        # PERMANENTLY preserves ALL BLOCK events, attack incidents, and quarantined/blocked IPs.
+        try:
+            twenty_four_hours_ago = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+            conn.execute(
+                "DELETE FROM security_events WHERE action != 'BLOCK' AND timestamp < ?",
+                (twenty_four_hours_ago,)
+            )
+        except Exception as e:
+            logger.warning(f"24-hour retention prune error: {e}")
+
         if website_id and website_id != "ALL":
             endpoints_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ?", (website_id,)).fetchone()[0]
             shadow_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ? AND status='shadow'", (website_id,)).fetchone()[0]
@@ -168,7 +183,7 @@ async def get_overview(website_id: Optional[str] = None):
             blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE website_id = ? AND action='BLOCK'", (website_id,)).fetchone()[0]
             recent_events = [
                 dict(row) for row in conn.execute(
-                    "SELECT * FROM security_events WHERE website_id = ? ORDER BY timestamp DESC LIMIT 50", (website_id,)
+                    "SELECT * FROM security_events WHERE website_id = ? ORDER BY timestamp DESC LIMIT 1000", (website_id,)
                 ).fetchall()
             ]
         else:
@@ -178,7 +193,7 @@ async def get_overview(website_id: Optional[str] = None):
             blocked_count = conn.execute("SELECT COUNT(*) FROM security_events WHERE action='BLOCK'").fetchone()[0]
             recent_events = [
                 dict(row) for row in conn.execute(
-                    "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 50"
+                    "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 1000"
                 ).fetchall()
             ]
 
@@ -695,6 +710,10 @@ async def inspect_live_request(req: WafTestRequest):
     now = datetime.now(timezone.utc).isoformat()
     client_ip = req.client_ip or "127.0.0.1"
 
+    # Clean and full request URI path resolution
+    base_path = req.path or "/"
+    full_path = f"{base_path}?{req.query_params}" if req.query_params else base_path
+
     is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
                   req.headers.get("x-sentinelgrid-sandbox") == "true" or
                   client_ip in ("sandbox-client", "127.0.0.1", "::1", "browser-client"))
@@ -711,7 +730,7 @@ async def inspect_live_request(req: WafTestRequest):
                 INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    event_id, site_id, now, client_ip, req.method, req.path,
+                    event_id, site_id, now, client_ip, req.method, full_path,
                     "BLOCK", 100.0, "AUTONOMOUS-IP-QUARANTINE", "A01:Broken Access Control",
                     f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)"
                 ))
@@ -722,7 +741,7 @@ async def inspect_live_request(req: WafTestRequest):
                 "timestamp": now,
                 "client_ip": client_ip,
                 "method": req.method,
-                "path": req.path,
+                "path": full_path,
                 "action": "BLOCK",
                 "risk_score": 100.0,
                 "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
@@ -768,7 +787,7 @@ async def inspect_live_request(req: WafTestRequest):
                     INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
-                        event_id, site_id, now, client_ip, req.method, req.path,
+                        event_id, site_id, now, client_ip, req.method, full_path,
                         rule_action, 100.0 if rule_action == "BLOCK" else 0.0,
                         f"IP-{rule_action}-LIST", "A01:Broken Access Control",
                         f"Rule: {rule['ip_or_cidr']} ({rule['description'] or 'Custom ACL'})"
@@ -800,7 +819,7 @@ async def inspect_live_request(req: WafTestRequest):
                 INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    event_id, site_id, now, client_ip, req.method, req.path,
+                    event_id, site_id, now, client_ip, req.method, full_path,
                     "BLOCK", 90.0, "RATE-LIMIT-FLOOD-EXCEEDED", "A04:Rate Limiting & Abuse",
                     f"Rate exceeded: {rate_verdict.get('current_count', 0)} reqs in 60s"
                 ))
@@ -881,14 +900,24 @@ async def inspect_live_request(req: WafTestRequest):
     event_id = f"ev-{uuid4().hex[:8]}"
     elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
+    details_meta = json.dumps({
+        "uri": full_path,
+        "query": req.query_params or "",
+        "user_agent": req.headers.get("user-agent", "Unknown")[:120],
+        "host": req.headers.get("host", site_id),
+        "payload_snippet": (req.body or "")[:150],
+        "cve": cve_ref or "N/A",
+        "latency_ms": elapsed_ms,
+        "action": action
+    })
+
     with conn:
         conn.execute("""
         INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            event_id, site_id, now, client_ip, req.method, req.path,
-            action, risk_score, rule_id, owasp,
-            f"CVE: {cve_ref or 'N/A'} | Headers: {req.headers.get('user-agent', 'None')[:60]} | Payload: {req.body[:80]}"
+            event_id, site_id, now, client_ip, req.method, full_path,
+            action, risk_score, rule_id, owasp, details_meta
         ))
 
     event_payload = {
@@ -897,12 +926,12 @@ async def inspect_live_request(req: WafTestRequest):
         "timestamp": now,
         "client_ip": client_ip,
         "method": req.method,
-        "path": req.path,
+        "path": full_path,
         "action": action,
         "risk_score": risk_score,
         "rule_triggered": rule_id,
         "owasp_category": owasp,
-        "details": f"CVE: {cve_ref or 'N/A'} | Payload: {req.body[:80]}",
+        "details": details_meta,
         "latency_ms": elapsed_ms
     }
     broadcast_sse_event(event_payload)
@@ -1156,6 +1185,27 @@ async def execute_quick_ip_action(req: QuickIpActionRequest):
 # -----------------------------------------------------------------------------
 # Security Events SIEM Export & Live Analytics
 # -----------------------------------------------------------------------------
+
+@router.get("/events/history-24h")
+async def get_24h_history(website_id: Optional[str] = None):
+    """
+    Fetches all requests and security events recorded in the last 24 hours
+    for offline IndexedDB client-side container storage and non-volatile inspection.
+    """
+    conn = get_db_connection()
+    with conn:
+        twenty_four_hours_ago = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+        if website_id and website_id != "ALL":
+            rows = conn.execute(
+                "SELECT * FROM security_events WHERE website_id = ? AND timestamp >= ? ORDER BY timestamp DESC LIMIT 5000",
+                (website_id, twenty_four_hours_ago)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM security_events WHERE timestamp >= ? ORDER BY timestamp DESC LIMIT 5000",
+                (twenty_four_hours_ago,)
+            ).fetchall()
+    return {"count": len(rows), "events": [dict(r) for r in rows]}
 
 @router.get("/events")
 async def list_events(

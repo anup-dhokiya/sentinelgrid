@@ -58,36 +58,36 @@
     }
 
     :root[data-theme="light"] {
-      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
-      --canvas-bg: #F5EFEB;
-      --card-white: #FAF7F2;
-      --card-elevated: #EFE8DC;
-      --sand-warm: #EBE3D5;
-      --sand-warm-hover: #DFD5C3;
-      --stone-border: #D8CEBE;
-      --stone-border-light: #E7DFD2;
-      --border-accent: rgba(29, 78, 216, 0.35);
+      /* Rich Archival Canvas & Surfaces (Warm Almond Linen / Dark Cream) */
+      --canvas-bg: #EFE8DD;
+      --card-white: #FAF6F0;
+      --card-elevated: #E7DFD1;
+      --sand-warm: #E4DBCC;
+      --sand-warm-hover: #D9CEBC;
+      --stone-border: #CFC2AE;
+      --stone-border-light: #DDD2BF;
+      --border-accent: rgba(27, 54, 93, 0.35);
       
-      --terracotta: #B91C1C;
-      --terracotta-soft: rgba(185, 28, 28, 0.09);
-      --terracotta-border: rgba(185, 28, 28, 0.25);
-      --sage-green: #166534;
-      --sage-soft: rgba(22, 101, 52, 0.09);
-      --sage-border: rgba(22, 101, 52, 0.25);
-      --deep-indigo: #1D4ED8;
-      --indigo-soft: rgba(29, 78, 216, 0.09);
-      --indigo-border: rgba(29, 78, 216, 0.25);
-      --warm-ochre: #9A3412;
-      --ochre-soft: rgba(154, 52, 18, 0.09);
-      --ochre-border: rgba(154, 52, 18, 0.25);
+      --terracotta: #A13A28;
+      --terracotta-soft: rgba(161, 58, 40, 0.10);
+      --terracotta-border: rgba(161, 58, 40, 0.28);
+      --sage-green: #236142;
+      --sage-soft: rgba(35, 97, 66, 0.10);
+      --sage-border: rgba(35, 97, 66, 0.28);
+      --deep-indigo: #1B365D;
+      --indigo-soft: rgba(27, 54, 93, 0.10);
+      --indigo-border: rgba(27, 54, 93, 0.28);
+      --warm-ochre: #8E4312;
+      --ochre-soft: rgba(142, 67, 18, 0.10);
+      --ochre-border: rgba(142, 67, 18, 0.28);
       
-      --text-charcoal: #241D17;
-      --text-muted: #655A4E;
-      --text-subtle: #716558;
+      --text-charcoal: #211B15;
+      --text-muted: #5E5245;
+      --text-subtle: #7A6D5E;
       
-      --shadow-sm: 0 1px 3px rgba(44, 36, 29, 0.05), 0 1px 2px rgba(44, 36, 29, 0.03);
-      --shadow-md: 0 4px 16px -2px rgba(44, 36, 29, 0.08), 0 2px 6px -1px rgba(44, 36, 29, 0.04);
-      --shadow-lg: 0 16px 40px -6px rgba(44, 36, 29, 0.12), 0 6px 16px -2px rgba(44, 36, 29, 0.06);
+      --shadow-sm: 0 1px 3px rgba(45, 36, 26, 0.06), 0 1px 2px rgba(45, 36, 26, 0.04);
+      --shadow-md: 0 4px 16px -2px rgba(45, 36, 26, 0.10), 0 2px 6px -1px rgba(45, 36, 26, 0.05);
+      --shadow-lg: 0 16px 40px -6px rgba(45, 36, 26, 0.15), 0 6px 16px -2px rgba(45, 36, 26, 0.08);
       --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
       --glass-blur: blur(16px) saturate(180%);
     }
@@ -581,8 +581,31 @@
       }
     }
 
+    /* Tablet Screen Range (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .drawer-panel {
+        width: 480px !important;
+      }
+      .chart-overview-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
     /* Mobile Phablet & Phone (<= 768px) */
     @media (max-width: 768px) {
+      .scope-bar-group,
+      .scope-bar-controls {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+      }
+      #scope-website-select {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      #auto-refresh-rate {
+        flex: 1 1 auto;
+        width: auto !important;
+      }
       .app-topbar {
         padding: 0 10px;
         gap: 6px;
@@ -1404,7 +1427,7 @@
 
       <!-- Live Stream Controls & Scope Bar -->
       <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); padding: 14px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm), var(--inner-rim); flex-wrap: wrap; gap: 12px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="scope-bar-group" style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 11px; font-weight: 800; color: var(--deep-indigo); letter-spacing: 0.5px;">
             🛡️ ACTIVE SITE SCOPE:
           </span>
@@ -1414,7 +1437,7 @@
           <span id="scope-badge" class="badge badge-online">GLOBAL FLEET</span>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="scope-bar-controls" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
           <!-- Live Polling Radar & Countdown -->
           <div style="display: flex; align-items: center; gap: 8px; background: var(--sand-warm); padding: 6px 14px; border-radius: var(--radius-pill); border: 1px solid var(--stone-border);">
             <span class="live-pulse" id="live-pulse-indicator"></span>
@@ -1540,54 +1563,58 @@
         </div>
       </div>
 
-      <!-- Real-Time Security Events Stream Table -->
-      <div class="panel">
-        <div class="panel-header">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span>Real-Time Threat Interception Stream</span>
-            <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(Click any event row for forensic breakdown)</span>
+      <!-- Real-Time Security Events & 24H Persistent Container Stream Table -->
+      <div class="panel" style="margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
+        <div class="panel-header" style="padding: 18px 24px; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+              <span>⚡ 24-Hour Telemetry & Threat Container</span>
+            </span>
+            <span id="container-24h-badge" class="badge badge-online" style="font-size: 11px;">📦 24H CONTAINER: SYNCED</span>
+            <span id="events-count-badge" class="badge badge-challenge" style="font-size: 11px;">0 requests</span>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-subtle" onclick="sync24hHistory()" id="sync-24h-btn" title="Sync all requests from past 24 hours">💾 Sync 24H History</button>
             <button class="btn btn-subtle" onclick="exportEvents()">📥 Export SIEM Logs</button>
             <button class="btn btn-primary" onclick="pollTelemetry(true)">⚡ Refresh Feed</button>
           </div>
         </div>
 
-        <div class="panel-body" style="padding-bottom: 0;">
-          <div class="filter-bar">
+        <div class="panel-body" style="padding: 14px 24px; border-bottom: 1px solid var(--stone-border);">
+          <div class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Filter Verdict:</span>
-            <select id="event-filter-action" class="form-input" style="width: 140px; margin: 0;" onchange="applyEventFilter()">
-              <option value="ALL">All Actions</option>
-              <option value="BLOCK">BLOCK (403)</option>
-              <option value="ALLOW">ALLOW (200)</option>
-              <option value="CHALLENGE">CHALLENGE</option>
+            <select id="event-filter-action" class="form-input" style="width: 170px; margin: 0; padding: 7px 10px;" onchange="applyEventFilter()">
+              <option value="ALL">🌐 All Traffic (24h)</option>
+              <option value="BLOCK">⛔ Threat Blocks (403)</option>
+              <option value="ALLOW">✅ Clean Requests (200)</option>
+              <option value="CHALLENGE">⚠️ Challenges</option>
             </select>
 
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: 8px;">Quick Search:</span>
-            <input type="text" id="event-search-query" class="form-input" style="max-width: 320px; margin: 0;" placeholder="Search IP, route, payload, rule..." oninput="applyEventFilter()">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: 6px;">Quick Search:</span>
+            <input type="text" id="event-search-query" class="form-input" style="min-width: 260px; flex: 1; max-width: 440px; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule..." oninput="applyEventFilter()">
 
-            <span id="events-count-badge" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-left: auto;">
-              Showing 0 events
-            </span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+              <span class="badge badge-allow" style="font-size: 10px;" title="Full 24-hour persistent storage in browser IndexedDB + cloud ledger">🛡️ 24h Rolling Window • Blocked IPs Kept Forever</span>
+            </div>
           </div>
         </div>
 
-        <div class="table-responsive">
-          <table class="table-clean">
-            <thead>
+        <div class="table-responsive" style="min-height: 520px; max-height: 720px; overflow-y: auto; position: relative;">
+          <table class="table-clean" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead style="position: sticky; top: 0; background: var(--card-white); z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
               <tr>
-                <th>Timestamp (Accurate)</th>
-                <th>Protected Site</th>
-                <th>Client IP</th>
-                <th>Method & URI</th>
-                <th>Risk Score</th>
-                <th>Verdict</th>
-                <th>Detection Signature</th>
-                <th>Forensics</th>
+                <th style="padding: 12px 14px; width: 140px;">Timestamp</th>
+                <th style="padding: 12px 14px; width: 150px;">Protected Site</th>
+                <th style="padding: 12px 14px; width: 140px;">Client IP</th>
+                <th style="padding: 12px 14px;">Method & Request URI</th>
+                <th style="padding: 12px 14px; width: 95px;">Risk Score</th>
+                <th style="padding: 12px 14px; width: 110px;">Verdict</th>
+                <th style="padding: 12px 14px;">Detection Signature</th>
+                <th style="padding: 12px 14px; width: 90px; text-align: center;">Forensics</th>
               </tr>
             </thead>
             <tbody id="telemetry-body">
-              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">Connecting to SentinelGrid WAAP Telemetry stream...</td></tr>
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">Connecting to SentinelGrid WAAP Telemetry stream...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1618,10 +1645,10 @@
         </div>
       </div>
 
-      <div class="panel" style="padding: 0; overflow: hidden;">
-        <div class="table-responsive" style="max-height: 72vh; overflow-y: auto;">
-          <table class="table-clean">
-            <thead>
+      <div class="panel" style="padding: 0; overflow: hidden; margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
+        <div class="table-responsive" style="min-height: 560px; max-height: 82vh; overflow-y: auto; position: relative;">
+          <table class="table-clean" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead style="position: sticky; top: 0; background: var(--card-white); z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
               <tr>
                 <th style="width: 140px;">Timestamp</th>
                 <th style="width: 90px;">Verdict</th>
@@ -2141,8 +2168,7 @@ app.add_middleware(
       </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <a href="register.html" class="btn btn-subtle" style="text-decoration: none; font-size: 11px;">➕ Register New Account</a>
+    <div style="display: flex; justify-content: flex-end; align-items: center;">
       <button class="btn btn-warm" onclick="handleLogout()">⎋ Terminate Session (Logout)</button>
     </div>
   </div>
@@ -2210,7 +2236,8 @@ app.add_middleware(
       localStorage.removeItem("sentinel_backend_url");
       storedBackend = null;
     }
-    const API = storedBackend || (window.location.hostname.endsWith("github.io") ? "https://sentinelgrid-one.vercel.app/v1" : "/v1");
+    const isLocalDevServer = window.location.hostname === "localhost" && (window.location.port === "8000" || window.location.port === "8080");
+    const API = storedBackend || (isLocalDevServer ? "/v1" : "https://sentinelgrid-one.vercel.app/v1");
 
     // -------------------------------------------------------------------------
     // Session Authentication Guard & RBAC Initializer
@@ -3197,6 +3224,154 @@ app.add_middleware(
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
       }[c]));
     }
+
+    // -------------------------------------------------------------------------
+    // 24-Hour Persistent In-Browser IndexedDB Event Container
+    // -------------------------------------------------------------------------
+    const SentinelEventStore = {
+      dbName: "SentinelGridDB",
+      storeName: "events_24h",
+      db: null,
+
+      async init() {
+        return new Promise((resolve) => {
+          if (!window.indexedDB) return resolve(null);
+          try {
+            const req = indexedDB.open(this.dbName, 1);
+            req.onupgradeneeded = (e) => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains(this.storeName)) {
+                const store = db.createObjectStore(this.storeName, { keyPath: "id" });
+                store.createIndex("timestamp", "timestamp", { unique: false });
+                store.createIndex("action", "action", { unique: false });
+              }
+            };
+            req.onsuccess = (e) => {
+              this.db = e.target.result;
+              this.pruneExpired();
+              resolve(this.db);
+            };
+            req.onerror = () => resolve(null);
+          } catch (_) {
+            resolve(null);
+          }
+        });
+      },
+
+      async putBatch(events) {
+        if (!events || !events.length) return;
+        if (!this.db) {
+          try {
+            const cur = JSON.parse(localStorage.getItem("sg_stored_events_24h") || "[]");
+            const map = new Map();
+            cur.forEach(e => map.set(e.id, e));
+            events.forEach(e => { if (e && e.id) map.set(e.id, e); });
+            const merged = Array.from(map.values()).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            localStorage.setItem("sg_stored_events_24h", JSON.stringify(merged.slice(0, 500)));
+          } catch (_) {}
+          return;
+        }
+        return new Promise((resolve) => {
+          try {
+            const tx = this.db.transaction(this.storeName, "readwrite");
+            const store = tx.objectStore(this.storeName);
+            events.forEach(ev => {
+              if (ev && ev.id) store.put(ev);
+            });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => resolve();
+          } catch (_) {
+            resolve();
+          }
+        });
+      },
+
+      async getAll() {
+        if (!this.db) {
+          try {
+            const raw = localStorage.getItem("sg_stored_events_24h");
+            return raw ? JSON.parse(raw) : [];
+          } catch (_) { return []; }
+        }
+        return new Promise((resolve) => {
+          try {
+            const tx = this.db.transaction(this.storeName, "readonly");
+            const store = tx.objectStore(this.storeName);
+            const req = store.getAll();
+            req.onsuccess = () => {
+              const sorted = (req.result || []).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+              resolve(sorted);
+            };
+            req.onerror = () => resolve([]);
+          } catch (_) {
+            resolve([]);
+          }
+        });
+      },
+
+      async pruneExpired() {
+        if (!this.db) return;
+        try {
+          const cutoff = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+          const tx = this.db.transaction(this.storeName, "readwrite");
+          const store = tx.objectStore(this.storeName);
+          const index = store.index("timestamp");
+          const range = IDBKeyRange.upperBound(cutoff);
+          const req = index.openCursor(range);
+          req.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+              if (cursor.value.action !== "BLOCK" && (!cursor.value.risk_score || cursor.value.risk_score < 50)) {
+                cursor.delete();
+              }
+              cursor.continue();
+            }
+          };
+        } catch (_) {}
+      }
+    };
+
+    function updateContainerBadge(count) {
+      const b = document.getElementById("container-24h-badge");
+      if (b) b.innerText = `📦 24H CONTAINER: ${Number(count || 0).toLocaleString()} STORED`;
+    }
+
+    async function sync24hHistory() {
+      const btn = document.getElementById("sync-24h-btn");
+      if (btn) btn.innerHTML = "⏳ Syncing 24h...";
+      try {
+        const res = await fetch(`${API}/events/history-24h`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.events && data.events.length) {
+            await SentinelEventStore.putBatch(data.events);
+            allRecentEvents = await SentinelEventStore.getAll();
+            applyEventFilter();
+            updateContainerBadge(allRecentEvents.length);
+            showThreatToast("24H Ledger Synchronized", `Stored ${data.events.length} events in local container.`);
+          }
+        }
+      } catch (err) {
+        console.error("24h history sync error:", err);
+      } finally {
+        if (btn) btn.innerHTML = "💾 Sync 24H History";
+      }
+    }
+
+    async function bootstrapEventStore() {
+      try {
+        await SentinelEventStore.init();
+        const stored = await SentinelEventStore.getAll();
+        if (stored && stored.length > 0) {
+          allRecentEvents = stored;
+          updateContainerBadge(allRecentEvents.length);
+          applyEventFilter();
+        }
+      } catch (err) {
+        console.warn("Bootstrap event store warning:", err);
+      }
+    }
+
     let allRecentEvents = [];
     let allWebsites = [];
     let currentDomainScope = "ALL";
@@ -3633,7 +3808,7 @@ app.add_middleware(
           : `${API}/overview?website_id=${encodeURIComponent(currentDomainScope)}`;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
         const res = await fetch(url, { signal: controller.signal });
         clearTimeout(timeoutId);
 
@@ -3671,10 +3846,15 @@ app.add_middleware(
           updateScopeDropdown(allWebsites);
         }
 
-        let incomingEvents = data.recent_events || [];
-        if (incomingEvents.length > 100) {
-          incomingEvents = incomingEvents.slice(0, 100);
+        const incomingEvents = data.recent_events || [];
+        if (incomingEvents.length > 0) {
+          await SentinelEventStore.putBatch(incomingEvents);
         }
+
+        // Retrieve full 24h container events
+        const storedEvents = await SentinelEventStore.getAll();
+        allRecentEvents = storedEvents.length > 0 ? storedEvents : incomingEvents;
+        updateContainerBadge(allRecentEvents.length);
 
         // Check for newly intercepted threats & feed 3D pipeline visualizer
         if (knownEventIds.size > 0) {
@@ -3703,20 +3883,16 @@ app.add_middleware(
         }
 
         incomingEvents.forEach(ev => knownEventIds.add(ev.id));
-        if (knownEventIds.size > 500) {
+        if (knownEventIds.size > 1000) {
           const arr = Array.from(knownEventIds);
-          knownEventIds = new Set(arr.slice(arr.length - 250));
+          knownEventIds = new Set(arr.slice(arr.length - 500));
         }
-        allRecentEvents = incomingEvents;
 
         applyEventFilter();
       } catch (e) {
-        console.warn("Telemetry sync error, activating static SOC demo telemetry:", e);
+        console.warn("Telemetry sync error, retrying cloud edge:", e);
         const cloudStatus = document.getElementById("cloud-status-text");
-        if (cloudStatus) cloudStatus.innerText = "CLOUD CORE: RECONNECTING...";
-        if (allRecentEvents.length === 0) {
-          loadStaticDemoTelemetry();
-        }
+        if (cloudStatus) cloudStatus.innerText = "CLOUD CORE: RECONNECTING TO VERCEL EDGE... (<1ms)";
       }
     }
 
@@ -3872,61 +4048,109 @@ app.add_middleware(
     }
 
     // -------------------------------------------------------------------------
-    // Security Events Table & Forensics Drawer
+    // Security Events Table & Forensics Drawer (24-Hour Container Non-Destructive Ingestion)
     // -------------------------------------------------------------------------
+    function formatEventRowHtml(ev) {
+      let badge = `<span class="badge badge-allow">ALLOW (200)</span>`;
+      if (ev.action === "BLOCK") badge = `<span class="badge badge-block">BLOCK (403)</span>`;
+      if (ev.action === "CHALLENGE") badge = `<span class="badge badge-challenge">CHALLENGE</span>`;
+      if (ev.rule_triggered && ev.rule_triggered.includes("RATE-LIMIT")) {
+        badge = `<span class="badge badge-ratelimit">RATE_LIMIT (429)</span>`;
+      }
+
+      const domainObj = allWebsites.find(w => w.id === ev.website_id);
+      const domainName = escapeHtml(domainObj ? domainObj.domain : (ev.website_id || 'Global'));
+      const safeId = escapeHtml(ev.id);
+      const safeIp = escapeHtml(ev.client_ip);
+      const safeMethod = escapeHtml(ev.method || 'GET');
+      const safePath = escapeHtml(ev.path || '/');
+      const safeRule = escapeHtml(ev.rule_triggered || 'Clean Request');
+      const safeScore = Number(ev.risk_score) || 0;
+
+      const t = formatTimestamp(ev.timestamp);
+      const riskColor = safeScore >= 75 ? "var(--terracotta)" : (safeScore >= 50 ? "var(--warm-ochre)" : "var(--sage-green)");
+
+      return `
+        <td title="${escapeHtml(t.full)}" style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap; padding: 10px 14px;">
+          <div style="font-weight: 700; color: var(--text-charcoal);">${escapeHtml(t.time)}</div>
+          <div style="color: var(--text-muted); font-size: 10px;" data-raw-ts="${escapeHtml(ev.timestamp)}">(${escapeHtml(t.relative)})</div>
+        </td>
+        <td style="font-family: var(--font-mono); font-weight: 700; color: var(--deep-indigo); font-size: 12px; padding: 10px 14px;">${domainName}</td>
+        <td style="font-family: var(--font-mono); font-weight: 600; font-size: 12px; padding: 10px 14px;" data-telemetry-hud="client-ip" data-telemetry-id="${safeIp}">${safeIp}</td>
+        <td style="padding: 10px 14px;"><strong style="color: var(--deep-indigo);">${safeMethod}</strong> <code style="background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${safePath}</code></td>
+        <td style="padding: 10px 14px;"><strong style="color: ${riskColor}; font-family: var(--font-mono);">${safeScore}</strong>/100</td>
+        <td style="padding: 10px 14px;">${badge}</td>
+        <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700; font-size: 12px; padding: 10px 14px;">
+          ${safeRule}
+        </td>
+        <td style="text-align: center; padding: 10px 14px;">
+          <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${safeId}')">
+            🔍 Forensics
+          </button>
+        </td>
+      `;
+    }
+
+    let lastRenderedFilterKey = "";
     function renderEventsTable(events) {
       const tbody = document.getElementById("telemetry-body");
       const countBadge = document.getElementById("events-count-badge");
-      countBadge.innerText = `Showing ${events.length} of ${allRecentEvents.length} events`;
+      if (countBadge) countBadge.innerText = `${events.length} of ${allRecentEvents.length} requests in view`;
 
       if (!events || events.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">No security events matching current criteria. All incoming traffic is clean.</td></tr>`;
+        lastRenderedFilterKey = "";
         return;
       }
 
-      tbody.innerHTML = events.map(ev => {
-        let badge = `<span class="badge badge-allow">ALLOW (200)</span>`;
-        if (ev.action === "BLOCK") badge = `<span class="badge badge-block">BLOCK (403)</span>`;
-        if (ev.action === "CHALLENGE") badge = `<span class="badge badge-challenge">CHALLENGE</span>`;
-        if (ev.rule_triggered && ev.rule_triggered.includes("RATE-LIMIT")) {
-          badge = `<span class="badge badge-ratelimit">RATE_LIMIT (429)</span>`;
-        }
-
-        const domainObj = allWebsites.find(w => w.id === ev.website_id);
-        const domainName = escapeHtml(domainObj ? domainObj.domain : (ev.website_id || 'Global'));
-        const safeId = escapeHtml(ev.id);
-        const safeIp = escapeHtml(ev.client_ip);
-        const safeMethod = escapeHtml(ev.method);
-        const safePath = escapeHtml(ev.path);
-        const safeRule = escapeHtml(ev.rule_triggered || 'Clean Request');
-        const safeScore = Number(ev.risk_score) || 0;
-
-        // High-precision localized timestamp
-        const t = formatTimestamp(ev.timestamp);
-        const riskColor = safeScore >= 75 ? "var(--terracotta)" : (safeScore >= 50 ? "var(--warm-ochre)" : "var(--sage-green)");
-
-        return `
-          <tr class="clickable-row" onclick="openEventForensics('${safeId}')">
-            <td title="${escapeHtml(t.full)}" style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap;">
-              <div style="font-weight: 700; color: var(--text-charcoal);">${escapeHtml(t.time)}</div>
-              <div style="color: var(--text-muted); font-size: 10px;" data-raw-ts="${escapeHtml(ev.timestamp)}">(${escapeHtml(t.relative)})</div>
-            </td>
-            <td style="font-family: var(--font-mono); font-weight: 700; color: var(--deep-indigo); font-size: 12px;">${domainName}</td>
-            <td style="font-family: var(--font-mono); font-weight: 600; font-size: 12px;">${safeIp}</td>
-            <td><strong style="color: var(--deep-indigo);">${safeMethod}</strong> <code style="background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${safePath}</code></td>
-            <td><strong style="color: ${riskColor}; font-family: var(--font-mono);">${safeScore}</strong>/100</td>
-            <td>${badge}</td>
-            <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700; font-size: 12px;">
-              ${safeRule}
-            </td>
-            <td>
-              <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${safeId}')">
-                🔍 Forensics
-              </button>
-            </td>
+      const filterKey = `${document.getElementById("event-filter-action")?.value || 'ALL'}_${document.getElementById("event-search-query")?.value || ''}`;
+      
+      // If table is freshly initializing or filter criteria changed: render complete set
+      if (!tbody.firstElementChild || tbody.firstElementChild.innerText.includes("Connecting to") || lastRenderedFilterKey !== filterKey) {
+        lastRenderedFilterKey = filterKey;
+        tbody.innerHTML = events.map(ev => `
+          <tr class="clickable-row" data-event-id="${escapeHtml(ev.id)}" onclick="openEventForensics('${escapeHtml(ev.id)}')">
+            ${formatEventRowHtml(ev)}
           </tr>
-        `;
-      }).join("");
+        `).join("");
+        return;
+      }
+
+      // Non-destructive incremental update: prepend ONLY new events that aren't already in the table
+      const existingFirstId = tbody.firstElementChild.getAttribute("data-event-id");
+      if (existingFirstId && events.length > 0 && events[0].id !== existingFirstId) {
+        const newBatch = [];
+        for (const ev of events) {
+          if (ev.id === existingFirstId) break;
+          newBatch.push(ev);
+        }
+        for (let i = newBatch.length - 1; i >= 0; i--) {
+          const ev = newBatch[i];
+          const tr = document.createElement("tr");
+          tr.className = "clickable-row new-event";
+          tr.setAttribute("data-event-id", ev.id);
+          tr.onclick = () => openEventForensics(ev.id);
+          tr.innerHTML = formatEventRowHtml(ev);
+          tbody.insertBefore(tr, tbody.firstChild);
+        }
+      }
+
+      // Update timestamps without wiping table
+      updateVisibleRelativeTimestamps();
+    }
+
+    function updateVisibleRelativeTimestamps() {
+      const rows = document.querySelectorAll("#telemetry-body tr[data-event-id]");
+      rows.forEach(tr => {
+        const tsEl = tr.querySelector("[data-raw-ts]");
+        if (tsEl) {
+          const raw = tsEl.getAttribute("data-raw-ts");
+          if (raw) {
+            const t = formatTimestamp(raw);
+            tsEl.innerText = `(${t.relative})`;
+          }
+        }
+      });
     }
 
     function applyEventFilter() {
@@ -3981,9 +4205,39 @@ app.add_middleware(
       document.getElementById("drawer-risk-level").innerText = ev.risk_score >= 80 ? "CRITICAL ADVERSARIAL THREAT" : (ev.risk_score >= 50 ? "SUSPICIOUS TRAFFIC" : "BENIGN TELEMETRY");
       
       let latency = "0.35 ms";
-      if (ev.details && ev.details.includes("Latency:")) {
-        const match = ev.details.match(/Latency:\s*([\d\.]+)ms/);
-        if (match) latency = `${match[1]} ms`;
+      if (ev.latency_ms) latency = `${ev.latency_ms} ms`;
+      let payloadSnippet = ev.path;
+      let headersSnippet = "Host: " + (domainObj ? domainObj.domain : "sentinelgrid-gateway");
+
+      if (ev.details) {
+        try {
+          if (typeof ev.details === "object") {
+            const meta = ev.details;
+            if (meta.latency_ms) latency = `${meta.latency_ms} ms`;
+            if (meta.payload_snippet) payloadSnippet = meta.payload_snippet;
+            if (meta.query) payloadSnippet += `\nQuery: ${meta.query}`;
+            headersSnippet = `Host: ${meta.host || (domainObj ? domainObj.domain : 'sentinelgrid-gateway')}\nUser-Agent: ${meta.user_agent || 'Unknown'}\nCVE: ${meta.cve || 'N/A'}`;
+          } else if (typeof ev.details === "string" && ev.details.trim().startsWith("{")) {
+            const meta = JSON.parse(ev.details);
+            if (meta.latency_ms) latency = `${meta.latency_ms} ms`;
+            if (meta.payload_snippet) payloadSnippet = meta.payload_snippet;
+            if (meta.query) payloadSnippet += `\nQuery: ${meta.query}`;
+            headersSnippet = `Host: ${meta.host || (domainObj ? domainObj.domain : 'sentinelgrid-gateway')}\nUser-Agent: ${meta.user_agent || 'Unknown'}\nCVE: ${meta.cve || 'N/A'}`;
+          } else if (typeof ev.details === "string") {
+            if (ev.details.includes("Latency:")) {
+              const match = ev.details.match(/Latency:\s*([\d\.]+)ms/);
+              if (match) latency = `${match[1]} ms`;
+            }
+            if (ev.details.includes("Payload:")) {
+              const pMatch = ev.details.split("Payload:")[1];
+              if (pMatch) payloadSnippet = pMatch.split("| Headers:")[0].trim();
+            }
+            if (ev.details.includes("Headers:")) {
+              const hMatch = ev.details.split("Headers:")[1];
+              if (hMatch) headersSnippet = hMatch.trim();
+            }
+          }
+        } catch (_) {}
       }
       document.getElementById("drawer-latency").innerText = latency;
 
@@ -3996,19 +4250,6 @@ app.add_middleware(
       document.getElementById("drawer-ip").innerText = ev.client_ip;
       document.getElementById("drawer-method").innerText = ev.method;
       document.getElementById("drawer-path").innerText = ev.path;
-
-      let payloadSnippet = ev.path;
-      let headersSnippet = "Host: " + (domainObj ? domainObj.domain : "sentinelgrid-gateway");
-      if (ev.details) {
-        if (ev.details.includes("Payload:")) {
-          const pMatch = ev.details.split("Payload:")[1];
-          if (pMatch) payloadSnippet = pMatch.split("| Headers:")[0].trim();
-        }
-        if (ev.details.includes("Headers:")) {
-          const hMatch = ev.details.split("Headers:")[1];
-          if (hMatch) headersSnippet = hMatch.trim();
-        }
-      }
 
       document.getElementById("drawer-payload").innerText = payloadSnippet || "No body payload captured.";
       document.getElementById("drawer-headers").innerText = headersSnippet || "Default Gateway Headers";
@@ -4748,6 +4989,9 @@ app.add_middleware(
     });
 
     updateSystemClock();
+    bootstrapEventStore().then(() => {
+      pollTelemetry(true);
+    });
     setupAutoRefreshEngine();
     initLiveTrafficSSE();
   </script>

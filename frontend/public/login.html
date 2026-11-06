@@ -389,14 +389,6 @@
         <button type="submit" id="submitBtn" class="btn-submit stagger-4">
           <span>🔒 Authenticate & Enter SOC</span>
         </button>
-
-        <button type="button" id="quickMasterBtn" onclick="quickFillMaster()" style="width: 100%; margin-top: 12px; padding: 11px; background: rgba(56, 189, 248, 0.12); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: var(--radius-md); color: var(--accent-cyan); font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;" class="stagger-4">
-          ⚡ Instant Master Access (a@123 / anup@5212)
-        </button>
-
-        <div style="text-align: center; margin-top: 18px; font-size: 12px; color: var(--text-muted);" class="stagger-4">
-          Need an operator account? <a href="register.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 700;">Create Account & Select Role →</a>
-        </div>
       </form>
 
       <!-- Footer Trust Badge -->
@@ -516,12 +508,6 @@
       pwd.type = pwd.type === "password" ? "text" : "password";
     }
 
-    function quickFillMaster() {
-      document.getElementById("emailInput").value = "a@123";
-      document.getElementById("passwordInput").value = "anup@5212";
-      document.querySelector("form").dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-    }
-
     // -------------------------------------------------------------------------
     // Authentication Submission Handler
     // -------------------------------------------------------------------------
@@ -544,7 +530,8 @@
           localStorage.removeItem("sentinel_backend_url");
           storedBackend = null;
         }
-        const API = storedBackend || (window.location.hostname.endsWith("github.io") ? "https://sentinelgrid-one.vercel.app/v1" : "/v1");
+        const isLocalDevServer = window.location.hostname === "localhost" && (window.location.port === "8000" || window.location.port === "8080");
+        const API = storedBackend || (isLocalDevServer ? "/v1" : "https://sentinelgrid-one.vercel.app/v1");
         const res = await fetch(`${API}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -568,22 +555,6 @@
           btn.disabled = false;
         }
       } catch (err) {
-        // Fallback demo clearance for static cloud CDN previews
-        if (email === "admin@sentinelgrid.internal" || email === "admin@sentinel.local") {
-          localStorage.setItem("sg_auth_token", "demo-jwt-ed25519-token-cloud-preview");
-          localStorage.setItem("sg_auth_user", JSON.stringify({
-            id: "usr-demo",
-            email: email,
-            role: "Admin",
-            full_name: "Sentinel SOC Lead Operator"
-          }));
-          btn.innerHTML = "<span>✅ Cloud Demo Session Active. Entering SOC...</span>";
-          btn.style.background = "var(--sage-green)";
-          setTimeout(() => {
-            window.location.href = "index.html#dashboard";
-          }, 450);
-          return;
-        }
         errMsg.innerText = "Control plane unreachable. Please check backend connection.";
         errBanner.style.display = "flex";
         btn.innerHTML = "<span>🔒 Authenticate & Enter SOC</span>";

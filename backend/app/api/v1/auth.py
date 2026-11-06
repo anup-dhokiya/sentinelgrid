@@ -118,53 +118,10 @@ async def login(req: LoginRequest):
 
 @router.post("/signup")
 async def signup(req: SignupRequest):
-    role_clean = req.role.lower().strip()
-    if role_clean not in ALLOWED_ROLES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid role. Allowed operational roles are: {', '.join(sorted(ALLOWED_ROLES))}"
-        )
-
-    if len(req.password) < 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 6 characters."
-        )
-
-    pwd_hash = hash_password(req.password)
-    user_id = f"usr-{uuid4().hex[:8]}"
-    now = datetime.now(timezone.utc).isoformat()
-
-    try:
-        with get_db() as conn:
-            with conn:
-                conn.execute(
-                    "INSERT INTO users (id, email, password_hash, full_name, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                    (user_id, req.email.lower().strip(), pwd_hash, req.full_name.strip(), role_clean, now)
-                )
-    except Exception as e:
-        if "UNIQUE constraint failed" in str(e):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="An account with this email address already exists."
-            )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to register user. An internal database error occurred."
-        )
-
-    token = create_session(user_id)
-
-    return {
-        "status": "created",
-        "token": token,
-        "user": {
-            "id": user_id,
-            "email": req.email.lower().strip(),
-            "full_name": req.full_name.strip(),
-            "role": role_clean
-        }
-    }
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Public operator registration is strictly disabled. Only designated administrator access is permitted."
+    )
 
 
 @router.get("/me")
