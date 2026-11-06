@@ -204,4 +204,104 @@ SentinelGrid rejects both sterile `#FFFFFF` Bootstrap light modes and generic bl
 
 ---
 
+## 8. Universal Display Responsiveness (320px to 5120px)
+
+1. **Two-Tier Adaptive Ribbon:**
+   - On viewports `<= 1024px`, `.app-topbar` wraps into a dual-tier operational command deck.
+   - Tier 1 preserves brand identity, current breadcrumbs, and operator clearance HUD.
+   - Tier 2 expands `#topbar-telemetry-strip` displaying real-time system clock and cloud core edge connectivity without truncation.
+   - Secondary tools (sound toggle, timezone switcher, profile, shortcuts) scroll horizontally in `.topbar-actions` with touch momentum, completely eliminating destructive `display: none` DOM deletion.
+
+2. **Ultrawide Split-Deck Mode (`21:9` to `32:9`):**
+   - Under `@media (min-aspect-ratio: 21/9) and (min-width: 1800px)`, the layout dynamically shifts into a panoramic split-deck view.
+   - Left deck (46% width) pins the real-time velocity graph engine, KPI tiles, and threat distribution charts.
+   - Right deck (54% width) anchors the full-height live telemetry stream table with independent vertical scrolling.
+
+3. **Lossless High-Density Tables:**
+   - Forensic data tables feature hardware-pinned sticky columns: Column 1 (`Timestamp/Verdict`) is anchored to `left: 0`, and Column 8 (`Actions/Inspect`) is anchored to `right: 0`.
+   - Headers and pinned cells use solid background fills (`var(--sand-warm)`) with 1px structural borders, guaranteeing 100% forensic visibility while swiping intermediate columns on 320px screens.
+
+4. **Fluid Inputs & Tabular Numerals:**
+   - Global filters (`#scope-website-select` and `#event-search-query`) scale fluidly via `width: clamp(180px, 25vw, 360px); flex: 1 1 200px;`.
+   - Primary metric numerals (`.metric-val`) utilize `font-size: clamp(18px, 1.8vw + 10px, 28px); font-variant-numeric: tabular-nums;` to prevent layout reflows and text clipping.
+
+---
+
+## 9. Scroll Performance & GPU Acceleration
+
+1. **Hardware Composite Layer Promotion:**
+   - Structural elements that slide or translate during scrolling (`.app-sidebar`, `.app-topbar`, `.drawer-panel`, `.shortcuts-floating-pill`, `.threat-toast-alert`, and `.table-clean thead th`) are promoted to dedicated GPU composite layers:
+     ```css
+     will-change: transform, opacity;
+     transform: translateZ(0);
+     backface-visibility: hidden;
+     ```
+2. **Strict Property Confinement:**
+   - Transitions and animations are strictly confined to `transform` and `opacity`. Properties that trigger browser reflow passes (`width`, `height`, `margin`, `padding`, `box-shadow`) are prohibited from scroll or hover transition loops.
+3. **CSS Containment:**
+   - Heavy data containers (`.table-responsive`, `.drawer-panel`, `.topology-card`, `#notificationPopover`) declare `contain: layout style paint;`, isolating their internal rendering tree from the main layout context.
+4. **Solid Sticky Table Headers:**
+   - Table headers maintain solid opaque background fills without blur filters or alpha-blended drop shadows, eliminating expensive real-time rasterization during scroll events.
+5. **Throttled Passive Event Listeners:**
+   - All scroll, touch, and resize handlers are registered with `{ passive: true }` and throttled via `window.requestAnimationFrame`, preventing main-thread scroll locking.
+
+---
+
+## 10. Micro-Interactions & State Transitions
+
+1. **High-Precision Active Press States:**
+   - All actionable elements (`.btn`, `.form-input`, `select.form-input`) respond with a physical tactile press state:
+     ```css
+     .btn:active, .form-input:active, select.form-input:active {
+       transform: scale(0.98) !important;
+     }
+     ```
+2. **Crisp 2px Hardware Focus Outlines:**
+   - Keyboard navigation and interactive focus states declare high-contrast, offset cyan rings:
+     ```css
+     .form-input:focus,
+     .btn:focus-visible,
+     select.form-input:focus {
+       outline: 2px solid var(--accent-cyan) !important;
+       outline-offset: 2px !important;
+       box-shadow: none !important;
+       border-color: var(--accent-cyan) !important;
+     }
+     ```
+3. **Dual-Square Badge Pulse:**
+   - Active status badges (`.badge-online`) feature an inline square indicator pulsing on a discrete 1-second cadence matching UTC system clock ticks:
+     ```css
+     .badge-online::before {
+       content: '';
+       display: inline-block;
+       width: 7px;
+       height: 7px;
+       border: 1px solid var(--sage-green);
+       background: var(--sage-green);
+       border-radius: 1px;
+       animation: dualSquarePulse 1s steps(2, start) infinite;
+     }
+     ```
+4. **Cascading Staggered Drawer Reveals:**
+   - Opening the Threat Forensics side drawer triggers an accelerated 180ms panel slide combined with 25ms staggered entrance reveals across each internal payload and metadata container block.
+5. **Tab Crossfade Animations:**
+   - View switching executes a rapid 150ms opacity/translation crossfade (`transform: translateY(4px) -> translateY(0)`), ensuring responsive transitions between operational modules.
+6. **Inline Copy Feedback:**
+   - Clipboard operations (`copySessionToken()`, `copyPayloadToClipboard()`, `copyHeadersToClipboard()`) morph the triggering button text directly to `[COPIED ✓]` in `#2EA043` for exactly 1200ms before returning to their original label, completely eliminating disruptive toast popups.
+
+---
+
+## 11. Interactive Scrubbing & Telemetry Graph Dynamics
+
+1. **SVG Hairline Cursor Tracking:**
+   - Hovering across `#traffic-histogram-container` renders a vertical dashed hairline cursor (`#hist-hairline`) in `var(--accent-cyan)` tracking dynamically to each time slice center.
+2. **Interactive Slice Dimming:**
+   - During histogram inspection, non-hovered time slice groups dim to `opacity: 0.35`, providing high visual contrast to isolate attack spikes and traffic anomalies.
+3. **Real-Time Dual-Series Velocity Oscilloscope:**
+   - Renders clean traffic (`Passed` in `#2EA043`) against mitigated traffic (`Blocked` in `#F85149`) with vertical gradient fills.
+   - Dual-ring reticle crosshair snapping reports exact `HH:MM:SS` slice timestamps, `PASSED r/s`, `BLOCKED r/s`, and `TOTAL r/s`.
+   - Dynamic rolling buffer window selection supports instant toggling between `1m` (60s), `5m` (300s), `15m` (900s), and `1h` (3600s) time horizons.
+
+---
+
 *This specification serves as the permanent architectural standard for all SentinelGrid frontend interfaces.*
