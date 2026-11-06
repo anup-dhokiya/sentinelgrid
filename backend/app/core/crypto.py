@@ -1,6 +1,6 @@
 """
 SentinelGrid - Cryptographic Engine & Ed25519 Policy Signing (RFC 8032)
-Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
+Author: SentinelGrid Architecture Core Team
 """
 
 import base64

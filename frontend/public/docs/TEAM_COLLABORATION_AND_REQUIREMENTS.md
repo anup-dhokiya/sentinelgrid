@@ -1,7 +1,7 @@
 # SentinelGrid — Team Collaboration Guide, Role Distribution, Skills Matrix & Requirements Specification
 
 > **Platform**: SentinelGrid — AI-Assisted Web Application & API Protection (WAAP) Platform  
-> **Repository Location**: `/run/media/anup/D/sentinelgrid`  
+> **Repository Location**: `sentinelgrid`  
 > **Team Size**: 4 Engineers (You + 3 Team Members)  
 > **Target Timeline**: 8 Weeks across 4 Coordinated Phased Sprints
 
@@ -35,7 +35,7 @@ To build SentinelGrid efficiently, the team has access to the best open-source r
 
 ### 2.1 Cloned Reference Repositories (`sentinelgrid/references/`)
 1. **OWASP Core Rule Set (CRS v4.0)** — [`coreruleset/coreruleset`](https://github.com/coreruleset/coreruleset)
-   - *Local Cloned Path*: `/run/media/anup/D/sentinelgrid/references/coreruleset/rules`
+   - *Local Cloned Path*: `sentinelgrid/references/coreruleset/rules`
    - *Role*: The global standard for WAF rules. Contains ready-to-use detection rules for SQLi (`REQUEST-942`), XSS (`REQUEST-941`), RCE (`REQUEST-932`), LFI (`REQUEST-930`), SSRF (`ssrf.data`), and Data Leakages (`RESPONSE-950`).
 2. **Schemathesis** — [`schemathesis/schemathesis`](https://github.com/schemathesis/schemathesis)
    - *Role*: Property-based OpenAPI contract validation and automated regression testing.

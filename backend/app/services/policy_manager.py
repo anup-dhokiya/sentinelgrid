@@ -1,6 +1,6 @@
 """
 SentinelGrid - Central Policy Management & Versioning Service
-Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
+Author: SentinelGrid Architecture Core Team
 """
 
 import os
@@ -14,8 +14,8 @@ from app.services.simulation import PolicyPayload, SimulationReport, PolicySimul
 
 if os.getenv("DATA_DIR"):
     MASTER_KEY_DIR = Path(os.getenv("DATA_DIR")) / ".keys"
-elif Path("/run/media/anup/D/sentinelgrid/backend").is_dir():
-    MASTER_KEY_DIR = Path("/run/media/anup/D/sentinelgrid/backend/.keys")
+elif Path("sentinelgrid/backend").is_dir():
+    MASTER_KEY_DIR = Path("sentinelgrid/backend/.keys")
 else:
     _base = Path(__file__).resolve().parent.parent.parent
     MASTER_KEY_DIR = _base / ".keys" if os.access(_base, os.W_OK) else Path(tempfile.gettempdir()) / "sentinelgrid_keys"

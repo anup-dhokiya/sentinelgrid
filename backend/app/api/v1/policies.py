@@ -1,6 +1,6 @@
 """
 SentinelGrid - Central Policy & Management API Router
-Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
+Author: SentinelGrid Architecture Core Team
 """
 
 from typing import List, Dict, Any, Optional

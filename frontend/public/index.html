@@ -2095,49 +2095,162 @@
     <!-- ===================================================================== -->
     <section id="view-onboarding" class="view-section">
       <div class="panel">
-        <div class="panel-header">
-          <span>Connecting Any Site to SentinelGrid for Live Observation</span>
-          <a href="docs/CONNECT_ANY_SITE_FOR_OBSERVATION.txt" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 5px 10px; text-decoration: none;">Download Plain Text Guide</a>
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--deep-indigo);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span style="font-weight: 800; font-size: 15px;">SentinelGrid WAAP // Master Integration & Setup Manual</span>
+          </div>
+          <a href="docs/SETUP_AND_INTEGRATION_GUIDE.md" target="_blank" class="btn btn-primary" style="font-size: 11px; padding: 6px 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>View Full Integration Spec (Markdown)</span>
+          </a>
         </div>
         <div class="panel-body">
-          <h3 style="font-size: 15px; margin-bottom: 10px;">Zero-Downtime Integration Architecture</h3>
-          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 18px;">
-            SentinelGrid inspects requests in-line with a <strong>&lt; 0.4ms latency budget</strong>. Connect any site via Nginx Reverse Proxy, Python ASGI Middleware, Node.js Express, or Go reverse proxy.
+          <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 8px; color: var(--text-charcoal);">Zero-Downtime Integration Architecture</h3>
+          <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 22px;">
+            SentinelGrid inspects incoming requests in-line with a sub-millisecond latency budget (p99 &lt; 0.4ms). All verified requests receive an unforgeable <strong>RFC 8032 Ed25519 origin seal</strong>, guaranteeing upstream backends that traffic traversed security inspection.
           </p>
 
-          <div class="integration-grid">
-            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border-light);">
-              <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option A: Nginx Reverse Proxy</h4>
-              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Use <code>auth_request</code> or <code>proxy_pass</code> to validate requests before passing to upstream.</p>
-              <pre style="background: var(--card-white); padding: 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; overflow-x: auto; border: 1px solid var(--stone-border);">location /api/ {
-    auth_request /_sentinel_check;
-    proxy_pass http://upstream_app;
-}
-location = /_sentinel_check {
-    internal;
-    proxy_pass http://127.0.0.1:8000/v1/inspect;
-    proxy_pass_request_body on;
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <!-- Option A: Vercel / Next.js Edge -->
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo);">Option A: Next.js & Vercel Edge Middleware</h4>
+                <span class="badge badge-online">EDGE ENGINE</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Drop this into <code>middleware.js</code> at the root of your project with fail-open circuit breaking:</p>
+              <pre class="forensic-code-block" style="padding: 12px; border-radius: var(--radius-sm); font-size: 11px; max-height: 220px; overflow-y: auto;">import { NextResponse } from 'next/server';
+
+export async function middleware(request) {
+  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+  try {
+    const res = await fetch('https://sentinelgrid-one.vercel.app/v1/inspect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        website_id: 'site-production',
+        method: request.method,
+        path: request.nextUrl.pathname,
+        client_ip: clientIp,
+        headers: Object.fromEntries(request.headers)
+      }),
+      signal: AbortSignal.timeout(1200)
+    });
+    if (res.ok) {
+      const decision = await res.json();
+      if (decision.action === 'BLOCK') {
+        return new NextResponse('&lt;h1&gt;403 Forbidden: Dropped by SentinelGrid WAAP&lt;/h1&gt;', { status: 403 });
+      }
+    }
+  } catch (err) {}
+  return NextResponse.next();
 }</pre>
             </div>
 
-            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border-light);">
-              <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 6px;">Option B: Python ASGI Middleware</h4>
-              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Drop-in middleware for FastAPI, Starlette, or Django ASGI applications.</p>
-              <pre style="background: var(--card-white); padding: 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; overflow-x: auto; border: 1px solid var(--stone-border);">from sentinelgrid.middleware import SentinelGridMiddleware
+            <!-- Option B: Nginx Reverse Proxy -->
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo);">Option B: Nginx Reverse Proxy (Any Stack)</h4>
+                <span class="badge badge-online">IN-LINE SUBREQUEST</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Use <code>auth_request</code> to validate incoming packets before routing to upstream services:</p>
+              <pre class="forensic-code-block" style="padding: 12px; border-radius: var(--radius-sm); font-size: 11px; max-height: 220px; overflow-y: auto;">server {
+    listen 80;
+    server_name app.corp.internal;
+
+    location / {
+        auth_request /_sentinel_inspect;
+        proxy_pass http://upstream_service;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location = /_sentinel_inspect {
+        internal;
+        proxy_pass https://sentinelgrid-one.vercel.app/v1/inspect;
+        proxy_pass_request_body on;
+        proxy_set_header Content-Type "application/json";
+    }
+
+    error_page 403 = @sentinel_blocked;
+    location @sentinel_blocked {
+        default_type text/html;
+        return 403 '&lt;h1&gt;403 Quarantined by SentinelGrid&lt;/h1&gt;';
+    }
+}</pre>
+            </div>
+
+            <!-- Option C: Python ASGI Middleware -->
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo);">Option C: Python ASGI (FastAPI / Starlette)</h4>
+                <span class="badge badge-online">PYTHON SDK</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Intercept requests directly in FastAPI, Django ASGI, or Starlette:</p>
+              <pre class="forensic-code-block" style="padding: 12px; border-radius: var(--radius-sm); font-size: 11px; max-height: 220px; overflow-y: auto;">from fastapi import FastAPI, Request
+from starlette.responses import HTMLResponse
+import httpx
 
 app = FastAPI()
-app.add_middleware(
-    SentinelGridMiddleware,
-    control_plane_url="http://127.0.0.1:8000",
-    fail_open=False
-)</pre>
+
+@app.middleware("http")
+async def sentinelgrid_waf(request: Request, call_next):
+    try:
+        async with httpx.AsyncClient(timeout=1.0) as client:
+            resp = await client.post("https://sentinelgrid-one.vercel.app/v1/inspect", json={
+                "website_id": "site-python",
+                "method": request.method,
+                "path": request.url.path,
+                "client_ip": request.client.host if request.client else "127.0.0.1",
+                "headers": dict(request.headers)
+            })
+            if resp.status_code == 200 and resp.json().get("action") == "BLOCK":
+                return HTMLResponse("&lt;h1&gt;403 Forbidden: Intercepted by WAAP&lt;/h1&gt;", status_code=403)
+    except Exception:
+        pass # Fail-open
+    return await call_next(request)</pre>
+            </div>
+
+            <!-- Option D: Node.js Express -->
+            <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: var(--deep-indigo);">Option D: Node.js & Express Middleware</h4>
+                <span class="badge badge-online">EXPRESS / CONNECT</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Drop-in Express middleware for API backends and microservices:</p>
+              <pre class="forensic-code-block" style="padding: 12px; border-radius: var(--radius-sm); font-size: 11px; max-height: 220px; overflow-y: auto;">const express = require('express');
+const axios = require('axios');
+const app = express();
+
+app.use(async (req, res, next) =&gt; {
+  try {
+    const verdict = await axios.post('https://sentinelgrid-one.vercel.app/v1/inspect', {
+      website_id: 'site-express',
+      method: req.method,
+      path: req.path,
+      client_ip: req.ip || req.connection.remoteAddress,
+      headers: req.headers
+    }, { timeout: 1000 });
+
+    if (verdict.data.action === 'BLOCK') {
+      return res.status(403).send('&lt;h1&gt;403 Forbidden: Dropped by SentinelGrid WAAP&lt;/h1&gt;');
+    }
+  } catch (err) {}
+  next();
+});</pre>
             </div>
           </div>
 
-          <div style="background: var(--sand-warm); border: 1px solid var(--stone-border); padding: 16px; border-radius: var(--radius-md); font-size: 12px;">
-            <strong>Full Observation Guide Documentation:</strong><br>
-            Production integration guide authored on your D drive at:<br>
-            <code>/run/media/anup/D/sentinelgrid/docs/CONNECT_ANY_SITE_FOR_OBSERVATION.md</code>
+          <div style="background: var(--sand-warm); border: 1px solid var(--stone-border); padding: 18px; border-radius: var(--radius-md); font-size: 12px; line-height: 1.6;">
+            <div style="font-weight: 800; color: var(--text-charcoal); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span>Verify In-Line Inspection Connectivity</span>
+            </div>
+            <div>
+              Send a simulated adversarial payload against your newly protected endpoint:
+              <code style="background: var(--card-white); padding: 4px 8px; border-radius: 4px; display: block; margin: 8px 0; font-family: var(--font-mono); border: 1px solid var(--stone-border);">curl -i -X POST -d "q=' OR 1=1--" https://your-domain.com/login</code>
+              Confirm that you receive <strong>HTTP 403 Forbidden</strong> and immediately witness the intercepted transaction streaming in real-time under <a href="#livetraffic" onclick="switchTab('livetraffic')" style="color: var(--deep-indigo); font-weight: 700;">Live Traffic</a>.
+            </div>
           </div>
         </div>
       </div>
@@ -2155,7 +2268,7 @@ app.add_middleware(
     <div class="drawer-header">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: var(--terracotta-soft); color: var(--terracotta); display: flex; align-items: center; justify-content: center; font-weight: 800;">
-          🔍
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
         <div>
           <div style="font-size: 14px; font-weight: 800; color: var(--deep-indigo);" id="drawer-event-id">ev-00000000</div>

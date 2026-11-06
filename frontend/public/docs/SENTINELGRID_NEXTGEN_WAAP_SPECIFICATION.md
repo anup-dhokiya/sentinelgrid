@@ -1380,5 +1380,5 @@ gantt
 ---
 
 **End of Specification**  
-*Approved by Lead Architect: Anup Dhokiya (@anup-dhokiya)*  
+*Approved by Lead Architect: SentinelGrid Architecture Core Team*  
 *Document Reference: SG-SPEC-WAAP-NEXTGEN-2026-V2*

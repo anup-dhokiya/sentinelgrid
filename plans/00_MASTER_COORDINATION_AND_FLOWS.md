@@ -3,8 +3,8 @@
 > **Version**: 3.0 (Enhanced)
 > **Platform Paradigm**: AI-Assisted Web Application & API Protection (WAAP) with Runtime Security, Behavioral Threat Detection, and Safe Reversible Automation.
 > **Legal Compliance Baseline**: Strictly defensive, privacy-preserving, zero offensive countermeasures ("no hack-back"), fully compliant across GDPR, CCPA, India DPDP Act 2023, CFAA, and Wassenaar Arrangement.
-> **Project Storage**: `/run/media/anup/D/sentinelgrid/`
-> **Author & Lead Architect**: [Anup Dhokiya](https://github.com/anup-dhokiya) — [@anup-dhokiya](https://github.com/anup-dhokiya)
+> **Project Storage**: `sentinelgrid/`
+> **Author & Lead Architect**: SentinelGrid Core Team — SentinelGrid Open Architecture Core
 
 ---
 

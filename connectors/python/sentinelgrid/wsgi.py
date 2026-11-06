@@ -1,7 +1,7 @@
 """
 SentinelGrid WSGI Middleware for Django & Flask
 Synchronous in-line inspection with input buffer rewinding and urllib3 connection pooling.
-Author: Anup Dhokiya (@anup-dhokiya) - Lead Architect
+Author: SentinelGrid Architecture Core Team
 """
 
 import io

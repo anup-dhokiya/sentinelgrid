@@ -1,7 +1,7 @@
 ================================================================================
 SENTINELGRID WAAP // INTEGRATION & ONBOARDING GUIDE FOR THIRD-PARTY SITES
 ================================================================================
-Author: Anup Dhokiya (@anup-dhokiya)
+Author: SentinelGrid Architecture Core Team
 Platform: SentinelGrid AI-Assisted Web Application & API Protection (WAAP)
 Version: 1.0 (Production Connector Specification)
 ================================================================================

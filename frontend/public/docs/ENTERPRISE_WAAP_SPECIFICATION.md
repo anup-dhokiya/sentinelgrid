@@ -1,7 +1,7 @@
 # SENTINELGRID WAAP // ENTERPRISE ARCHITECTURE & FEATURE SPECIFICATION
 **Document ID:** SG-SPEC-WAAP-ENT-2026-V1  
 **Classification:** Engineering Specification / Production Architecture  
-**Author:** Anup Dhokiya (@anup-dhokiya) - Lead Architect  
+**Author:** SentinelGrid Architecture Core Team  
 **Platform:** SentinelGrid AI-Assisted Web Application & API Protection (WAAP)  
 **Target Gateways:** Cloudflare WAF, Akamai Kona/AAP, AWS WAF, Imperva, Datadog ASM, Wallarm  
 

@@ -2,9 +2,9 @@
 
 > **Document Type**: Product & Architecture Plan (NO implementation yet)
 > **Version**: 1.0 — For team review and approval
-> **Author**: [Anup Dhokiya](https://github.com/anup-dhokiya) — Lead Architect ([@anup-dhokiya](https://github.com/anup-dhokiya))
+> **Author**: SentinelGrid Core Team — Lead Architect (SentinelGrid Open Architecture Core)
 > **Date**: 2026-11-02
-> **Storage**: `/run/media/anup/D/sentinelgrid/plans/09_OPENROUTER_INTEGRATION_PLAN.md`
+> **Storage**: `sentinelgrid/plans/09_OPENROUTER_INTEGRATION_PLAN.md`
 > **Status**: 🟡 DRAFT — Awaiting team review
 
 ---

@@ -1,7 +1,7 @@
 /**
  * SentinelGrid In-Line WAAP Middleware for Express / NestJS
  * Features: Keep-Alive HTTP agent, fail-open policy, exact header propagation.
- * Author: Anup Dhokiya (@anup-dhokiya) - Lead Architect
+ * Author: SentinelGrid Architecture Core Team
  */
 
 const http = require('http');

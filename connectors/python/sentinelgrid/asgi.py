@@ -1,7 +1,7 @@
 """
 SentinelGrid ASGI Middleware for FastAPI / Starlette
 Provides non-blocking async request inspection with stream buffering and fail-open policy.
-Author: Anup Dhokiya (@anup-dhokiya) - Lead Architect
+Author: SentinelGrid Architecture Core Team
 """
 
 import logging

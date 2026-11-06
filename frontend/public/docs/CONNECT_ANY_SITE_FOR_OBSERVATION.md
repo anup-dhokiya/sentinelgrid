@@ -1,7 +1,7 @@
 # SENTINELGRID WAAP // PRODUCTION ONBOARDING & INTEGRATION MANUAL
 **Document Reference:** SG-INT-GUIDE-2026-PROD-V1  
 **Classification:** Systems Engineering / Deployment Guide  
-**Author:** Anup Dhokiya (@anup-dhokiya) - Lead Architect  
+**Author:** SentinelGrid Architecture Core Team  
 **Platform:** SentinelGrid Web Application & API Protection (WAAP) Control Plane  
 **Target Environments:** Python (ASGI/WSGI), Node.js (Express/Next.js), Nginx, Go `net/http`, Cloudflare Workers, Docker Compose  
 

@@ -1,6 +1,6 @@
 """
 SentinelGrid - Central Control Plane & Management API Server
-Author: Anup Dhokiya (@anup-dhokiya) - Developer 1 / Lead Architect
+Author: SentinelGrid Architecture Core Team
 """
 
 import sys
