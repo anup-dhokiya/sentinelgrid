@@ -1120,7 +1120,7 @@ class SecurityBrain:
         # ---------------------------------------------------------------------
         # Vector 0.1: Autonomous Dynamic Quarantine Enforcement
         # ---------------------------------------------------------------------
-        if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1", "192.168.122.1") and not global_rate_limiter.is_whitelisted(client_ip):
+        if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1") and not global_rate_limiter.is_whitelisted(client_ip):
             is_quarantined, remaining_sec, q_reason = global_rate_limiter.check_quarantine(client_ip)
             if is_quarantined:
                 record_match(ThreatSignature(
@@ -1225,7 +1225,7 @@ class SecurityBrain:
                     score=98.0,
                     pattern=re.compile(r".*")
                 ))
-                if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1", "192.168.122.1") and not global_rate_limiter.is_whitelisted(client_ip):
+                if client_ip and client_ip not in ("127.0.0.1", "localhost", "::1") and not global_rate_limiter.is_whitelisted(client_ip):
                     global_rate_limiter.trigger_violation(
                         client_ip,
                         severity=smart_match["severity"],

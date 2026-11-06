@@ -8,10 +8,11 @@ import secrets
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
 from typing import Optional, Dict, Any
-from fastapi import APIRouter, HTTPException, status, Header, Depends
+from fastapi import APIRouter, HTTPException, status, Header, Depends, Request
 from pydantic import BaseModel
 
 from app.core.database import get_db_connection, get_db
+from app.security_engine.rate_limiter import global_rate_limiter
 
 router = APIRouter(prefix="/v1/auth", tags=["Authentication"])
 
@@ -88,7 +89,15 @@ def verify_session(token: str) -> Optional[Dict[str, Any]]:
 
 
 @router.post("/login")
-async def login(req: LoginRequest):
+async def login(req: LoginRequest, request: Request):
+    client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (request.client.host if request.client else "127.0.0.1")
+    rate = global_rate_limiter.evaluate_rate(f"auth-login-{client_ip}", limit=5, window_seconds=60.0)
+    if not rate["allowed"]:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many authentication attempts. Please wait {rate.get('retry_after', 60)} seconds before retrying."
+        )
+
     with get_db() as conn:
         row = conn.execute(
             "SELECT id, email, password_hash, full_name, role FROM users WHERE email = ?",

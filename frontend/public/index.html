@@ -4501,9 +4501,11 @@ app.add_middleware(
         }
 
         container.innerHTML = list.map(d => {
-          const isAegis = d.domain.includes("aegis-pro");
-          const gatewayPort = isAegis ? "8080" : "8080";
-          const originPort = isAegis ? "127.0.0.1:3000" : "Origin Target";
+          const isAegis = d.domain.includes("aegis");
+          const gatewayUrl = (d.domain && d.domain.includes(".")) 
+            ? (d.domain.startsWith("http") ? d.domain : `https://${d.domain}`) 
+            : `http://127.0.0.1:8080`;
+          const originPort = isAegis ? "Cloud Edge Middleware" : "Origin Target";
 
           return `
             <div class="domain-card">
@@ -4519,7 +4521,7 @@ app.add_middleware(
                 </div>
 
                 <div style="background: var(--sand-warm); padding: 12px; border-radius: var(--radius-sm); margin: 10px 0; font-size: 11px; font-family: var(--font-mono);">
-                  <div>🌐 <strong>Gateway:</strong> <a href="http://192.168.122.1:${gatewayPort}" target="_blank" style="color: var(--deep-indigo);">http://192.168.122.1:${gatewayPort}</a></div>
+                  <div>🌐 <strong>Gateway:</strong> <a href="${gatewayUrl}" target="_blank" style="color: var(--deep-indigo); text-decoration: underline;">${gatewayUrl}</a></div>
                   <div style="margin-top: 3px;">🎯 <strong>Origin:</strong> ${originPort}</div>
                 </div>
 

@@ -11,7 +11,7 @@ _BACKEND_DIR = Path(__file__).resolve().parent.parent
 if str(_BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(_BACKEND_DIR))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api.v1.policies import router as policies_router
@@ -25,14 +25,41 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Standard Cloud & Local CORS configuration
+# Explicit Whitelist CORS Configuration (Prevents Wildcard & Internal Subnet Leakage)
+ALLOWED_ORIGINS = [
+    "https://sentinelgrid-one.vercel.app",
+    "https://aegispro.vercel.app",
+    "https://aegispro-murex.vercel.app",
+    "https://anup-dhokiya.github.io",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|.*\.vercel\.app|.*\.github\.io|.*\.onrender\.com)(:\d+)?$",
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|github\.io)$",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Enforces strict defense-in-depth HTTP response headers and sanitizes inline dispositions."""
+    response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
+    if "content-disposition" in response.headers and response.headers["content-disposition"] == "inline":
+        del response.headers["content-disposition"]
+    return response
 
 # Register routers
 app.include_router(policies_router)

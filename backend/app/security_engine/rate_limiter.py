@@ -25,8 +25,7 @@ class SlidingWindowLimiter:
         self._whitelist: set = {
             "127.0.0.1",
             "localhost",
-            "::1",
-            "192.168.122.1"
+            "::1"
         }
 
     def _get_shard(self, key: str) -> int:
