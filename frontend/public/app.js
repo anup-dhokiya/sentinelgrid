@@ -184,11 +184,22 @@
       if (backdrop) backdrop.classList.remove("active");
     }
 
-    function copySessionToken() {
+    function showInlineCopyFeedback(btn) {
+      if (!btn) return;
+      const originalHtml = btn.dataset.origHtml || btn.innerHTML;
+      btn.dataset.origHtml = originalHtml;
+      btn.innerHTML = `<span style="color: #2EA043; font-weight: 700; font-family: var(--font-mono);">[COPIED ✓]</span>`;
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+      }, 1200);
+    }
+
+    function copySessionToken(e) {
       const tokenInput = document.getElementById("prof-modal-token");
       if (tokenInput) {
         navigator.clipboard.writeText(tokenInput.value);
-        showThreatToast("Token Copied", "Session bearer token copied to clipboard.");
+        const btn = (e && e.currentTarget) || (e && e.target && e.target.closest("button")) || document.activeElement;
+        showInlineCopyFeedback(btn);
       }
     }
 
@@ -1722,8 +1733,12 @@
       svg += `<line x1="10" y1="${height - 20}" x2="${width - 10}" y2="${height - 20}" stroke="var(--stone-border)" stroke-width="1"/>`;
       svg += `<line x1="10" y1="${(height - 20) / 2}" x2="${width - 10}" y2="${(height - 20) / 2}" stroke="var(--stone-border)" stroke-dasharray="3,3" stroke-width="1"/>`;
 
+      // Hairline Cursor for High-Precision Scrubbing
+      svg += `<line id="hist-hairline" x1="0" y1="0" x2="0" y2="${height}" stroke="var(--accent-cyan)" stroke-dasharray="2,2" stroke-width="1" style="display: none; pointer-events: none;"/>`;
+
       timeline.forEach((b, idx) => {
         const x = 20 + idx * (barWidth + 4);
+        const barCenterX = x + (barWidth / 2);
         const total = b.allowed + b.blocked + b.challenged;
         const totalH = Math.max(2, (total / maxVal) * (height - 35));
         const blockedH = Math.max(b.blocked > 0 ? 3 : 0, (b.blocked / maxVal) * (height - 35));
@@ -1731,6 +1746,8 @@
 
         const yAllowed = (height - 20) - allowedH;
         const yBlocked = yAllowed - blockedH;
+
+        svg += `<g class="hist-slice-group" id="hist-slice-${idx}" style="transition: opacity 120ms ease;">`;
 
         // Clean allowed bar (green)
         if (allowedH > 0) {
@@ -1741,25 +1758,48 @@
           svg += `<rect x="${x}" y="${yBlocked}" width="${barWidth}" height="${blockedH}" fill="var(--terracotta)" rx="2"/>`;
         }
 
-        // Invisible hover target for tooltip
+        // Invisible hover target for tooltip & scrubbing
         svg += `<rect x="${x}" y="0" width="${barWidth}" height="${height}" fill="transparent" style="cursor: pointer;"
-                onmouseover="showHistTooltip(event, '${b.time}', ${b.allowed}, ${b.blocked})" onmouseout="hideHistTooltip()"/>`;
+                onmouseover="showHistTooltip(event, '${b.time}', ${b.allowed}, ${b.blocked}, ${idx}, ${barCenterX})" onmouseout="hideHistTooltip()"/>`;
+
+        svg += `</g>`;
       });
 
       svg += `</svg>`;
       container.innerHTML = svg;
     }
 
-    function showHistTooltip(e, time, allowed, blocked) {
+    function showHistTooltip(e, time, allowed, blocked, idx, barCenterX) {
       const tip = document.getElementById("hist-tooltip");
-      tip.innerHTML = `<strong>${time}</strong><br>Mitigated: <span style="color: #F87171;">${blocked}</span><br>Allowed: <span style="color: #4ADE80;">${allowed}</span>`;
-      tip.style.left = `${e.clientX + 10}px`;
-      tip.style.top = `${e.clientY - 40}px`;
-      tip.style.display = "block";
+      if (tip) {
+        tip.innerHTML = `<strong>${time}</strong><br>Mitigated: <span style="color: #F87171;">${blocked}</span><br>Allowed: <span style="color: #4ADE80;">${allowed}</span>`;
+        tip.style.left = `${e.clientX + 10}px`;
+        tip.style.top = `${e.clientY - 40}px`;
+        tip.style.display = "block";
+      }
+
+      // Hairline position
+      const hairline = document.getElementById("hist-hairline");
+      if (hairline && typeof barCenterX === "number") {
+        hairline.setAttribute("x1", barCenterX);
+        hairline.setAttribute("x2", barCenterX);
+        hairline.style.display = "block";
+      }
+
+      // Dim non-hovered slices to 0.35 opacity
+      document.querySelectorAll(".hist-slice-group").forEach((el, i) => {
+        el.style.opacity = (i === idx) ? "1.0" : "0.35";
+      });
     }
 
     function hideHistTooltip() {
-      document.getElementById("hist-tooltip").style.display = "none";
+      const tip = document.getElementById("hist-tooltip");
+      if (tip) tip.style.display = "none";
+      const hairline = document.getElementById("hist-hairline");
+      if (hairline) hairline.style.display = "none";
+      document.querySelectorAll(".hist-slice-group").forEach((el) => {
+        el.style.opacity = "1.0";
+      });
     }
 
     function renderOwaspDistribution(dist) {
@@ -2057,16 +2097,18 @@
       document.getElementById("event-drawer").classList.remove("open");
     }
 
-    function copyPayloadToClipboard() {
-      const text = document.getElementById("drawer-payload").innerText;
+    function copyPayloadToClipboard(e) {
+      const text = document.getElementById("drawer-payload")?.innerText || "";
       navigator.clipboard.writeText(text);
-      showThreatToast("Copied to Clipboard", "Payload snippet copied.");
+      const btn = (e && e.currentTarget) || (e && e.target && e.target.closest("button")) || document.activeElement;
+      showInlineCopyFeedback(btn);
     }
 
-    function copyHeadersToClipboard() {
-      const text = document.getElementById("drawer-headers").innerText;
+    function copyHeadersToClipboard(e) {
+      const text = document.getElementById("drawer-headers")?.innerText || "";
       navigator.clipboard.writeText(text);
-      showThreatToast("Copied to Clipboard", "Headers snippet copied.");
+      const btn = (e && e.currentTarget) || (e && e.target && e.target.closest("button")) || document.activeElement;
+      showInlineCopyFeedback(btn);
     }
 
     async function executeIpQuickAction(actionType) {
