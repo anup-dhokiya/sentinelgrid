@@ -1248,6 +1248,41 @@
     #livetraffic-table-body tr.new-event {
       animation: rowSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    /* Wide View Mode for Live Traffic Watch */
+    body.livetraffic-wide-mode .app-layout {
+      grid-template-columns: 64px 1fr !important;
+    }
+    body.livetraffic-wide-mode .app-sidebar {
+      width: 64px !important;
+      min-width: 64px !important;
+    }
+    body.livetraffic-wide-mode .nav-label,
+    body.livetraffic-wide-mode .sidebar-header h1,
+    body.livetraffic-wide-mode .sidebar-header .logo-badge,
+    body.livetraffic-wide-mode .sidebar-badge {
+      display: none !important;
+    }
+    body.livetraffic-wide-mode .content-wrapper {
+      max-width: 100vw !important;
+      width: 100% !important;
+      padding: 10px 18px !important;
+    }
+    body.livetraffic-wide-mode #view-livetraffic {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+    body.livetraffic-wide-mode #view-livetraffic .panel {
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+    }
+    body.livetraffic-wide-mode #view-livetraffic .table-responsive {
+      min-height: 75vh !important;
+      max-height: 88vh !important;
+    }
+    body.livetraffic-wide-mode #view-livetraffic table {
+      width: 100% !important;
+    }
   </style>
 </head>
 <body>
@@ -1640,6 +1675,7 @@
             <option value="ALLOW">✅ Clean Legitimate Only</option>
             <option value="CHALLENGE">⚠️ Challenges Only</option>
           </select>
+          <button class="btn btn-subtle" id="livetraffic-wide-btn" onclick="toggleLiveTrafficWideView()">⛶ Wide View</button>
           <button class="btn btn-subtle" id="livetraffic-pause-btn" onclick="toggleLiveTrafficStream()">⏸️ Pause</button>
           <button class="btn btn-subtle" onclick="clearLiveTrafficBuffer()">🗑️ Clear</button>
         </div>
@@ -2295,6 +2331,12 @@ app.add_middleware(
           });
         }
       } catch (_) {}
+      try {
+        if (typeof SentinelEventStore !== "undefined" && SentinelEventStore.clear) {
+          await SentinelEventStore.clear();
+        }
+      } catch (_) {}
+      localStorage.removeItem("sg_stored_events_24h");
       localStorage.removeItem("sg_auth_token");
       localStorage.removeItem("sg_auth_user");
       window.location.replace("login.html");
@@ -2563,14 +2605,34 @@ app.add_middleware(
 
     async function loadInitialLiveTraffic() {
       try {
+        if (typeof SentinelEventStore !== "undefined") {
+          const stored = await SentinelEventStore.getAll();
+          if (stored && stored.length > 0) {
+            liveTrafficBuffer = [...stored];
+            renderLiveTrafficTable();
+          }
+        }
         const res = await fetch(`${API}/overview`);
-        const data = await res.json();
-        const events = data.recent_events || [];
-        liveTrafficBuffer = [...events];
-        renderLiveTrafficTable();
+        if (res.ok) {
+          const data = await res.json();
+          const events = data.recent_events || [];
+          if (events.length > 0 && typeof SentinelEventStore !== "undefined") {
+            await SentinelEventStore.putBatch(events);
+            const merged = await SentinelEventStore.getAll();
+            liveTrafficBuffer = [...merged];
+            renderLiveTrafficTable();
+          }
+        }
       } catch (err) {
         console.error("Failed to load initial live traffic:", err);
       }
+    }
+
+    function toggleLiveTrafficWideView() {
+      const isWide = document.body.classList.toggle("livetraffic-wide-mode");
+      const btn = document.getElementById("livetraffic-wide-btn");
+      if (btn) btn.innerHTML = isWide ? "🗗 Standard View" : "⛶ Wide View";
+      localStorage.setItem("sg_livetraffic_wide", isWide ? "true" : "false");
     }
 
     function toggleLiveTrafficStream() {
@@ -2580,8 +2642,10 @@ app.add_middleware(
     }
 
     function clearLiveTrafficBuffer() {
-      liveTrafficBuffer = [];
-      renderLiveTrafficTable();
+      if (confirm("Clear in-memory view buffer? Stored 24h events remain safe in local container until explicit logout.")) {
+        liveTrafficBuffer = [];
+        renderLiveTrafficTable();
+      }
     }
 
     function applyLiveTrafficFilter() {
@@ -2591,8 +2655,18 @@ app.add_middleware(
     }
 
     function prependLiveTrafficEvent(ev) {
-      liveTrafficBuffer.unshift(ev);
-      if (liveTrafficBuffer.length > 200) liveTrafficBuffer.pop();
+      if (!ev || !ev.id) return;
+      if (typeof SentinelEventStore !== "undefined") {
+        SentinelEventStore.putBatch([ev]);
+      }
+      if (!allRecentEvents.some(e => e.id === ev.id)) {
+        allRecentEvents.unshift(ev);
+        updateContainerBadge(allRecentEvents.length);
+      }
+      if (!liveTrafficBuffer.some(e => e.id === ev.id)) {
+        liveTrafficBuffer.unshift(ev);
+      }
+      if (liveTrafficBuffer.length > 500) liveTrafficBuffer.pop();
 
       if (liveTrafficFilter === "ALL" || ev.action === liveTrafficFilter) {
         const tbody = document.getElementById("livetraffic-table-body");
@@ -2605,7 +2679,7 @@ app.add_middleware(
           tr.onclick = () => openEventForensics(ev.id);
           tr.innerHTML = formatLiveTrafficRowHtml(ev);
           tbody.insertBefore(tr, tbody.firstChild);
-          if (tbody.children.length > 200) {
+          if (tbody.children.length > 500) {
             tbody.removeChild(tbody.lastChild);
           }
         }
@@ -2636,20 +2710,40 @@ app.add_middleware(
     function formatLiveTrafficRowHtml(ev) {
       const ts = formatTimestamp(ev.timestamp);
       const safeAction = escapeHtml(ev.action);
-      const badgeClass = ev.action === 'BLOCK' ? 'badge-block' : (ev.action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
+      let badgeClass = ev.action === 'BLOCK' ? 'badge-block' : (ev.action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
       const safeMethod = escapeHtml(ev.method || 'GET');
       const safePath = escapeHtml(ev.path || '/');
       const safeIp = escapeHtml(ev.client_ip || '127.0.0.1');
       const safeRule = escapeHtml(ev.rule_triggered || 'CLEAN-TRAFFIC');
       const safeScore = Number(ev.risk_score) || 0;
 
+      const isReOffender = ev.rule_triggered === "ALREADY-BLOCKED-REACH-ATTEMPT" || 
+                           (ev.details && ev.details.includes("QUARANTINED OFFENDER RE-ATTEMPT"));
+
+      let verdictBadge = `<span class="badge ${badgeClass}">${safeAction}</span>`;
+      let ruleDisplay = `<span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600; font-size: 11px; font-family: var(--font-mono);">${safeRule}</span>`;
+
+      if (isReOffender) {
+        verdictBadge = `<span class="badge badge-block" style="background: rgba(239, 68, 68, 0.22); border: 1px solid #ef4444; color: #ff5555; font-weight: 800; letter-spacing: 0.3px; padding: 4px 8px; box-shadow: 0 0 10px rgba(239,68,68,0.35);">⛔ ALREADY BANNED</span>`;
+        ruleDisplay = `
+          <div>
+            <div style="color: var(--terracotta); font-weight: 800; font-size: 11px; font-family: var(--font-mono); display: flex; align-items: center; gap: 4px;">
+              <span>🚨</span> ALREADY BANNED IP RE-ATTEMPT
+            </div>
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+              Offender banned in firewall still attempting to reach endpoint
+            </div>
+          </div>
+        `;
+      }
+
       return `
-        <td style="color: var(--text-muted); font-family: var(--font-mono); font-size: 11px;">${ts.time}</td>
-        <td><span class="badge ${badgeClass}">${safeAction}</span></td>
+        <td style="color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; white-space: nowrap;">${ts.time}</td>
+        <td>${verdictBadge}</td>
         <td><span style="font-weight: 700; font-family: var(--font-mono); color: var(--deep-indigo);">${safeMethod}</span></td>
         <td><code style="color: var(--text-charcoal); background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${safePath}</code></td>
-        <td style="color: var(--deep-indigo); font-family: var(--font-mono); font-size: 11px;" data-telemetry-hud="client-ip" data-telemetry-id="${safeIp}">${safeIp}</td>
-        <td><span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600; font-size: 11px; font-family: var(--font-mono);">${safeRule}</span></td>
+        <td style="color: var(--deep-indigo); font-family: var(--font-mono); font-size: 11px; font-weight: 700;" data-telemetry-hud="client-ip" data-telemetry-id="${safeIp}">${safeIp}</td>
+        <td>${ruleDisplay}</td>
         <td style="font-weight: 700; font-family: var(--font-mono); color: ${safeScore > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">${safeScore.toFixed(1)}</td>
         <td><button class="btn btn-subtle" style="padding: 2px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${escapeHtml(ev.id)}')">Inspect</button></td>
       `;
@@ -3328,6 +3422,27 @@ app.add_middleware(
             }
           };
         } catch (_) {}
+      },
+
+      async clear() {
+        if (!this.db) {
+          try { localStorage.removeItem("sg_stored_events_24h"); } catch (_) {}
+          return;
+        }
+        return new Promise((resolve) => {
+          try {
+            const tx = this.db.transaction(this.storeName, "readwrite");
+            const store = tx.objectStore(this.storeName);
+            store.clear();
+            tx.oncomplete = () => {
+              try { localStorage.removeItem("sg_stored_events_24h"); } catch (_) {}
+              resolve();
+            };
+            tx.onerror = () => resolve();
+          } catch (_) {
+            resolve();
+          }
+        });
       }
     };
 
@@ -3346,7 +3461,9 @@ app.add_middleware(
           if (data.events && data.events.length) {
             await SentinelEventStore.putBatch(data.events);
             allRecentEvents = await SentinelEventStore.getAll();
+            liveTrafficBuffer = [...allRecentEvents];
             applyEventFilter();
+            renderLiveTrafficTable();
             updateContainerBadge(allRecentEvents.length);
             showThreatToast("24H Ledger Synchronized", `Stored ${data.events.length} events in local container.`);
           }
@@ -3364,8 +3481,10 @@ app.add_middleware(
         const stored = await SentinelEventStore.getAll();
         if (stored && stored.length > 0) {
           allRecentEvents = stored;
+          liveTrafficBuffer = [...stored];
           updateContainerBadge(allRecentEvents.length);
           applyEventFilter();
+          renderLiveTrafficTable();
         }
       } catch (err) {
         console.warn("Bootstrap event store warning:", err);
@@ -3703,7 +3822,10 @@ app.add_middleware(
       }
 
       if (tabId === "dashboard") pollTelemetry(true);
-      if (tabId === "livetraffic") initLiveTrafficSSE();
+      if (tabId === "livetraffic") {
+        renderLiveTrafficTable();
+        initLiveTrafficSSE();
+      }
       if (tabId === "domains") loadDomains();
       if (tabId === "inventory") loadEndpoints();
       if (tabId === "iprules") loadIpRules();
@@ -3854,7 +3976,9 @@ app.add_middleware(
         // Retrieve full 24h container events
         const storedEvents = await SentinelEventStore.getAll();
         allRecentEvents = storedEvents.length > 0 ? storedEvents : incomingEvents;
+        liveTrafficBuffer = [...allRecentEvents];
         updateContainerBadge(allRecentEvents.length);
+        renderLiveTrafficTable();
 
         // Check for newly intercepted threats & feed 3D pipeline visualizer
         if (knownEventIds.size > 0) {
@@ -4051,11 +4175,17 @@ app.add_middleware(
     // Security Events Table & Forensics Drawer (24-Hour Container Non-Destructive Ingestion)
     // -------------------------------------------------------------------------
     function formatEventRowHtml(ev) {
+      const isReOffender = ev.rule_triggered === "ALREADY-BLOCKED-REACH-ATTEMPT" || 
+                           (ev.details && ev.details.includes("QUARANTINED OFFENDER RE-ATTEMPT"));
+
       let badge = `<span class="badge badge-allow">ALLOW (200)</span>`;
       if (ev.action === "BLOCK") badge = `<span class="badge badge-block">BLOCK (403)</span>`;
       if (ev.action === "CHALLENGE") badge = `<span class="badge badge-challenge">CHALLENGE</span>`;
       if (ev.rule_triggered && ev.rule_triggered.includes("RATE-LIMIT")) {
         badge = `<span class="badge badge-ratelimit">RATE_LIMIT (429)</span>`;
+      }
+      if (isReOffender) {
+        badge = `<span class="badge badge-block" style="background: rgba(239, 68, 68, 0.22); border: 1px solid #ef4444; color: #ff5555; font-weight: 800; padding: 4px 8px; box-shadow: 0 0 10px rgba(239,68,68,0.35);">⛔ ALREADY BANNED</span>`;
       }
 
       const domainObj = allWebsites.find(w => w.id === ev.website_id);
@@ -4070,6 +4200,11 @@ app.add_middleware(
       const t = formatTimestamp(ev.timestamp);
       const riskColor = safeScore >= 75 ? "var(--terracotta)" : (safeScore >= 50 ? "var(--warm-ochre)" : "var(--sage-green)");
 
+      let ruleCellContent = safeRule;
+      if (isReOffender) {
+        ruleCellContent = `<div style="color: var(--terracotta); font-weight: 800; display: flex; align-items: center; gap: 4px;"><span>🚨</span> ALREADY BANNED IP RE-ATTEMPT</div><div style="font-size: 10px; color: var(--text-muted); font-weight: normal;">Offender banned in firewall still attempting access</div>`;
+      }
+
       return `
         <td title="${escapeHtml(t.full)}" style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap; padding: 10px 14px;">
           <div style="font-weight: 700; color: var(--text-charcoal);">${escapeHtml(t.time)}</div>
@@ -4081,7 +4216,7 @@ app.add_middleware(
         <td style="padding: 10px 14px;"><strong style="color: ${riskColor}; font-family: var(--font-mono);">${safeScore}</strong>/100</td>
         <td style="padding: 10px 14px;">${badge}</td>
         <td style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'inherit'}; font-weight: 700; font-size: 12px; padding: 10px 14px;">
-          ${safeRule}
+          ${ruleCellContent}
         </td>
         <td style="text-align: center; padding: 10px 14px;">
           <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${safeId}')">
@@ -4189,8 +4324,14 @@ app.add_middleware(
       const t = formatTimestamp(ev.timestamp);
       document.getElementById("drawer-event-time").innerText = `${t.time} (${t.relative}) | ${t.full}`;
       
+      const isReOffender = ev.rule_triggered === "ALREADY-BLOCKED-REACH-ATTEMPT" || 
+                           (ev.details && ev.details.includes("QUARANTINED OFFENDER RE-ATTEMPT"));
+
       const badge = document.getElementById("drawer-verdict-badge");
-      if (ev.action === "BLOCK") {
+      if (isReOffender) {
+        badge.innerText = "ALREADY BANNED (403)";
+        badge.className = "badge badge-block";
+      } else if (ev.action === "BLOCK") {
         badge.innerText = "BLOCK (403)";
         badge.className = "badge badge-block";
       } else if (ev.action === "CHALLENGE") {
@@ -4241,7 +4382,11 @@ app.add_middleware(
       }
       document.getElementById("drawer-latency").innerText = latency;
 
-      document.getElementById("drawer-rule").innerText = ev.rule_triggered || "CLEAN-REQUEST";
+      if (isReOffender) {
+        document.getElementById("drawer-rule").innerHTML = `<span style="color:var(--terracotta); font-weight:800;">⛔ ALREADY-BLOCKED-REACH-ATTEMPT</span><div style="font-size:11px; color:var(--text-muted); margin-top:4px;">⚠️ OFFENDER FIREWALL RE-ATTEMPT: Client IP ${escapeHtml(ev.client_ip)} is ALREADY BANNED in firewall rules but is actively attempting repeat access.</div>`;
+      } else {
+        document.getElementById("drawer-rule").innerText = ev.rule_triggered || "CLEAN-REQUEST";
+      }
       document.getElementById("drawer-owasp").innerText = ev.owasp_category || "None";
       
       const domainObj = allWebsites.find(w => w.id === ev.website_id);
@@ -4987,6 +5132,12 @@ app.add_middleware(
         if (popover) popover.style.display = "none";
       }
     });
+
+    if (localStorage.getItem("sg_livetraffic_wide") === "true") {
+      document.body.classList.add("livetraffic-wide-mode");
+      const wideBtn = document.getElementById("livetraffic-wide-btn");
+      if (wideBtn) wideBtn.innerHTML = "🗗 Standard View";
+    }
 
     updateSystemClock();
     bootstrapEventStore().then(() => {

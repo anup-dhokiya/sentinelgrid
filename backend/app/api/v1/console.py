@@ -677,14 +677,16 @@ async def register_connector_heartbeat(req: ConnectorHeartbeatRequest):
 
 
 def is_public_bannable_ip(ip: str) -> bool:
-    """Strictly prevents banning loopback, private subnets, or test/internal clients."""
-    if not ip or ip in ("127.0.0.1", "::1", "localhost", "unknown", "unknown-client", "sandbox-client", "browser-client"):
+    """
+    Prevents banning origin host loopback (127.0.0.1, ::1, localhost),
+    while permitting automated firewall quarantine of threat actors, scanner bots, and attacking IPs.
+    """
+    if not ip:
         return False
-    try:
-        addr = ipaddress.ip_address(ip)
-        return not (addr.is_private or addr.is_loopback or addr.is_reserved or addr.is_link_local)
-    except Exception:
+    cleaned = ip.strip()
+    if cleaned in ("127.0.0.1", "::1", "localhost"):
         return False
+    return True
 
 
 # -----------------------------------------------------------------------------
@@ -716,7 +718,7 @@ async def inspect_live_request(req: WafTestRequest):
 
     is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
                   req.headers.get("x-sentinelgrid-sandbox") == "true" or
-                  client_ip in ("sandbox-client", "127.0.0.1", "::1", "browser-client"))
+                  client_ip in ("127.0.0.1", "::1", "localhost"))
 
     # Step 0: Fast Autonomous Dynamic IP Quarantine Check (<0.05ms)
     if not is_sandbox:
@@ -731,8 +733,8 @@ async def inspect_live_request(req: WafTestRequest):
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     event_id, site_id, now, client_ip, req.method, full_path,
-                    "BLOCK", 100.0, "AUTONOMOUS-IP-QUARANTINE", "A01:Broken Access Control",
-                    f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)"
+                    "BLOCK", 100.0, "ALREADY-BLOCKED-REACH-ATTEMPT", "A01:Broken Access Control",
+                    f"⚠️ QUARANTINED OFFENDER RE-ATTEMPT: Client IP {client_ip} is ALREADY QUARANTINED ({q_reason}) but is still attempting to reach {full_path}! Cooldown: {remaining_sec}s remaining"
                 ))
 
             event_payload = {
@@ -744,9 +746,9 @@ async def inspect_live_request(req: WafTestRequest):
                 "path": full_path,
                 "action": "BLOCK",
                 "risk_score": 100.0,
-                "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
+                "rule_triggered": "ALREADY-BLOCKED-REACH-ATTEMPT",
                 "owasp_category": "A01:Broken Access Control",
-                "details": f"Quarantined IP: {q_reason} (Cooldown: {remaining_sec}s remaining)",
+                "details": f"⚠️ QUARANTINED OFFENDER RE-ATTEMPT: Client IP {client_ip} is ALREADY QUARANTINED ({q_reason}) but is still attempting to reach {full_path}! Cooldown: {remaining_sec}s remaining",
                 "latency_ms": elapsed_ms
             }
             broadcast_sse_event(event_payload)
@@ -755,20 +757,17 @@ async def inspect_live_request(req: WafTestRequest):
                 "event_id": event_id,
                 "action": "BLOCK",
                 "risk_score": 100.0,
-                "rule_triggered": "AUTONOMOUS-IP-QUARANTINE",
+                "rule_triggered": "ALREADY-BLOCKED-REACH-ATTEMPT",
                 "owasp_category": "A01:Broken Access Control",
                 "cve_reference": None,
                 "total_matches": 1,
-                "all_matches": [{"rule_id": "AUTONOMOUS-IP-QUARANTINE", "name": f"IP Quarantined: {q_reason}"}],
+                "all_matches": [{"rule_id": "ALREADY-BLOCKED-REACH-ATTEMPT", "name": f"Quarantined Offender Re-attempt: {q_reason}"}],
                 "timestamp": now,
                 "retry_after_seconds": remaining_sec,
                 "execution_latency_ms": elapsed_ms
             }
 
-    # Step 1: Check IP Access Rules (Bypass for explicit Sandbox / testbed requests)
-    is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
-                  req.headers.get("x-sentinelgrid-sandbox") == "true" or
-                  client_ip in ("sandbox-client", "127.0.0.1", "::1"))
+    # Step 1: Check IP Access Rules (Bypass only for explicit loopback)
     if not is_sandbox:
         with conn:
             ip_rules = conn.execute(
@@ -782,26 +781,51 @@ async def inspect_live_request(req: WafTestRequest):
                 elapsed_ms = round((time.perf_counter() - start_time) * 1000, 2)
                 event_id = f"ev-{uuid4().hex[:8]}"
 
+                if rule_action == "BLOCK":
+                    triggered_rule = "ALREADY-BLOCKED-REACH-ATTEMPT"
+                    rule_desc = f"⚠️ QUARANTINED OFFENDER RE-ATTEMPT: Client IP {client_ip} is ALREADY BANNED in firewall rules ({rule['description'] or 'Firewall ACL'}) but is still attempting to reach {full_path}!"
+                    risk_score = 100.0
+                else:
+                    triggered_rule = f"IP-{rule_action}-LIST"
+                    rule_desc = f"Rule: {rule['ip_or_cidr']} ({rule['description'] or 'Custom ACL'})"
+                    risk_score = 0.0
+
                 with conn:
                     conn.execute("""
                     INSERT INTO security_events (id, website_id, timestamp, client_ip, method, path, action, risk_score, rule_triggered, owasp_category, details)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
                         event_id, site_id, now, client_ip, req.method, full_path,
-                        rule_action, 100.0 if rule_action == "BLOCK" else 0.0,
-                        f"IP-{rule_action}-LIST", "A01:Broken Access Control",
-                        f"Rule: {rule['ip_or_cidr']} ({rule['description'] or 'Custom ACL'})"
+                        rule_action, risk_score,
+                        triggered_rule, "A01:Broken Access Control",
+                        rule_desc
                     ))
+
+                event_payload = {
+                    "id": event_id,
+                    "website_id": site_id,
+                    "timestamp": now,
+                    "client_ip": client_ip,
+                    "method": req.method,
+                    "path": full_path,
+                    "action": rule_action,
+                    "risk_score": risk_score,
+                    "rule_triggered": triggered_rule,
+                    "owasp_category": "A01:Broken Access Control",
+                    "details": rule_desc,
+                    "latency_ms": elapsed_ms
+                }
+                broadcast_sse_event(event_payload)
 
                 return {
                     "event_id": event_id,
                     "action": rule_action,
-                    "risk_score": 100.0 if rule_action == "BLOCK" else 0.0,
-                    "rule_triggered": f"IP-{rule_action}-LIST",
+                    "risk_score": risk_score,
+                    "rule_triggered": triggered_rule,
                     "owasp_category": "A01:Broken Access Control",
                     "cve_reference": None,
                     "total_matches": 1,
-                    "all_matches": [{"rule_id": f"IP-{rule_action}-LIST", "name": rule["description"] or "IP Access Rule"}],
+                    "all_matches": [{"rule_id": triggered_rule, "name": rule_desc}],
                     "timestamp": now,
                     "execution_latency_ms": elapsed_ms
                 }
