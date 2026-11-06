@@ -508,101 +508,88 @@
     // -------------------------------------------------------------------------
     // REAL-TIME 3D IN-LINE WAAP PIPELINE ENGINE (LIVE TRAFFIC SYNCHRONIZED)
     // -------------------------------------------------------------------------
-    let particleAnimationId = null;
-    let particleSpeedMultiplier = 2.0;
-    let isParticleStreamActive = true;
-    const particles = [];
-    const explosionSparks = [];
-    const floatingBadges = [];
+    // =========================================================================
+    // REAL-TIME IN-LINE INSPECTION VELOCITY LIVE GRAPH ENGINE (PASSED VS BLOCKED)
+    // =========================================================================
+
+    let isVelocityStreamActive = true;
+    let velocityWindowSeconds = 60;
+    let currentSecondPassed = 0;
+    let currentSecondBlocked = 0;
+    const velocityHistory = [];
 
     let pipelineTotalCount = 0;
     let pipelinePassedCount = 0;
     let pipelineDestroyedCount = 0;
 
-    const PIPELINE_NODES = [
-      {
-        id: "ingress",
-        label: "Client Ingress",
-        sublabel: "Untrusted Edge Traffic",
-        badge: "TLS 1.3 / EDGE",
-        xRatio: 0.12,
-        yRatio: 0.50,
-        radius: 26,
-        color: "#38BDF8",
-        glow: "rgba(56, 189, 248, 0.4)",
-        desc: "Edge TLS termination & HTTP connection pool receiving live client requests.",
-        telemetry: { status: "ACTIVE", rps: "Live Ingress", transport: "TLS 1.3" }
-      },
-      {
-        id: "waap",
-        label: "SentinelGrid WAAP",
-        sublabel: "In-Process Zero-Trust Gate",
-        badge: "SMARTPARSE AST",
-        xRatio: 0.50,
-        yRatio: 0.50,
-        radius: 36,
-        color: "#818CF8",
-        glow: "rgba(129, 140, 248, 0.5)",
-        pulseRadius: 0,
-        pulseColor: null,
-        desc: "Lexical AST analysis, IP access rules, rate limiter & Ed25519 signature enforcement.",
-        telemetry: { status: "PROTECTED", p99: "0.35ms", engine: "Sub-1.5ms" }
-      },
-      {
-        id: "origin",
-        label: "Protected Origin",
-        sublabel: "Healthy Upstream Service",
-        badge: "HTTP 200 PASS",
-        xRatio: 0.88,
-        yRatio: 0.28,
-        radius: 26,
-        color: "#22C55E",
-        glow: "rgba(34, 197, 94, 0.45)",
-        pulseRadius: 0,
-        pulseColor: null,
-        desc: "Sanitized clean requests forwarded safely to origin applications.",
-        telemetry: { status: "ONLINE", upstream: "agispro.vercel.app", state: "CLEAN" }
-      },
-      {
-        id: "quarantine",
-        label: "Threat Quarantine",
-        sublabel: "Mitigated Attack Sinkhole",
-        badge: "403 DESTROYED",
-        xRatio: 0.88,
-        yRatio: 0.72,
-        radius: 26,
-        color: "#EF4444",
-        glow: "rgba(239, 68, 68, 0.5)",
-        pulseRadius: 0,
-        pulseColor: null,
-        desc: "Exploits (SQLi, XSS, BOLA, RCE) deflected and destroyed with forensics.",
-        telemetry: { status: "CONTAINING", trap: "Dynamic Tarpit", mitigation: "100.0%" }
+    // Initialize 60 initial baseline points so graph is immediately populated
+    (function initVelocityHistory() {
+      const now = Date.now();
+      for (let i = 59; i >= 0; i--) {
+        velocityHistory.push({
+          time: now - (i * 1000),
+          passed: 0,
+          blocked: 0,
+          total: 0
+        });
       }
-    ];
+    })();
+
+    function setVelocityWindow(sec) {
+      velocityWindowSeconds = parseInt(sec, 10) || 60;
+      const now = Date.now();
+      while (velocityHistory.length < velocityWindowSeconds) {
+        velocityHistory.unshift({
+          time: now - (velocityHistory.length * 1000),
+          passed: 0,
+          blocked: 0,
+          total: 0
+        });
+      }
+    }
 
     function setParticleSpeed(val) {
-      particleSpeedMultiplier = parseFloat(val) || 2.0;
+      // Backward-compatibility bridge
+      const num = parseInt(val, 10);
+      if (num === 1) setVelocityWindow(60);
+      else if (num === 2) setVelocityWindow(300);
+      else if (num === 4) setVelocityWindow(900);
+      else setVelocityWindow(60);
     }
 
-    function toggleParticleStream() {
-      isParticleStreamActive = !isParticleStreamActive;
+    function toggleVelocityStream() {
+      isVelocityStreamActive = !isVelocityStreamActive;
       const btn = document.getElementById("canvas-pause-btn");
-      if (btn) btn.innerText = isParticleStreamActive ? "⏸️ Pause 3D" : "▶️ Resume 3D";
+      const txt = document.getElementById("canvas-pause-btn-text");
+      if (txt) {
+        txt.innerText = isVelocityStreamActive ? "Pause Stream" : "Resume Stream";
+      } else if (btn) {
+        btn.innerText = isVelocityStreamActive ? "Pause Stream" : "Resume Stream";
+      }
     }
+    const toggleParticleStream = toggleVelocityStream; // alias
 
-    let lastDispatchedPacketTime = Date.now();
+    function showToast(msg, type = "info") {
+      if (typeof showThreatToast === "function") {
+        showThreatToast(type === "error" ? "Threat Event" : "Telemetry Notice", msg);
+      }
+    }
 
     /**
-     * Dispatches a real, live HTTP request into the 3D pipeline visualization
+     * Public telemetry consumer: ingests live events from SSE & polling
      */
     function dispatchLivePacketToPipeline(ev) {
-      lastDispatchedPacketTime = Date.now();
-      if (!isParticleStreamActive) return;
+      if (!ev) return;
       const isBlock = ev.action === "BLOCK";
       
       pipelineTotalCount++;
-      if (isBlock) pipelineDestroyedCount++;
-      else pipelinePassedCount++;
+      if (isBlock) {
+        pipelineDestroyedCount++;
+        currentSecondBlocked++;
+      } else {
+        pipelinePassedCount++;
+        currentSecondPassed++;
+      }
 
       // Update HUD counters
       const totEl = document.getElementById("pipeline-stat-total");
@@ -611,27 +598,10 @@
       if (totEl) totEl.innerText = pipelineTotalCount.toLocaleString();
       if (passEl) passEl.innerText = pipelinePassedCount.toLocaleString();
       if (destEl) destEl.innerText = pipelineDestroyedCount.toLocaleString();
-
-      const method = ev.method || "GET";
-      const path = ev.path || "/";
-      const rule = ev.rule_triggered || (isBlock ? "THREAT" : "CLEAN");
-
-      // Spawn live packet particle
-      particles.push({
-        leg: 0,
-        t: 0,
-        speed: (0.008 + Math.random() * 0.003) * particleSpeedMultiplier,
-        isThreat: isBlock,
-        method: method,
-        label: `${method} ${path.slice(0, 14)}`,
-        rule: rule,
-        size: isBlock ? 4.5 : 3.6,
-        trail: []
-      });
     }
 
     function triggerSimulatedThreatWave() {
-      showToast("🚨 Attack Wave Injected: 25 exploit packets dispatched to live 3D pipeline!", "error");
+      showToast("Attack Wave Injected: 25 exploit packets dispatched to live velocity graph!", "error");
       const attacks = [
         { path: "/api/users?id=1' UNION SELECT", rule: "SQLI-UNION-SELECT" },
         { path: "/search?q=<script>alert(1)", rule: "XSS-INJECTION" },
@@ -648,24 +618,42 @@
             path: atk.path,
             rule_triggered: atk.rule
           });
-        }, i * 75);
+        }, i * 60);
       }
     }
 
+    // 1-Second Rolling Ticker to push current throughput into rolling buffer
+    setInterval(() => {
+      if (!isVelocityStreamActive) return;
+      const now = Date.now();
+      velocityHistory.push({
+        time: now,
+        passed: currentSecondPassed,
+        blocked: currentSecondBlocked,
+        total: currentSecondPassed + currentSecondBlocked
+      });
+      currentSecondPassed = 0;
+      currentSecondBlocked = 0;
+      while (velocityHistory.length > velocityWindowSeconds) {
+        velocityHistory.shift();
+      }
+    }, 1000);
+
     function initInteractive3DPipeline() {
-      const canvas = document.getElementById("interactive-3d-pipeline-canvas");
-      const card = document.getElementById("topology3dCard");
+      const canvas = document.getElementById("interactive-3d-pipeline-canvas") || document.getElementById("inspection-velocity-canvas");
       const hud = document.getElementById("canvas-node-hud");
-      if (!canvas || !card) return;
+      if (!canvas) return;
 
       const ctx = canvas.getContext("2d");
+      let mouseHoverX = null;
+      let mouseHoverY = null;
 
       function resizePipelineCanvas() {
         const rect = canvas.getBoundingClientRect();
         if (rect.width > 0) {
           const dpr = Math.min(window.devicePixelRatio || 1, 2);
           const displayWidth = rect.width;
-          const displayHeight = Math.max(160, Math.min(260, Math.round(rect.width * 0.22)));
+          const displayHeight = Math.max(160, Math.min(240, Math.round(rect.width * 0.22)));
           canvas.style.height = `${displayHeight}px`;
           canvas.width = Math.round(displayWidth * dpr);
           canvas.height = Math.round(displayHeight * dpr);
@@ -673,397 +661,251 @@
         }
       }
 
-      if (window.ResizeObserver) {
-        const ro = new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            if (entry.contentRect && entry.contentRect.width > 0) {
-              window.requestAnimationFrame(resizePipelineCanvas);
-            }
-          }
-        });
-        ro.observe(card);
-      } else {
-        window.addEventListener("resize", resizePipelineCanvas, { passive: true });
-      }
+      window.addEventListener("resize", resizePipelineCanvas, { passive: true });
+      window.addEventListener("orientationchange", () => setTimeout(resizePipelineCanvas, 150), { passive: true });
       resizePipelineCanvas();
 
-      // Touch inspection support for mobile screens
+      // Mouse / Touch interaction for crosshair
+      canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseHoverX = e.clientX - rect.left;
+        mouseHoverY = e.clientY - rect.top;
+      }, { passive: true });
+
+      canvas.addEventListener("mouseleave", () => {
+        mouseHoverX = null;
+        mouseHoverY = null;
+        if (hud) hud.style.display = "none";
+      });
+
+      // Touch support
       canvas.addEventListener("touchstart", (e) => {
         if (e.touches && e.touches[0]) {
-          const t = e.touches[0];
-          const fake = new MouseEvent("mousemove", { clientX: t.clientX, clientY: t.clientY });
-          canvas.dispatchEvent(fake);
+          const rect = canvas.getBoundingClientRect();
+          mouseHoverX = e.touches[0].clientX - rect.left;
+          mouseHoverY = e.touches[0].clientY - rect.top;
         }
       }, { passive: true });
       canvas.addEventListener("touchmove", (e) => {
         if (e.touches && e.touches[0]) {
-          const t = e.touches[0];
-          const fake = new MouseEvent("mousemove", { clientX: t.clientX, clientY: t.clientY });
-          canvas.dispatchEvent(fake);
+          const rect = canvas.getBoundingClientRect();
+          mouseHoverX = e.touches[0].clientX - rect.left;
+          mouseHoverY = e.touches[0].clientY - rect.top;
         }
       }, { passive: true });
       canvas.addEventListener("touchend", () => {
+        mouseHoverX = null;
+        mouseHoverY = null;
         if (hud) hud.style.display = "none";
       }, { passive: true });
 
-      // Stationary hardware alignment (Zero 3D perspective tilt)
-      card.style.transform = "none";
-      card.addEventListener("mouseleave", () => {
-        if (hud) hud.style.display = "none";
-      });
-
-      // Mouse Hover HUD on Canvas Nodes (Dynamic 1:1 Hit Testing)
-      canvas.addEventListener("mousemove", (e) => {
-        if (!hud) return;
+      function render() {
         const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
         const W = rect.width;
-        const H = rect.height;
-        const radiusScale = Math.min(1.2, Math.max(0.7, W / 1000));
+        const H = Math.max(160, Math.min(240, Math.round(rect.width * 0.22)));
 
-        let hovered = null;
-        for (const n of PIPELINE_NODES) {
-          const nx = n.xRatio * W;
-          const ny = n.yRatio * H;
-          const currentRadius = n.radius * radiusScale;
-          const dist = Math.hypot(mouseX - nx, mouseY - ny);
-          if (dist <= currentRadius + 8) {
-            hovered = n;
-            break;
-          }
+        if (W <= 0 || H <= 0) {
+          requestAnimationFrame(render);
+          return;
         }
-
-        if (hovered) {
-          hud.style.display = "block";
-          hud.style.left = `${Math.min(rect.width - 240, Math.max(10, e.clientX - rect.left + 15))}px`;
-          hud.style.top = `${Math.min(rect.height - 110, Math.max(10, e.clientY - rect.top - 20))}px`;
-          hud.innerHTML = `
-            <div style="font-weight: 800; color: ${hovered.color}; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-              <span>${escapeHtml(hovered.label)}</span>
-              <span style="font-size: 9px; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: var(--radius-pill);">${hovered.badge}</span>
-            </div>
-            <div style="font-size: 10px; color: #CBD5E1; margin-bottom: 6px;">${escapeHtml(hovered.desc)}</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 9px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
-              ${Object.entries(hovered.telemetry).map(([k, v]) => `<div><span style="color:#94A3B8;">${k.toUpperCase()}:</span> <strong>${escapeHtml(v)}</strong></div>`).join("")}
-            </div>
-          `;
-        } else {
-          hud.style.display = "none";
-        }
-      });
-
-      function evalCubicBezier(p0, p1, p2, p3, t) {
-        const u = 1 - t;
-        const tt = t * t;
-        const uu = u * u;
-        const uuu = uu * u;
-        const ttt = tt * t;
-        return {
-          x: uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x,
-          y: uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y
-        };
-      }
-
-      function spawnBaseParticle() {
-        if (!isParticleStreamActive) return;
-        const isThreat = Math.random() < 0.20;
-        particles.push({
-          leg: 0,
-          t: 0,
-          speed: (0.005 + Math.random() * 0.003) * particleSpeedMultiplier,
-          isThreat: isThreat,
-          size: isThreat ? 4.0 : 3.2,
-          label: isThreat ? "PROBE /api" : "GET /",
-          trail: []
-        });
-      }
-
-      let lastSpawn = 0;
-      function render(now) {
-        if (now - lastSpawn > (160 / particleSpeedMultiplier)) {
-          if (particles.length < 5) spawnBaseParticle();
-          lastSpawn = now;
-        }
-
-        const W = canvas.width;
-        const H = canvas.height;
 
         const isDark = document.documentElement.getAttribute("data-theme") !== "light";
-        ctx.fillStyle = isDark ? "#0D1117" : "#F7F6F2";
+        ctx.fillStyle = isDark ? "#090B0E" : "#FAF6EE";
         ctx.fillRect(0, 0, W, H);
 
-        // Draw 3D Isometric Grid Floor
-        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.03)";
+        const padLeft = 48;
+        const padRight = 20;
+        const padTop = 20;
+        const padBottom = 26;
+        const plotW = W - padLeft - padRight;
+        const plotH = H - padTop - padBottom;
+
+        const data = velocityHistory.slice(-velocityWindowSeconds);
+        const count = data.length;
+
+        // Determine scale (max throughput per second)
+        let maxVal = 10;
+        for (let i = 0; i < count; i++) {
+          if (data[i].passed > maxVal) maxVal = data[i].passed;
+          if (data[i].blocked > maxVal) maxVal = data[i].blocked;
+          if (data[i].total > maxVal) maxVal = data[i].total;
+        }
+        maxVal = Math.ceil(maxVal * 1.15);
+
+        // Draw horizontal grid lines & Y-axis labels
+        const gridLines = 4;
+        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)";
         ctx.lineWidth = 1;
-        const step = 28;
-        for (let x = 0; x < W; x += step) {
+        ctx.font = "9px 'Space Mono', monospace";
+        ctx.fillStyle = isDark ? "#6E7681" : "#8C95A0";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        for (let i = 0; i <= gridLines; i++) {
+          const y = padTop + (plotH / gridLines) * i;
+          const val = Math.round(maxVal - (maxVal / gridLines) * i);
           ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, H);
+          ctx.moveTo(padLeft, y);
+          ctx.lineTo(W - padRight, y);
           ctx.stroke();
+          ctx.fillText(`${val} r/s`, padLeft - 6, y);
         }
-        for (let y = 0; y < H; y += step) {
+
+        // Draw X-axis time marks (-60s, -30s, NOW)
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        const xIntervals = 4;
+        for (let i = 0; i <= xIntervals; i++) {
+          const x = padLeft + (plotW / xIntervals) * i;
+          const secAgo = Math.round(velocityWindowSeconds * (1 - i / xIntervals));
+          const label = secAgo === 0 ? "NOW" : `-${secAgo}s`;
+          ctx.fillText(label, x, H - padBottom + 8);
+        }
+
+        if (count < 2) {
+          requestAnimationFrame(render);
+          return;
+        }
+
+        const stepX = plotW / (count - 1);
+
+        // ------------------------------------------
+        // SERIES 1: PASSED (CLEAN) TRAFFIC (SAGE GREEN)
+        // ------------------------------------------
+        const passGrad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+        passGrad.addColorStop(0, "rgba(46, 160, 67, 0.20)");
+        passGrad.addColorStop(1, "rgba(46, 160, 67, 0.0)");
+
+        ctx.beginPath();
+        ctx.moveTo(padLeft, padTop + plotH);
+        for (let i = 0; i < count; i++) {
+          const x = padLeft + i * stepX;
+          const y = padTop + plotH - (data[i].passed / maxVal) * plotH;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(padLeft + (count - 1) * stepX, padTop + plotH);
+        ctx.closePath();
+        ctx.fillStyle = passGrad;
+        ctx.fill();
+
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+          const x = padLeft + i * stepX;
+          const y = padTop + plotH - (data[i].passed / maxVal) * plotH;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = "#2EA043";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // ------------------------------------------
+        // SERIES 2: DESTROYED (BLOCKED) THREATS (TERRACOTTA)
+        // ------------------------------------------
+        const blockGrad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+        blockGrad.addColorStop(0, "rgba(248, 81, 73, 0.32)");
+        blockGrad.addColorStop(1, "rgba(248, 81, 73, 0.0)");
+
+        ctx.beginPath();
+        ctx.moveTo(padLeft, padTop + plotH);
+        for (let i = 0; i < count; i++) {
+          const x = padLeft + i * stepX;
+          const y = padTop + plotH - (data[i].blocked / maxVal) * plotH;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(padLeft + (count - 1) * stepX, padTop + plotH);
+        ctx.closePath();
+        ctx.fillStyle = blockGrad;
+        ctx.fill();
+
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+          const x = padLeft + i * stepX;
+          const y = padTop + plotH - (data[i].blocked / maxVal) * plotH;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = "#F85149";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // ------------------------------------------
+        // INTERACTIVE CROSSHAIR & TOOLTIP
+        // ------------------------------------------
+        if (mouseHoverX !== null && mouseHoverX >= padLeft && mouseHoverX <= (W - padRight)) {
+          const relX = mouseHoverX - padLeft;
+          const index = Math.min(count - 1, Math.max(0, Math.round(relX / stepX)));
+          const pt = data[index];
+          const pointX = padLeft + index * stepX;
+          const pointYPassed = padTop + plotH - (pt.passed / maxVal) * plotH;
+          const pointYBlocked = padTop + plotH - (pt.blocked / maxVal) * plotH;
+
+          // Vertical crosshair trace
           ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(W, y);
-          ctx.stroke();
-        }
-
-        const nodes = {};
-        for (const n of PIPELINE_NODES) {
-          nodes[n.id] = {
-            ...n,
-            radius: n.radius * radiusScale,
-            x: n.xRatio * W,
-            y: n.yRatio * H
-          };
-        }
-
-        const paths = [
-          // Leg 0: Ingress -> WAAP
-          {
-            p0: { x: nodes.ingress.x + nodes.ingress.radius, y: nodes.ingress.y },
-            p1: { x: (nodes.ingress.x + nodes.waap.x) / 2, y: nodes.ingress.y },
-            p2: { x: (nodes.ingress.x + nodes.waap.x) / 2, y: nodes.waap.y },
-            p3: { x: nodes.waap.x - nodes.waap.radius, y: nodes.waap.y },
-            color: isDark ? "rgba(56, 189, 248, 0.25)" : "rgba(2, 132, 199, 0.25)"
-          },
-          // Leg 1: WAAP -> Origin (Passed)
-          {
-            p0: { x: nodes.waap.x + nodes.waap.radius, y: nodes.waap.y - 8 },
-            p1: { x: nodes.waap.x + (nodes.origin.x - nodes.waap.x) * 0.45, y: nodes.waap.y - 12 },
-            p2: { x: nodes.origin.x - (nodes.origin.x - nodes.waap.x) * 0.45, y: nodes.origin.y },
-            p3: { x: nodes.origin.x - nodes.origin.radius, y: nodes.origin.y },
-            color: isDark ? "rgba(34, 197, 94, 0.3)" : "rgba(5, 150, 105, 0.3)"
-          },
-          // Leg 2: WAAP -> Quarantine (Destroyed)
-          {
-            p0: { x: nodes.waap.x + nodes.waap.radius, y: nodes.waap.y + 8 },
-            p1: { x: nodes.waap.x + (nodes.quarantine.x - nodes.waap.x) * 0.45, y: nodes.waap.y + 16 },
-            p2: { x: nodes.quarantine.x - (nodes.quarantine.x - nodes.waap.x) * 0.45, y: nodes.quarantine.y },
-            p3: { x: nodes.quarantine.x - nodes.quarantine.radius, y: nodes.quarantine.y },
-            color: isDark ? "rgba(239, 68, 68, 0.32)" : "rgba(220, 38, 38, 0.32)"
-          }
-        ];
-
-        paths.forEach((p, idx) => {
-          ctx.beginPath();
-          ctx.moveTo(p.p0.x, p.p0.y);
-          ctx.bezierCurveTo(p.p1.x, p.p1.y, p.p2.x, p.p2.y, p.p3.x, p.p3.y);
-          ctx.strokeStyle = p.color;
-          ctx.lineWidth = 3.5;
-          ctx.setLineDash(idx === 2 ? [6, 4] : []);
+          ctx.setLineDash([3, 3]);
+          ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.25)" : "rgba(0, 0, 0, 0.25)";
+          ctx.lineWidth = 1;
+          ctx.moveTo(pointX, padTop);
+          ctx.lineTo(pointX, padTop + plotH);
           ctx.stroke();
           ctx.setLineDash([]);
-        });
 
-        // ---------------------------------------------------------------------
-        // Render & Animate Live Packets
-        // ---------------------------------------------------------------------
-        if (isParticleStreamActive) {
-          for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            p.t += p.speed;
-
-            if (p.t < 0) continue;
-
-            const path = paths[p.leg];
-            if (!path) {
-              particles.splice(i, 1);
-              continue;
-            }
-
-            const pos = evalCubicBezier(path.p0, path.p1, path.p2, path.p3, Math.min(1, p.t));
-            p.trail.push({ x: pos.x, y: pos.y });
-            if (p.trail.length > 7) p.trail.shift();
-
-            // Transition between nodes
-            if (p.t >= 1.0) {
-              if (p.leg === 0) {
-                // Packet reached SentinelGrid WAAP Decision Gate!
-                p.leg = p.isThreat ? 2 : 1;
-                p.t = 0;
-                p.trail = [];
-
-                // Trigger WAAP Node Pulse
-                nodes.waap.pulseRadius = 1;
-                nodes.waap.pulseColor = p.isThreat ? "#EF4444" : "#22C55E";
-
-                // Floating decision badge
-                floatingBadges.push({
-                  x: nodes.waap.x,
-                  y: nodes.waap.y - 42,
-                  text: p.isThreat ? "[403 DROP]" : "[200 OK]",
-                  color: p.isThreat ? "#EF4444" : "#22C55E",
-                  life: 1.0,
-                  vy: -0.6
-                });
-              } else {
-                // Packet reached final destination (Origin or Quarantine)
-                if (p.leg === 2) {
-                  // CRISP QUARANTINE SINKHOLE RETICLE DROP
-                  nodes.quarantine.pulseRadius = 1;
-                  nodes.quarantine.pulseColor = "#F85149";
-                  floatingBadges.push({
-                    x: nodes.quarantine.x,
-                    y: nodes.quarantine.y - 28,
-                    text: "[SINKHOLE]",
-                    color: "#EF4444",
-                    life: 1.0,
-                    vy: -0.7
-                  });
-                  nodes.quarantine.pulseRadius = 1;
-                } else {
-                  // PASSED SAFELY TO ORIGIN!
-                  nodes.origin.pulseRadius = 1;
-                  floatingBadges.push({
-                    x: nodes.origin.x,
-                    y: nodes.origin.y - 28,
-                    text: "[200 OK]",
-                    color: "#22C55E",
-                    life: 1.0,
-                    vy: -0.7
-                  });
-                }
-                particles.splice(i, 1);
-                continue;
-              }
-            }
-
-            // Draw Packet Trail
-            if (p.trail.length > 1) {
-              ctx.beginPath();
-              ctx.moveTo(p.trail[0].x, p.trail[0].y);
-              for (let tr = 1; tr < p.trail.length; tr++) {
-                ctx.lineTo(p.trail[tr].x, p.trail[tr].y);
-              }
-              ctx.strokeStyle = p.isThreat ? "rgba(239, 68, 68, 0.45)" : (p.leg === 1 ? "rgba(34, 197, 94, 0.45)" : "rgba(56, 189, 248, 0.45)");
-              ctx.lineWidth = p.size * 0.8;
-              ctx.stroke();
-            }
-
-            // Draw Packet Sphere
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = p.isThreat ? "#EF4444" : (p.leg === 1 ? "#22C55E" : "#38BDF8");
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.shadowBlur = 10;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // Draw Floating Packet Micro-Label
-            if (p.label && p.t < 0.85) {
-              ctx.font = "9px 'Space Mono', monospace";
-              ctx.fillStyle = isDark ? "#CBD5E1" : "#475569";
-              ctx.fillText(p.label, pos.x - 20, pos.y - 9);
-            }
-          }
-
-          // -------------------------------------------------------------------
-          // Explosion Sparks Animation (Quarantine Blast)
-          // -------------------------------------------------------------------
-          for (let s = explosionSparks.length - 1; s >= 0; s--) {
-            const sp = explosionSparks[s];
-            sp.x += sp.vx;
-            sp.y += sp.vy;
-            sp.life -= 0.035;
-            if (sp.life <= 0) {
-              explosionSparks.splice(s, 1);
-              continue;
-            }
-            ctx.beginPath();
-            ctx.arc(sp.x, sp.y, 2.4 * sp.life, 0, Math.PI * 2);
-            ctx.fillStyle = sp.color || "#EF4444";
-            ctx.globalAlpha = Math.max(0, sp.life);
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.shadowBlur = 8;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.globalAlpha = 1.0;
-          }
-
-          // -------------------------------------------------------------------
-          // Floating Decision Badges
-          // -------------------------------------------------------------------
-          for (let b = floatingBadges.length - 1; b >= 0; b--) {
-            const badge = floatingBadges[b];
-            badge.y += badge.vy;
-            badge.life -= 0.022;
-            if (badge.life <= 0) {
-              floatingBadges.splice(b, 1);
-              continue;
-            }
-            ctx.font = "bold 10px 'Plus Jakarta Sans', sans-serif";
-            ctx.fillStyle = badge.color;
-            ctx.globalAlpha = Math.max(0, badge.life);
-            ctx.fillText(badge.text, badge.x - 24, badge.y);
-            ctx.globalAlpha = 1.0;
-          }
-        }
-
-        // ---------------------------------------------------------------------
-        // Render 4 Topology Nodes (With Pulse Ripple Waves)
-        // ---------------------------------------------------------------------
-        for (const key of Object.keys(nodes)) {
-          const node = nodes[key];
-
-          // Expanding Ripple Wave
-          if (node.pulseRadius > 0) {
-            node.pulseRadius += 1.4;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, node.radius + node.pulseRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = node.pulseColor || node.color;
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = Math.max(0, 1.0 - node.pulseRadius / 36);
-            ctx.stroke();
-            ctx.globalAlpha = 1.0;
-            if (node.pulseRadius > 36) node.pulseRadius = 0;
-          }
-
-          // Node Outer Glow
+          // Reticle highlights
+          ctx.fillStyle = "#2EA043";
           ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius + 6, 0, Math.PI * 2);
-          ctx.fillStyle = node.glow;
+          ctx.arc(pointX, pointYPassed, 4, 0, Math.PI * 2);
           ctx.fill();
-
-          // Node Inner Body
-          const grad = ctx.createRadialGradient(node.x, node.y, 2, node.x, node.y, node.radius);
-          grad.addColorStop(0, isDark ? "#1E293B" : "#FFFFFF");
-          grad.addColorStop(0.35, node.color);
-          grad.addColorStop(1, isDark ? "#111827" : "#334155");
-
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-          ctx.fillStyle = grad;
-          ctx.strokeStyle = node.color;
-          ctx.lineWidth = 2.5;
-          ctx.fill();
+          ctx.strokeStyle = "#FFFFFF";
+          ctx.lineWidth = 1.5;
           ctx.stroke();
 
-          // Inner Core Icon
-          ctx.fillStyle = "#FFFFFF";
-          ctx.font = node.id === "waap" ? "bold 13px system-ui" : "bold 10px system-ui";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          const code = node.id === "ingress" ? "ING" : (node.id === "waap" ? "WAF" : (node.id === "origin" ? "200" : "403"));
-          ctx.font = "bold 10px 'Space Mono', monospace";
-          ctx.fillText(code, node.x, node.y);
+          ctx.fillStyle = "#F85149";
+          ctx.beginPath();
+          ctx.arc(pointX, pointYBlocked, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "#FFFFFF";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
 
-          // Labels
-          ctx.font = "bold 11px system-ui, -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? "#F8FAFC" : "#1E293B";
-          ctx.fillText(node.label, node.x, node.y + node.radius + 14);
+          if (hud) {
+            hud.style.display = "block";
+            const tooltipLeft = Math.min(W - 200, Math.max(10, pointX + 15));
+            const tooltipTop = Math.min(H - 90, Math.max(10, Math.min(pointYPassed, pointYBlocked) - 20));
+            hud.style.left = `${tooltipLeft}px`;
+            hud.style.top = `${tooltipTop}px`;
 
-          ctx.font = "9px var(--font-mono, monospace)";
-          ctx.fillStyle = node.color;
-          ctx.fillText(node.badge, node.x, node.y + node.radius + 26);
+            const d = new Date(pt.time);
+            const timeStr = d.toTimeString().split(" ")[0];
+
+            hud.innerHTML = `
+              <div style="font-weight: 800; color: #E2E8F0; margin-bottom: 4px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px;">
+                <span>${timeStr}</span>
+                <span style="color: #94A3B8;">[${Math.round((Date.now() - pt.time) / 1000)}s ago]</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px; font-size: 10px;">
+                <div style="display: flex; justify-content: space-between; gap: 12px;">
+                  <span style="color: #2EA043; font-weight: 700;">PASSED:</span>
+                  <strong>${pt.passed.toLocaleString()} req/s</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 12px;">
+                  <span style="color: #F85149; font-weight: 700;">BLOCKED:</span>
+                  <strong>${pt.blocked.toLocaleString()} req/s</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 2px;">
+                  <span style="color: #94A3B8;">TOTAL:</span>
+                  <strong>${pt.total.toLocaleString()} req/s</strong>
+                </div>
+              </div>
+            `;
+          }
+        } else {
+          if (hud) hud.style.display = "none";
         }
 
-        particleAnimationId = requestAnimationFrame(render);
+        requestAnimationFrame(render);
       }
 
-      particleAnimationId = requestAnimationFrame(render);
+      requestAnimationFrame(render);
     }
 
     function escapeHtml(str) {
