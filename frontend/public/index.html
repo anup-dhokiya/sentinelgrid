@@ -35,7 +35,7 @@
       
       --text-charcoal: #F0F6FC;
       --text-muted: #94A3B8;
-      --text-subtle: #64748B;
+      --text-subtle: #8B9BB4;
       
       --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -59,37 +59,53 @@
 
     :root[data-theme="light"] {
       /* Rich Archival Canvas & Surfaces (Warm Almond Linen / Dark Cream) */
-      --canvas-bg: #EFE8DD;
-      --card-white: #FAF6F0;
-      --card-elevated: #E7DFD1;
-      --sand-warm: #E4DBCC;
-      --sand-warm-hover: #D9CEBC;
-      --stone-border: #CFC2AE;
-      --stone-border-light: #DDD2BF;
+      --canvas-bg: #EFE9DF;
+      --card-white: #FAF6EE;
+      --card-elevated: #E6DECE;
+      --sand-warm: #E6DECE;
+      --sand-warm-hover: #DDD2BF;
+      --stone-border: #CFBFAB;
+      --stone-border-light: #DFD3C2;
       --border-accent: rgba(27, 54, 93, 0.35);
       
-      --terracotta: #A13A28;
-      --terracotta-soft: rgba(161, 58, 40, 0.10);
-      --terracotta-border: rgba(161, 58, 40, 0.28);
-      --sage-green: #236142;
-      --sage-soft: rgba(35, 97, 66, 0.10);
-      --sage-border: rgba(35, 97, 66, 0.28);
+      --terracotta: #9C2A1B;
+      --terracotta-soft: rgba(156, 42, 27, 0.09);
+      --terracotta-border: rgba(156, 42, 27, 0.25);
+      --sage-green: #1B633E;
+      --sage-soft: rgba(27, 99, 62, 0.09);
+      --sage-border: rgba(27, 99, 62, 0.25);
       --deep-indigo: #1B365D;
-      --indigo-soft: rgba(27, 54, 93, 0.10);
-      --indigo-border: rgba(27, 54, 93, 0.28);
-      --warm-ochre: #8E4312;
-      --ochre-soft: rgba(142, 67, 18, 0.10);
-      --ochre-border: rgba(142, 67, 18, 0.28);
+      --indigo-soft: rgba(27, 54, 93, 0.08);
+      --indigo-border: rgba(27, 54, 93, 0.25);
+      --warm-ochre: #8C4A0E;
+      --ochre-soft: rgba(140, 74, 14, 0.09);
+      --ochre-border: rgba(140, 74, 14, 0.25);
       
-      --text-charcoal: #211B15;
-      --text-muted: #5E5245;
-      --text-subtle: #7A6D5E;
+      --text-charcoal: #1C1712;
+      --text-muted: #564B3E;
+      --text-subtle: #7A6C5B;
       
-      --shadow-sm: 0 1px 3px rgba(45, 36, 26, 0.06), 0 1px 2px rgba(45, 36, 26, 0.04);
-      --shadow-md: 0 4px 16px -2px rgba(45, 36, 26, 0.10), 0 2px 6px -1px rgba(45, 36, 26, 0.05);
-      --shadow-lg: 0 16px 40px -6px rgba(45, 36, 26, 0.15), 0 6px 16px -2px rgba(45, 36, 26, 0.08);
+      --shadow-sm: 0 1px 3px rgba(45, 36, 26, 0.05), 0 1px 2px rgba(45, 36, 26, 0.03);
+      --shadow-md: 0 4px 16px -2px rgba(45, 36, 26, 0.08), 0 2px 6px -1px rgba(45, 36, 26, 0.04);
+      --shadow-lg: 0 16px 40px -6px rgba(45, 36, 26, 0.12), 0 6px 16px -2px rgba(45, 36, 26, 0.06);
       --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
-      --glass-blur: blur(16px) saturate(180%);
+      --glass-blur: blur(16px) saturate(160%);
+    }
+
+    [data-theme="light"] .forensic-code-block {
+      background: #E8E0D2 !important;
+      color: #1C1712 !important;
+      border-color: #CFBFAB !important;
+    }
+    [data-theme="light"] .btn-primary {
+      background: linear-gradient(180deg, #1B365D 0%, #132742 100%) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 1px 3px rgba(27, 54, 93, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    }
+    [data-theme="light"] .btn-warm {
+      background: linear-gradient(180deg, #9C2A1B 0%, #7E2215 100%) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 1px 3px rgba(156, 42, 27, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -961,36 +977,39 @@
     .metric-card {
       background: var(--card-white);
       border: 1px solid var(--stone-border);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-md);
       padding: 18px 20px;
-      box-shadow: var(--shadow-sm), var(--inner-rim);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       position: relative;
-      overflow: hidden;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, border-color 0.2s;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .metric-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md), var(--inner-rim);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
-    .metric-card.terracotta::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--terracotta);
+    .metric-card-kicker {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .metric-card.sage::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--sage-green);
-    }
-    .metric-card.indigo::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--deep-indigo);
-    }
-    .metric-card.ochre::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--warm-ochre);
-    }
-
     .metric-val {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       font-family: var(--font-mono);
-      margin: 4px 0;
+      font-variant-numeric: tabular-nums;
+      margin: 8px 0 4px;
       letter-spacing: -0.5px;
+      color: var(--text-charcoal);
     }
 
     /* Next-Gen Pill Badges */
@@ -1248,24 +1267,38 @@
     #livetraffic-table-body tr.new-event {
       animation: rowSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    /* Wide View Mode for Live Traffic Watch */
-    body.livetraffic-wide-mode .app-layout {
-      grid-template-columns: 64px 1fr !important;
-    }
+    /* =========================================================================
+       AUTHENTIC FULL-BLEED WIDE VIEW CONSOLE FOR LIVE TRAFFIC
+       ========================================================================= */
     body.livetraffic-wide-mode .app-sidebar {
-      width: 64px !important;
-      min-width: 64px !important;
+      width: 68px !important;
+      min-width: 68px !important;
+      padding: 14px 6px !important;
     }
-    body.livetraffic-wide-mode .nav-label,
-    body.livetraffic-wide-mode .sidebar-header h1,
-    body.livetraffic-wide-mode .sidebar-header .logo-badge,
-    body.livetraffic-wide-mode .sidebar-badge {
+    body.livetraffic-wide-mode .sidebar-brand-text,
+    body.livetraffic-wide-mode .sidebar-label,
+    body.livetraffic-wide-mode .sidebar-section-title,
+    body.livetraffic-wide-mode .sidebar-user-meta,
+    body.livetraffic-wide-mode .sidebar-item .badge {
       display: none !important;
     }
-    body.livetraffic-wide-mode .content-wrapper {
-      max-width: 100vw !important;
-      width: 100% !important;
-      padding: 10px 18px !important;
+    body.livetraffic-wide-mode .sidebar-item {
+      justify-content: center !important;
+      padding: 10px 0 !important;
+      margin: 2px 4px !important;
+    }
+    body.livetraffic-wide-mode .sidebar-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 !important;
+    }
+    body.livetraffic-wide-mode .app-main {
+      max-width: 100% !important;
+      width: calc(100vw - 68px) !important;
+      padding: 14px 20px !important;
     }
     body.livetraffic-wide-mode #view-livetraffic {
       max-width: 100% !important;
@@ -1274,11 +1307,11 @@
     body.livetraffic-wide-mode #view-livetraffic .panel {
       box-shadow: var(--shadow-lg);
       border-radius: var(--radius-md);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     body.livetraffic-wide-mode #view-livetraffic .table-responsive {
-      min-height: 75vh !important;
-      max-height: 88vh !important;
+      min-height: 80vh !important;
+      max-height: 90vh !important;
     }
     body.livetraffic-wide-mode #view-livetraffic table {
       width: 100% !important;
@@ -1307,47 +1340,65 @@
         </button>
       </div>
 
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-title">OPERATIONS</div>
-        <div class="sidebar-item nav-item active" onclick="switchTab('dashboard')">
-          <span class="sidebar-icon">📊</span>
+      <nav class="sidebar-nav" aria-label="Main Navigation">
+        <div class="sidebar-section-title">Operations</div>
+        <div class="sidebar-item nav-item active" onclick="switchTab('dashboard')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          </span>
           <span class="sidebar-label">Dashboard</span>
         </div>
-        <div class="sidebar-item nav-item" onclick="switchTab('livetraffic')">
-          <span class="sidebar-icon">⚡</span>
+        <div class="sidebar-item nav-item" onclick="switchTab('livetraffic')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </span>
           <span class="sidebar-label">Live Traffic</span>
-          <span class="badge badge-online" style="margin-left: auto; font-size: 8px; padding: 1px 4px;">SSE</span>
+          <span class="badge badge-online" style="margin-left: auto; font-size: 8px; padding: 1px 5px;">LIVE</span>
         </div>
-        <div class="sidebar-item nav-item" onclick="switchTab('domains')">
-          <span class="sidebar-icon">🌐</span>
+        <div class="sidebar-item nav-item" onclick="switchTab('domains')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </span>
           <span class="sidebar-label">Domains & Sites</span>
         </div>
 
-        <div class="sidebar-section-title">SURFACE & POLICIES</div>
-        <div class="sidebar-item nav-item" onclick="switchTab('inventory')">
-          <span class="sidebar-icon">🔍</span>
+        <div class="sidebar-section-title">Surface & Security</div>
+        <div class="sidebar-item nav-item" onclick="switchTab('inventory')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
           <span class="sidebar-label">Discovered APIs</span>
         </div>
-        <div class="sidebar-item nav-item" onclick="switchTab('iprules')">
-          <span class="sidebar-icon">🛡️</span>
+        <div class="sidebar-item nav-item" onclick="switchTab('iprules')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
           <span class="sidebar-label">IP Access Control</span>
         </div>
-        <div class="sidebar-item nav-item" onclick="switchTab('connectors')">
-          <span class="sidebar-icon">🔌</span>
+        <div class="sidebar-item nav-item" onclick="switchTab('connectors')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </span>
           <span class="sidebar-label">Edge Nodes</span>
         </div>
 
-        <div class="sidebar-section-title">TESTING & LABS</div>
-        <div class="sidebar-item nav-item" onclick="switchTab('sandbox')">
-          <span class="sidebar-icon">🧪</span>
+        <div class="sidebar-section-title">Testing & Diagnostics</div>
+        <div class="sidebar-item nav-item" onclick="switchTab('sandbox')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31M14 2v7.31M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
+          </span>
           <span class="sidebar-label">In-Line WAF Lab</span>
         </div>
-        <div class="sidebar-item nav-item" onclick="switchTab('simulation')">
-          <span class="sidebar-icon">📈</span>
+        <div class="sidebar-item nav-item" onclick="switchTab('simulation')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </span>
           <span class="sidebar-label">Policy Simulation</span>
         </div>
-        <div class="sidebar-item nav-item" onclick="switchTab('onboarding')">
-          <span class="sidebar-icon">📖</span>
+        <div class="sidebar-item nav-item" onclick="switchTab('onboarding')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>
           <span class="sidebar-label">Setup Guide</span>
         </div>
       </nav>
@@ -1403,12 +1454,15 @@
           <!-- Live Threat Mitigations Bell -->
           <div style="position: relative;">
             <button id="notificationBellBtn" class="btn btn-subtle topbar-btn-compact" onclick="toggleNotificationPopover()" aria-label="Notifications" title="Recent Mitigated Threats">
-              🔔
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
               <span id="notificationBadge" style="position: absolute; top: -3px; right: -3px; background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: var(--radius-pill); display: none;">0</span>
             </button>
             <div id="notificationPopover" style="display: none; position: absolute; right: 0; top: 125%; width: 340px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1000; padding: 14px; backdrop-filter: var(--glass-blur);">
               <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 8px; margin-bottom: 10px;">
-                <span style="font-size: 11px; font-weight: 800; font-family: var(--font-mono); color: var(--text-charcoal);">⚡ RECENT MITIGATIONS</span>
+                <span style="font-size: 11px; font-weight: 800; font-family: var(--font-mono); color: var(--text-charcoal); display: flex; align-items: center; gap: 6px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  <span>RECENT MITIGATIONS</span>
+                </span>
                 <span id="notif-clear-btn" style="font-size: 10px; color: var(--text-muted); cursor: pointer;" onclick="clearNotifications()">Clear</span>
               </div>
               <div id="notificationList" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
@@ -1424,19 +1478,25 @@
 
           <!-- Theme Switcher Toggle -->
           <button id="theme-toggle-btn" class="btn btn-subtle topbar-btn-compact" onclick="toggleThemePreference()" aria-label="Toggle Theme" title="Switch Theme">
-            <span id="theme-btn-icon">🌙</span>
+            <span id="theme-btn-icon" style="display: inline-flex; align-items: center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </span>
             <span class="btn-text-label" id="theme-btn-label" style="margin-left: 4px;">Theme: OBSIDIAN</span>
           </button>
 
           <!-- Timezone Switcher Toggle -->
           <button id="tz-toggle-btn" class="btn btn-subtle topbar-btn-compact" onclick="toggleTimezonePreference()" aria-label="Toggle Timezone" title="Switch Timezone">
-            <span>🌐</span>
+            <span style="display: inline-flex; align-items: center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </span>
             <span class="btn-text-label" id="tz-btn-label" style="margin-left: 4px;">TZ: IST</span>
           </button>
 
           <!-- Synthesizer Audio Alerts Toggle -->
           <button id="sound-toggle-btn" class="btn btn-subtle topbar-btn-compact" onclick="toggleSoundAlerts()" aria-label="Toggle Sound" title="Sound Alerts">
-            <span id="sound-btn-icon">🔇</span>
+            <span id="sound-btn-icon" style="display: inline-flex; align-items: center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            </span>
             <span class="btn-text-label" id="sound-btn-label" style="margin-left: 4px;">Sound: OFF</span>
           </button>
 
@@ -1445,8 +1505,9 @@
             <span class="btn-text-label" id="topbar-user-role" style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: var(--deep-indigo); margin-left: 4px;">PROFILE</span>
           </button>
 
-          <a href="register.html" class="btn btn-subtle topbar-btn-secondary" style="font-size: 11px; padding: 6px 10px; text-decoration: none;" title="Add Team Operator">
-            ➕ New Operator
+          <a href="register.html" class="btn btn-subtle topbar-btn-secondary" style="font-size: 11px; padding: 6px 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Add Team Operator">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Operator</span>
           </a>
         </div>
       </header>
@@ -1463,11 +1524,12 @@
       <!-- Live Stream Controls & Scope Bar -->
       <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-lg); padding: 14px 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm), var(--inner-rim); flex-wrap: wrap; gap: 12px;">
         <div class="scope-bar-group" style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 11px; font-weight: 800; color: var(--deep-indigo); letter-spacing: 0.5px;">
-            🛡️ ACTIVE SITE SCOPE:
+          <span style="font-size: 11px; font-weight: 800; color: var(--deep-indigo); letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>ACTIVE SITE SCOPE:</span>
           </span>
           <select id="scope-website-select" class="form-input" style="width: 280px; margin: 0; font-weight: 700; background: var(--sand-warm); cursor: pointer;" onchange="handleDomainScopeChange()">
-            <option value="ALL">🌐 All Protected Domains (Global Fleet View)</option>
+            <option value="ALL">All Protected Domains (Global Fleet View)</option>
           </select>
           <span id="scope-badge" class="badge badge-online">GLOBAL FLEET</span>
         </div>
@@ -1482,18 +1544,24 @@
 
           <!-- Stream Speed Selector -->
           <select id="auto-refresh-rate" class="form-input" style="width: 140px; margin: 0; font-weight: 600; cursor: pointer;" onchange="changeAutoRefreshRate()">
-            <option value="1">⚡ Live Stream (1s)</option>
-            <option value="2" selected>🔄 Real-Time (2s)</option>
-            <option value="5">⏱️ Standard (5s)</option>
-            <option value="10">⏳ Relaxed (10s)</option>
-            <option value="0">⏸️ Paused (Manual)</option>
+            <option value="1">Stream 1s</option>
+            <option value="2" selected>Stream 2s</option>
+            <option value="5">Stream 5s</option>
+            <option value="10">Relaxed 10s</option>
+            <option value="0">Paused (Manual)</option>
           </select>
 
           <!-- Play/Pause Toggle -->
-          <button id="stream-pause-btn" class="btn btn-subtle" onclick="toggleStreamPause()">⏸️ Pause</button>
+          <button id="stream-pause-btn" class="btn btn-subtle" onclick="toggleStreamPause()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <span>Pause</span>
+          </button>
 
           <!-- Sync Now Button -->
-          <button class="btn btn-primary" onclick="pollTelemetry(true)">⚡ Sync Now</button>
+          <button class="btn btn-primary" onclick="pollTelemetry(true)" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Sync Now</span>
+          </button>
         </div>
       </div>
 
@@ -1504,7 +1572,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.8px; color: var(--deep-indigo); text-transform: uppercase;">
-              ⚡ Interactive 3D In-Line Execution Pipeline (Live Traffic Topology)
+              Interactive In-Line Execution Pipeline (Live Traffic Topology)
             </span>
             <span class="badge badge-online">P99: 0.35ms (IN-PROCESS)</span>
             <!-- Live Flow Metrics -->
@@ -1526,11 +1594,13 @@
                 <option value="0.5">0.5x</option>
               </select>
             </label>
-            <button class="btn btn-subtle" style="font-size: 10px; padding: 3px 8px;" onclick="triggerSimulatedThreatWave()">
-              🚨 Inject Attack Wave
+            <button class="btn btn-subtle" style="font-size: 10px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;" onclick="triggerSimulatedThreatWave()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Simulate Threat Wave</span>
             </button>
-            <button class="btn btn-subtle" id="canvas-pause-btn" style="font-size: 10px; padding: 3px 8px;" onclick="toggleParticleStream()">
-              ⏸️ Pause 3D
+            <button class="btn btn-subtle" id="canvas-pause-btn" style="font-size: 10px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;" onclick="toggleParticleStream()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              <span>Pause Pipeline</span>
             </button>
           </div>
         </div>
@@ -1598,20 +1668,30 @@
         </div>
       </div>
 
-      <!-- Real-Time Security Events & 24H Persistent Container Stream Table -->
+      <!-- Real-Time Security Events & Persistent Incident Container Table -->
       <div class="panel" style="margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
         <div class="panel-header" style="padding: 18px 24px; flex-wrap: wrap; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <span style="font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-              <span>⚡ 24-Hour Telemetry & Threat Container</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--deep-indigo);"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+              <span>Telemetry & Incident Container</span>
             </span>
-            <span id="container-24h-badge" class="badge badge-online" style="font-size: 11px;">📦 24H CONTAINER: SYNCED</span>
+            <span id="container-24h-badge" class="badge badge-online" style="font-size: 11px;">THREAT CONTAINER: SYNCED</span>
             <span id="events-count-badge" class="badge badge-challenge" style="font-size: 11px;">0 requests</span>
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-subtle" onclick="sync24hHistory()" id="sync-24h-btn" title="Sync all requests from past 24 hours">💾 Sync 24H History</button>
-            <button class="btn btn-subtle" onclick="exportEvents()">📥 Export SIEM Logs</button>
-            <button class="btn btn-primary" onclick="pollTelemetry(true)">⚡ Refresh Feed</button>
+            <button class="btn btn-subtle" onclick="sync24hHistory()" id="sync-24h-btn" title="Sync all ledger requests from past 12 hours" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Sync Ledger</span>
+            </button>
+            <button class="btn btn-subtle" onclick="exportEvents()" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export SIEM</span>
+            </button>
+            <button class="btn btn-primary" onclick="pollTelemetry(true)" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Refresh Feed</span>
+            </button>
           </div>
         </div>
 
@@ -1619,17 +1699,17 @@
           <div class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Filter Verdict:</span>
             <select id="event-filter-action" class="form-input" style="width: 170px; margin: 0; padding: 7px 10px;" onchange="applyEventFilter()">
-              <option value="ALL">🌐 All Traffic (24h)</option>
-              <option value="BLOCK">⛔ Threat Blocks (403)</option>
-              <option value="ALLOW">✅ Clean Requests (200)</option>
-              <option value="CHALLENGE">⚠️ Challenges</option>
+              <option value="ALL">All Traffic (12h Ledger)</option>
+              <option value="BLOCK">Threat Blocks (403)</option>
+              <option value="ALLOW">Clean Requests (200)</option>
+              <option value="CHALLENGE">Challenges</option>
             </select>
 
             <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: 6px;">Quick Search:</span>
-            <input type="text" id="event-search-query" class="form-input" style="min-width: 260px; flex: 1; max-width: 440px; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule..." oninput="applyEventFilter()">
+            <input type="text" id="event-search-query" class="form-input" style="min-width: 260px; flex: 1; max-width: 440px; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule... (Hotkey: /)" oninput="applyEventFilter()">
 
             <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
-              <span class="badge badge-allow" style="font-size: 10px;" title="Full 24-hour persistent storage in browser IndexedDB + cloud ledger">🛡️ 24h Rolling Window • Blocked IPs Kept Forever</span>
+              <span class="badge badge-allow" style="font-size: 10px;" title="Persistent storage in browser IndexedDB + cloud ledger. Live stream clears after 12h, blocked IPs kept permanently.">12h Live Window &bull; Blocked IPs Preserved</span>
             </div>
           </div>
         </div>
@@ -1660,24 +1740,37 @@
     <!-- TAB: NATIVE LIVE SSE TRAFFIC PIPELINE & TELEMETRY STREAM -->
     <!-- ===================================================================== -->
     <section id="view-livetraffic" class="view-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
         <div>
-          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
-            <span>⚡ Live API Traffic Stream & Real-Time Telemetry</span>
-            <span class="badge badge-online" id="livetraffic-count-badge">0 requests buffered</span>
+          <h2 style="font-size: 17px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
+            <span class="pulse-dot" style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--sage-green); box-shadow: 0 0 8px var(--sage-green);"></span>
+            <span>Live Traffic Stream & Edge Telemetry</span>
+            <span class="badge badge-online" id="livetraffic-count-badge" style="font-size: 10px; font-family: var(--font-mono);">0 buffered</span>
           </h2>
-          <p style="font-size: 13px; color: var(--text-muted);">In-flight edge requests streamed directly via SentinelGrid Server-Sent Events (SSE) telemetry pipeline.</p>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">In-flight edge requests streamed directly via SentinelGrid Server-Sent Events (SSE) telemetry pipeline.</p>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <select id="livetraffic-verdict-filter" class="form-input" style="width: 210px; margin: 0; padding: 6px 10px; font-weight: 600;" onchange="applyLiveTrafficFilter()">
-            <option value="ALL">🌐 All Traffic (Allow + Block)</option>
-            <option value="BLOCK">⛔ Threats Intercepted Only</option>
-            <option value="ALLOW">✅ Clean Legitimate Only</option>
-            <option value="CHALLENGE">⚠️ Challenges Only</option>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <select id="livetraffic-verdict-filter" class="form-input" style="width: auto; min-width: 170px; margin: 0; padding: 6px 12px; font-weight: 600;" onchange="applyLiveTrafficFilter()" aria-label="Filter Traffic by Verdict">
+            <option value="ALL">All Traffic Stream</option>
+            <option value="BLOCK">Threat Interceptions Only</option>
+            <option value="ALLOW">Clean Legitimate Only</option>
+            <option value="CHALLENGE">Challenges Only</option>
           </select>
-          <button class="btn btn-subtle" id="livetraffic-wide-btn" onclick="toggleLiveTrafficWideView()">⛶ Wide View</button>
-          <button class="btn btn-subtle" id="livetraffic-pause-btn" onclick="toggleLiveTrafficStream()">⏸️ Pause</button>
-          <button class="btn btn-subtle" onclick="clearLiveTrafficBuffer()">🗑️ Clear</button>
+          <button class="btn btn-subtle" id="livetraffic-wide-btn" onclick="toggleLiveTrafficWideView()" title="Toggle Wide View (Hotkey: W)" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            <span>Wide View</span>
+            <kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">W</kbd>
+          </button>
+          <button class="btn btn-subtle" id="livetraffic-pause-btn" onclick="toggleLiveTrafficStream()" title="Pause/Resume Stream (Hotkey: Space)" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <span>Pause</span>
+            <kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">Space</kbd>
+          </button>
+          <button class="btn btn-subtle" onclick="clearLiveTrafficBuffer()" title="Clear View Buffer (Hotkey: C)" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Clear</span>
+            <kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">C</kbd>
+          </button>
         </div>
       </div>
 
@@ -1719,8 +1812,14 @@
           <p style="font-size: 13px; color: var(--text-muted);">Manage per-domain WAAP inspection policies, edge routing, and live attack testing.</p>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn btn-sage" onclick="probeAllGatewaysLive()">⚡ Probe Edge Gateways</button>
-          <button class="btn btn-warm" onclick="showAddDomainModal()">+ Add Protected Domain</button>
+          <button class="btn btn-sage" onclick="probeAllGatewaysLive()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Probe Gateways</span>
+          </button>
+          <button class="btn btn-warm" onclick="showAddDomainModal()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Domain</span>
+          </button>
         </div>
       </div>
 
@@ -1752,7 +1851,10 @@
       <div class="panel">
         <div class="panel-header">
           <span>Protected Domain Fleet Directory</span>
-          <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px;" onclick="loadDomains()">🔄 Reload Registry</button>
+          <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;" onclick="loadDomains()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Reload</span>
+          </button>
         </div>
         <div class="panel-body" style="padding: 0;">
           <div class="table-responsive">
@@ -1786,8 +1888,14 @@
         <div class="panel-header">
           <span>Automated API Attack Surface Inventory (Shadow & Zombie Catalog)</span>
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-warm" onclick="toggleSpecImport()">📄 Import OpenAPI Spec</button>
-            <button class="btn btn-primary" onclick="loadEndpoints()">Resync Schema</button>
+            <button class="btn btn-warm" onclick="toggleSpecImport()" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Import OpenAPI Spec</span>
+            </button>
+            <button class="btn btn-primary" onclick="loadEndpoints()" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Resync Schema</span>
+            </button>
           </div>
         </div>
         <div class="panel-body">
@@ -2117,7 +2225,10 @@ app.add_middleware(
       <div style="margin-bottom: 18px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
           <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo);">Intercepted Attack Payload</h4>
-          <button class="btn btn-subtle" style="padding: 2px 7px; font-size: 10px;" onclick="copyPayloadToClipboard()">📋 Copy</button>
+          <button class="btn btn-subtle" style="padding: 2px 7px; font-size: 10px; display: inline-flex; align-items: center; gap: 4px;" onclick="copyPayloadToClipboard()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy</span>
+          </button>
         </div>
         <div class="forensic-code-block" id="drawer-payload">No payload content</div>
       </div>
@@ -2126,7 +2237,10 @@ app.add_middleware(
       <div style="margin-bottom: 18px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
           <h4 style="font-size: 12px; font-weight: 800; color: var(--deep-indigo);">Captured Headers Snippet</h4>
-          <button class="btn btn-subtle" style="padding: 2px 7px; font-size: 10px;" onclick="copyHeadersToClipboard()">📋 Copy</button>
+          <button class="btn btn-subtle" style="padding: 2px 7px; font-size: 10px; display: inline-flex; align-items: center; gap: 4px;" onclick="copyHeadersToClipboard()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy</span>
+          </button>
         </div>
         <div class="forensic-code-block" style="color: #A7F3D0;" id="drawer-headers">No header metadata</div>
       </div>
@@ -2134,11 +2248,14 @@ app.add_middleware(
 
     <!-- Rapid Response Footer Actions (Dynamic TTL) -->
     <div class="drawer-footer">
-      <button class="btn btn-subtle" onclick="sendEventToSandbox()">🧪 Replay in WAF Lab</button>
-      <button class="btn btn-subtle" style="color: var(--sage-green);" onclick="executeIpQuickAction('UNBAN')">✓ Unban IP</button>
-      <button class="btn btn-warm" style="font-size: 11px;" onclick="executeIpQuickAction('BAN_15M')">🛑 15m Quarantine</button>
-      <button class="btn btn-warm" style="font-size: 11px;" onclick="executeIpQuickAction('BAN_1H')">🛑 1h Quarantine</button>
-      <button class="btn btn-warm" style="font-size: 11px; background: #991B1B;" onclick="executeIpQuickAction('PERMANENT_BLOCK')">⛔ Permanent Ban</button>
+      <button class="btn btn-subtle" onclick="sendEventToSandbox()" style="display: inline-flex; align-items: center; gap: 6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Replay in Lab</span>
+      </button>
+      <button class="btn btn-subtle" style="color: var(--sage-green);" onclick="executeIpQuickAction('UNBAN')">Unban IP</button>
+      <button class="btn btn-warm" style="font-size: 11px;" onclick="executeIpQuickAction('BAN_15M')">15m Quarantine</button>
+      <button class="btn btn-warm" style="font-size: 11px;" onclick="executeIpQuickAction('BAN_1H')">1h Quarantine</button>
+      <button class="btn btn-warm" style="font-size: 11px; background: #991B1B;" onclick="executeIpQuickAction('PERMANENT_BLOCK')">Permanent Ban</button>
     </div>
   </div>
 
@@ -2146,7 +2263,7 @@ app.add_middleware(
   <!-- MODAL 2: DOMAIN DEEP SECURITY PROFILE MODAL -->
   <!-- ======================================================================= -->
   <div id="domain-modal-backdrop" class="drawer-backdrop" onclick="closeDomainModal()"></div>
-  <div id="domain-stats-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="domain-modal-title" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 840px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002;">
+  <div id="domain-stats-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="domain-modal-title" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(840px, 94vw); max-height: 90vh; overflow-y: auto; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002;">
     <div style="padding: 20px 24px; border-bottom: 1px solid var(--stone-border); background: var(--sand-warm); display: flex; justify-content: space-between; align-items: center;">
       <div>
         <div style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);" id="domain-modal-title">Domain Security Profile</div>
@@ -2164,7 +2281,7 @@ app.add_middleware(
   <!-- MODAL 3: OPERATOR PROFILE & RBAC GOVERNANCE HUD MODAL -->
   <!-- ======================================================================= -->
   <div id="user-profile-backdrop" class="drawer-backdrop" onclick="closeUserProfileModal()"></div>
-  <div id="user-profile-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="prof-modal-name" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
+  <div id="user-profile-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="prof-modal-name" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(520px, 94vw); max-height: 90vh; overflow-y: auto; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 26px;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--stone-border-light); padding-bottom: 16px;">
       <div style="display: flex; align-items: center; gap: 14px;">
         <div class="avatar-circle" id="prof-modal-avatar" style="width: 48px; height: 48px; font-size: 18px; font-weight: 800;">OP</div>
@@ -2173,7 +2290,7 @@ app.add_middleware(
           <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);" id="prof-modal-email">operator@sentinelgrid.io</div>
         </div>
       </div>
-      <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 14px;" onclick="closeUserProfileModal()">✕</button>
+      <button class="btn btn-subtle" style="padding: 4px 8px; font-size: 14px;" onclick="closeUserProfileModal()" aria-label="Close Profile Modal">✕</button>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
@@ -2191,7 +2308,10 @@ app.add_middleware(
       <label style="font-size: 11px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Session Bearer Token</label>
       <div style="display: flex; gap: 8px; margin-top: 6px;">
         <input type="text" id="prof-modal-token" readonly class="form-input" style="margin: 0; font-family: var(--font-mono); font-size: 11px; color: var(--deep-indigo);" value="sg_session_••••••••••••••••">
-        <button class="btn btn-subtle" onclick="copySessionToken()" title="Copy Token">📋 Copy</button>
+        <button class="btn btn-subtle" onclick="copySessionToken()" title="Copy Token" style="display: inline-flex; align-items: center; gap: 4px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
       </div>
     </div>
 
@@ -2631,14 +2751,22 @@ app.add_middleware(
     function toggleLiveTrafficWideView() {
       const isWide = document.body.classList.toggle("livetraffic-wide-mode");
       const btn = document.getElementById("livetraffic-wide-btn");
-      if (btn) btn.innerHTML = isWide ? "🗗 Standard View" : "⛶ Wide View";
+      if (btn) {
+        btn.innerHTML = isWide
+          ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/></svg><span>Standard View</span><kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">W</kbd>`
+          : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg><span>Wide View</span><kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">W</kbd>`;
+      }
       localStorage.setItem("sg_livetraffic_wide", isWide ? "true" : "false");
     }
 
     function toggleLiveTrafficStream() {
       isLiveTrafficPaused = !isLiveTrafficPaused;
       const btn = document.getElementById("livetraffic-pause-btn");
-      if (btn) btn.innerText = isLiveTrafficPaused ? "▶️ Resume" : "⏸️ Pause";
+      if (btn) {
+        btn.innerHTML = isLiveTrafficPaused
+          ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Resume</span><kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">Space</kbd>`
+          : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><span>Pause</span><kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">Space</kbd>`;
+      }
     }
 
     function clearLiveTrafficBuffer() {
@@ -2724,14 +2852,15 @@ app.add_middleware(
       let ruleDisplay = `<span style="color: ${ev.action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'}; font-weight: 600; font-size: 11px; font-family: var(--font-mono);">${safeRule}</span>`;
 
       if (isReOffender) {
-        verdictBadge = `<span class="badge badge-block" style="background: rgba(239, 68, 68, 0.22); border: 1px solid #ef4444; color: #ff5555; font-weight: 800; letter-spacing: 0.3px; padding: 4px 8px; box-shadow: 0 0 10px rgba(239,68,68,0.35);">⛔ ALREADY BANNED</span>`;
+        verdictBadge = `<span class="badge" style="background: rgba(156, 42, 27, 0.12); border: 1px solid var(--terracotta); color: var(--terracotta); font-weight: 800; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px; padding: 3px 8px;">BLOCKED IP RE-ATTEMPT</span>`;
         ruleDisplay = `
           <div>
-            <div style="color: var(--terracotta); font-weight: 800; font-size: 11px; font-family: var(--font-mono); display: flex; align-items: center; gap: 4px;">
-              <span>🚨</span> ALREADY BANNED IP RE-ATTEMPT
+            <div style="color: var(--terracotta); font-weight: 800; font-size: 11px; font-family: var(--font-mono); display: flex; align-items: center; gap: 5px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              <span>QUARANTINED OFFENDER RE-ATTEMPT</span>
             </div>
-            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
-              Offender banned in firewall still attempting to reach endpoint
+            <div style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">
+              Firewall active drop &bull; Zero origin execution
             </div>
           </div>
         `;
@@ -3320,7 +3449,7 @@ app.add_middleware(
     }
 
     // -------------------------------------------------------------------------
-    // 24-Hour Persistent In-Browser IndexedDB Event Container
+    // 12-Hour Telemetry & Persistent Threat Ledger In-Browser Container
     // -------------------------------------------------------------------------
     const SentinelEventStore = {
       dbName: "SentinelGridDB",
@@ -3343,6 +3472,8 @@ app.add_middleware(
             req.onsuccess = (e) => {
               this.db = e.target.result;
               this.pruneExpired();
+              // Periodic background prune every 15 minutes
+              setInterval(() => this.pruneExpired(), 15 * 60 * 1000);
               resolve(this.db);
             };
             req.onerror = () => resolve(null);
@@ -3352,16 +3483,36 @@ app.add_middleware(
         });
       },
 
+      sanitizeEvent(ev) {
+        if (!ev || !ev.id) return null;
+        return {
+          id: String(ev.id),
+          website_id: ev.website_id || "",
+          client_ip: ev.client_ip || "127.0.0.1",
+          method: ev.method || "GET",
+          path: ev.path || "/",
+          timestamp: ev.timestamp || new Date().toISOString(),
+          action: ev.action || "ALLOW",
+          status_code: ev.status_code || 200,
+          risk_score: Number(ev.risk_score) || 0,
+          rule_triggered: ev.rule_triggered || "",
+          details: ev.details ? String(ev.details).substring(0, 500) : "",
+          headers: ev.headers ? String(ev.headers).substring(0, 1000) : "",
+          payload_sample: ev.payload_sample ? String(ev.payload_sample).substring(0, 1000) : ""
+        };
+      },
+
       async putBatch(events) {
         if (!events || !events.length) return;
+        const sanitized = events.map(e => this.sanitizeEvent(e)).filter(Boolean);
         if (!this.db) {
           try {
             const cur = JSON.parse(localStorage.getItem("sg_stored_events_24h") || "[]");
             const map = new Map();
             cur.forEach(e => map.set(e.id, e));
-            events.forEach(e => { if (e && e.id) map.set(e.id, e); });
+            sanitized.forEach(e => { if (e && e.id) map.set(e.id, e); });
             const merged = Array.from(map.values()).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-            localStorage.setItem("sg_stored_events_24h", JSON.stringify(merged.slice(0, 500)));
+            localStorage.setItem("sg_stored_events_24h", JSON.stringify(merged.slice(0, 1000)));
           } catch (_) {}
           return;
         }
@@ -3369,7 +3520,7 @@ app.add_middleware(
           try {
             const tx = this.db.transaction(this.storeName, "readwrite");
             const store = tx.objectStore(this.storeName);
-            events.forEach(ev => {
+            sanitized.forEach(ev => {
               if (ev && ev.id) store.put(ev);
             });
             tx.oncomplete = () => resolve();
@@ -3406,16 +3557,25 @@ app.add_middleware(
       async pruneExpired() {
         if (!this.db) return;
         try {
-          const cutoff = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+          // 12-Hour threshold: clear live stream non-threat traffic older than 12 hours
+          const cutoff12h = new Date(Date.now() - 12 * 3600 * 1000).toISOString();
           const tx = this.db.transaction(this.storeName, "readwrite");
           const store = tx.objectStore(this.storeName);
           const index = store.index("timestamp");
-          const range = IDBKeyRange.upperBound(cutoff);
+          const range = IDBKeyRange.upperBound(cutoff12h);
           const req = index.openCursor(range);
           req.onsuccess = (e) => {
             const cursor = e.target.result;
             if (cursor) {
-              if (cursor.value.action !== "BLOCK" && (!cursor.value.risk_score || cursor.value.risk_score < 50)) {
+              const val = cursor.value;
+              // Preserve blocked IPs, challenges, high-risk attacks, and quarantine events permanently in the threat ledger
+              const isCriticalThreat = val.action === "BLOCK" || 
+                                       val.action === "CHALLENGE" || 
+                                       (val.risk_score && val.risk_score >= 50) || 
+                                       val.rule_triggered === "ALREADY-BLOCKED-REACH-ATTEMPT" || 
+                                       val.rule_triggered === "IP-BLOCK-LIST";
+              if (!isCriticalThreat) {
+                // Delete routine benign requests older than 12 hours to prevent container bloat
                 cursor.delete();
               }
               cursor.continue();
@@ -3448,7 +3608,7 @@ app.add_middleware(
 
     function updateContainerBadge(count) {
       const b = document.getElementById("container-24h-badge");
-      if (b) b.innerText = `📦 24H CONTAINER: ${Number(count || 0).toLocaleString()} STORED`;
+      if (b) b.innerText = `THREAT CONTAINER: ${Number(count || 0).toLocaleString()} EVENTS`;
     }
 
     async function sync24hHistory() {
@@ -3701,11 +3861,14 @@ app.add_middleware(
       const btn = document.getElementById("sound-toggle-btn");
       const icon = document.getElementById("sound-btn-icon");
       const label = document.getElementById("sound-btn-label");
+      const iconHtml = soundAlertsEnabled
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
       if (icon && label) {
-        icon.innerText = soundAlertsEnabled ? "🔊" : "🔇";
+        icon.innerHTML = iconHtml;
         label.innerText = soundAlertsEnabled ? "Sound: ON" : "Sound: OFF";
       } else if (btn) {
-        btn.innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+        btn.innerHTML = `${iconHtml}<span class="btn-text-label" style="margin-left: 4px;">Sound: ${soundAlertsEnabled ? 'ON' : 'OFF'}</span>`;
       }
       if (soundAlertsEnabled) playThreatTone(90);
     }
@@ -3762,14 +3925,16 @@ app.add_middleware(
       const label = document.getElementById("theme-btn-label");
       if (currentTheme === "light") {
         document.documentElement.setAttribute("data-theme", "light");
-        if (icon) icon.innerText = "🌾";
+        const sunSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        if (icon) icon.innerHTML = sunSvg;
         if (label) label.innerText = "Theme: DARK CREAM";
-        if (!icon && btn) btn.innerHTML = "🌾 Theme: DARK CREAM";
+        if (!icon && btn) btn.innerHTML = `${sunSvg}<span class="btn-text-label" style="margin-left: 4px;">Theme: DARK CREAM</span>`;
       } else {
         document.documentElement.removeAttribute("data-theme");
-        if (icon) icon.innerText = "🌙";
+        const moonSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+        if (icon) icon.innerHTML = moonSvg;
         if (label) label.innerText = "Theme: OBSIDIAN";
-        if (!icon && btn) btn.innerHTML = "🌙 Theme: OBSIDIAN";
+        if (!icon && btn) btn.innerHTML = `${moonSvg}<span class="btn-text-label" style="margin-left: 4px;">Theme: OBSIDIAN</span>`;
       }
     }
     function toggleThemePreference() {
@@ -4185,7 +4350,7 @@ app.add_middleware(
         badge = `<span class="badge badge-ratelimit">RATE_LIMIT (429)</span>`;
       }
       if (isReOffender) {
-        badge = `<span class="badge badge-block" style="background: rgba(239, 68, 68, 0.22); border: 1px solid #ef4444; color: #ff5555; font-weight: 800; padding: 4px 8px; box-shadow: 0 0 10px rgba(239,68,68,0.35);">⛔ ALREADY BANNED</span>`;
+        badge = `<span class="badge" style="background: rgba(156, 42, 27, 0.12); border: 1px solid var(--terracotta); color: var(--terracotta); font-weight: 800; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px; padding: 3px 8px;">BLOCKED IP RE-ATTEMPT</span>`;
       }
 
       const domainObj = allWebsites.find(w => w.id === ev.website_id);
@@ -4202,7 +4367,17 @@ app.add_middleware(
 
       let ruleCellContent = safeRule;
       if (isReOffender) {
-        ruleCellContent = `<div style="color: var(--terracotta); font-weight: 800; display: flex; align-items: center; gap: 4px;"><span>🚨</span> ALREADY BANNED IP RE-ATTEMPT</div><div style="font-size: 10px; color: var(--text-muted); font-weight: normal;">Offender banned in firewall still attempting access</div>`;
+        ruleCellContent = `
+          <div>
+            <div style="color: var(--terracotta); font-weight: 800; font-family: var(--font-mono); font-size: 11px; display: flex; align-items: center; gap: 5px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              <span>QUARANTINED OFFENDER RE-ATTEMPT</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">
+              Firewall active drop &bull; Zero origin execution
+            </div>
+          </div>
+        `;
       }
 
       return `
@@ -4219,8 +4394,9 @@ app.add_middleware(
           ${ruleCellContent}
         </td>
         <td style="text-align: center; padding: 10px 14px;">
-          <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px;" onclick="event.stopPropagation(); openEventForensics('${safeId}')">
-            🔍 Forensics
+          <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px; display: inline-flex; align-items: center; gap: 4px;" onclick="event.stopPropagation(); openEventForensics('${safeId}')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Forensics</span>
           </button>
         </td>
       `;
@@ -5090,8 +5266,10 @@ app.add_middleware(
     initInteractive3DPipeline();
     initContextualHoverInspection();
     applyTheme();
-    document.getElementById("tz-toggle-btn").innerText = consoleTimezone === "LOCAL" ? "🌐 TZ: LOCAL (IST)" : "🌐 TZ: UTC (GMT+0)";
-    document.getElementById("sound-toggle-btn").innerText = soundAlertsEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+    const tzLabel = document.getElementById("tz-btn-label");
+    if (tzLabel) tzLabel.innerText = consoleTimezone === "LOCAL" ? "TZ: IST" : "TZ: UTC";
+    const soundLabel = document.getElementById("sound-btn-label");
+    if (soundLabel) soundLabel.innerText = soundAlertsEnabled ? "Sound: ON" : "Sound: OFF";
 
     // Restore Active Tab from URL Hash or localStorage (Prevents unwanted reset on refresh)
     const initialHash = window.location.hash.replace("#", "").trim();
@@ -5120,7 +5298,23 @@ app.add_middleware(
         }
       } else if (e.code === "Space") {
         e.preventDefault();
-        toggleStreamPause();
+        if (document.getElementById("view-livetraffic")?.classList.contains("active")) {
+          toggleLiveTrafficStream();
+        } else {
+          toggleStreamPause();
+        }
+      } else if (e.key === "w" || e.key === "W") {
+        e.preventDefault();
+        toggleLiveTrafficWideView();
+      } else if (e.key === "c" || e.key === "C") {
+        if (document.getElementById("view-livetraffic")?.classList.contains("active")) {
+          e.preventDefault();
+          clearLiveTrafficBuffer();
+        }
+      } else if (e.key === "/") {
+        e.preventDefault();
+        const searchInput = document.getElementById("event-search-query");
+        if (searchInput) searchInput.focus();
       } else if (e.key >= "1" && e.key <= "9") {
         const tabKeys = ["dashboard", "livetraffic", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
         const idx = parseInt(e.key, 10) - 1;
@@ -5138,7 +5332,9 @@ app.add_middleware(
     if (localStorage.getItem("sg_livetraffic_wide") === "true") {
       document.body.classList.add("livetraffic-wide-mode");
       const wideBtn = document.getElementById("livetraffic-wide-btn");
-      if (wideBtn) wideBtn.innerHTML = "🗗 Standard View";
+      if (wideBtn) {
+        wideBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M4 10h6m0 0V4m0 6L3 3m17 7h-6m0 0V4m0 6l7-7"/></svg><span>Standard View</span><kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">W</kbd>`;
+      }
     }
 
     updateSystemClock();

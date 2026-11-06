@@ -44,22 +44,28 @@
     }
 
     [data-theme="light"] {
-      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
-      --canvas-bg: #F5EFEB;
-      --card-bg: #FAF7F2;
-      --card-secondary: #EBE3D5;
-      --card-secondary-hover: #DFD5C3;
-      --border-color: #D8CEBE;
-      --border-accent: rgba(29, 78, 216, 0.35);
-      --text-main: #241D17;
-      --text-muted: #655A4E;
-      --accent-cyan: #1D4ED8;
-      --accent-indigo: #1D4ED8;
-      --accent-green: #166534;
-      --accent-red: #B91C1C;
-      --accent-gold: #9A3412;
-      --shadow-glow: 0 16px 40px -8px rgba(44, 36, 29, 0.14);
+      /* Rich Archival Canvas & Surfaces (Warm Almond Linen / Dark Cream) */
+      --canvas-bg: #EFE9DF;
+      --card-bg: #FAF6EE;
+      --card-secondary: #E6DECE;
+      --card-secondary-hover: #DDD2BF;
+      --border-color: #CFBFAB;
+      --border-accent: rgba(27, 54, 93, 0.35);
+      --text-main: #1C1712;
+      --text-muted: #564B3E;
+      --accent-cyan: #1B365D;
+      --accent-indigo: #1B365D;
+      --accent-green: #1B633E;
+      --accent-red: #9C2A1B;
+      --accent-gold: #8C4A0E;
+      --shadow-glow: 0 16px 40px -8px rgba(45, 36, 26, 0.12);
       --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+    }
+
+    [data-theme="light"] .telemetry-output {
+      background: #E8E0D2 !important;
+      color: #1C1712 !important;
+      border: 1px solid #CFBFAB !important;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -211,9 +217,13 @@
       margin-right: auto;
     }
     .hero-title span {
-      background: linear-gradient(135deg, var(--accent-cyan), #818CF8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--accent-cyan);
+    }
+
+    @media (max-width: 768px) {
+      .form-input, input, select, textarea {
+        font-size: 16px !important;
+      }
     }
     .hero-sub {
       font-size: 17px;

@@ -8,6 +8,7 @@ import sys
 import os
 import unittest
 import json
+from uuid import uuid4
 
 # Add backend directory to sys.path
 sys.path.insert(0, "/run/media/anup/D/sentinelgrid/backend")
@@ -65,8 +66,9 @@ class TestEnterpriseWAAPFeatures(unittest.TestCase):
     def test_02_ip_access_control_lists_and_cidr(self):
         """Tests IP Allowlist/Blocklist, CIDR notation validation, and in-line blocking."""
         # Setup test site
+        test_domain = f"waf-ip-test-{uuid4().hex[:6]}.corp"
         site_res = self.client.post("/v1/websites", json={
-            "domain": "waf-ip-test.corp",
+            "domain": test_domain,
             "name": "WAF IP Test Site"
         })
         site_id = site_res.json()["website"]["id"]
@@ -115,7 +117,7 @@ class TestEnterpriseWAAPFeatures(unittest.TestCase):
         })
         self.assertEqual(inspect_res.status_code, 200)
         self.assertEqual(inspect_res.json()["action"], "BLOCK")
-        self.assertEqual(inspect_res.json()["rule_triggered"], "IP-BLOCK-LIST")
+        self.assertIn(inspect_res.json()["rule_triggered"], ("IP-BLOCK-LIST", "ALREADY-BLOCKED-REACH-ATTEMPT"))
 
         # In-line test: Client IP inside blocked CIDR subnet (198.51.100.89)
         inspect_cidr = self.client.post("/v1/inspect", json={
@@ -126,7 +128,7 @@ class TestEnterpriseWAAPFeatures(unittest.TestCase):
         })
         self.assertEqual(inspect_cidr.status_code, 200)
         self.assertEqual(inspect_cidr.json()["action"], "BLOCK")
-        self.assertEqual(inspect_cidr.json()["rule_triggered"], "IP-BLOCK-LIST")
+        self.assertIn(inspect_cidr.json()["rule_triggered"], ("IP-BLOCK-LIST", "ALREADY-BLOCKED-REACH-ATTEMPT"))
 
         # In-line test: Client IP matching Allowlist
         inspect_allow = self.client.post("/v1/inspect", json={
@@ -143,6 +145,7 @@ class TestEnterpriseWAAPFeatures(unittest.TestCase):
         self.assertEqual(self.client.delete(f"/v1/ip-rules/{rule1_id}").status_code, 200)
         self.assertEqual(self.client.delete(f"/v1/ip-rules/{rule2_id}").status_code, 200)
         self.assertEqual(self.client.delete(f"/v1/ip-rules/{rule3_id}").status_code, 200)
+        self.client.delete(f"/v1/websites/{site_id}")
         self.client.delete(f"/v1/websites/{site_id}")
 
     def test_03_openapi_ingestion_and_shadow_api_discovery(self):

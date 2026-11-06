@@ -45,24 +45,30 @@
     }
 
     :root[data-theme="light"] {
-      /* Next-Gen Dark Cream / Warm Parchment / Almond Linen Palette */
-      --canvas-bg: #F5EFEB;
-      --card-bg: rgba(250, 247, 242, 0.94);
-      --surface-elevated: #EBE3D5;
-      --border-subtle: #D8CEBE;
-      --border-hover: #1D4ED8;
-      --accent-cyan: #1D4ED8;
-      --accent-soft: rgba(29, 78, 216, 0.12);
-      --text-primary: #241D17;
-      --text-muted: #655A4E;
-      --text-subtle: #716558;
-      --terracotta: #B91C1C;
-      --sage-green: #166534;
-      --warm-ochre: #9A3412;
+      /* Rich Archival Canvas & Surfaces (Warm Almond Linen / Dark Cream) */
+      --canvas-bg: #EFE9DF;
+      --card-bg: rgba(250, 246, 238, 0.94);
+      --surface-elevated: #E6DECE;
+      --border-subtle: #CFBFAB;
+      --border-hover: #1B365D;
+      --accent-cyan: #1B365D;
+      --accent-soft: rgba(27, 54, 93, 0.12);
+      --text-primary: #1C1712;
+      --text-muted: #564B3E;
+      --text-subtle: #7A6C5B;
+      --terracotta: #9C2A1B;
+      --sage-green: #1B633E;
+      --warm-ochre: #8C4A0E;
       --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-      --shadow-sm: 0 1px 3px rgba(44, 36, 29, 0.05);
-      --shadow-md: 0 4px 16px -2px rgba(44, 36, 29, 0.08);
-      --shadow-lg: 0 16px 40px -6px rgba(44, 36, 29, 0.14);
+      --shadow-sm: 0 1px 3px rgba(45, 36, 26, 0.05);
+      --shadow-md: 0 4px 16px -2px rgba(45, 36, 26, 0.08);
+      --shadow-lg: 0 16px 40px -6px rgba(45, 36, 26, 0.12);
+    }
+
+    [data-theme="light"] .bg-grid {
+      background-image: 
+        linear-gradient(to right, rgba(45, 36, 26, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(45, 36, 26, 0.04) 1px, transparent 1px) !important;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
