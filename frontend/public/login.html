@@ -6,85 +6,55 @@
   <title>SentinelGrid // Security Operations Authentication</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      /* Developer Precision Dark Palette (Carbon / GitHub Dark) */
-      --canvas-bg: #0D1117;
-      --card-bg: rgba(22, 27, 34, 0.92);
-      --surface-elevated: #21262D;
-      --border-subtle: #30363D;
-      --border-hover: rgba(47, 129, 247, 0.4);
-      --accent-cyan: #2F81F7;
-      --accent-soft: rgba(47, 129, 247, 0.12);
-      --text-primary: #E6EDF3;
+      --canvas-bg: #090B0E;
+      --card-bg: #0F1217;
+      --surface-elevated: #141920;
+      --border-subtle: #1E242E;
+      --border-hover: #38BDF8;
+      --accent-cyan: #38BDF8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --text-primary: #F0F6FC;
       --text-muted: #8B949E;
       --text-subtle: #6E7681;
       --terracotta: #F85149;
       --sage-green: #3FB950;
-      --warm-ochre: #D29922;
+      --warm-ochre: #F59E0B;
       --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'Space Mono', SFMono-Regular, Menlo, monospace;
 
-      /* Next-Gen Rounded Geometry Tokens */
-      --radius-xs: 6px;
-      --radius-sm: 10px;
-      --radius-md: 14px;
-      --radius-lg: 18px;
-      --radius-xl: 22px;
-      --radius-2xl: 28px;
-      --radius-pill: 9999px;
-
-      /* Soft Layered Shadows & Optical Rim */
-      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
-      --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
-      --shadow-lg: 0 24px 60px -8px rgba(0, 0, 0, 0.65), 0 12px 28px -6px rgba(0, 0, 0, 0.45);
-      --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      --glass-blur: blur(20px) saturate(180%);
+      --radius-sm: 4px;
+      --radius-md: 4px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.6);
     }
 
     :root[data-theme="light"] {
-      /* Rich Archival Canvas & Surfaces (Warm Almond Linen / Dark Cream) */
       --canvas-bg: #EFE9DF;
-      --card-bg: rgba(250, 246, 238, 0.94);
+      --card-bg: #FAF6EE;
       --surface-elevated: #E6DECE;
       --border-subtle: #CFBFAB;
       --border-hover: #1B365D;
       --accent-cyan: #1B365D;
-      --accent-soft: rgba(27, 54, 93, 0.12);
+      --accent-soft: rgba(27, 54, 93, 0.08);
       --text-primary: #1C1712;
       --text-muted: #564B3E;
       --text-subtle: #7A6C5B;
       --terracotta: #9C2A1B;
       --sage-green: #1B633E;
       --warm-ochre: #8C4A0E;
-      --inner-rim: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-      --shadow-sm: 0 1px 3px rgba(45, 36, 26, 0.05);
-      --shadow-md: 0 4px 16px -2px rgba(45, 36, 26, 0.08);
-      --shadow-lg: 0 16px 40px -6px rgba(45, 36, 26, 0.12);
-    }
-
-    [data-theme="light"] .bg-grid {
-      background-image: 
-        linear-gradient(to right, rgba(45, 36, 26, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(45, 36, 26, 0.04) 1px, transparent 1px) !important;
+      --shadow-lg: 0 16px 40px -8px rgba(45, 36, 26, 0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    ::selection { background: rgba(47, 129, 247, 0.3); color: inherit; }
+    ::selection { background: rgba(56, 189, 248, 0.3); color: inherit; }
     :focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
 
-    html, body {
-      overflow-x: hidden;
-      width: 100%;
-      max-width: 100%;
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
-
     body {
-      background: var(--canvas-bg);
+      background-color: var(--canvas-bg);
       color: var(--text-primary);
       font-family: var(--font-ui);
       min-height: 100vh;
@@ -92,122 +62,131 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow-y: auto;
+      padding: 24px;
+      transition: background-color 0.2s ease, color 0.2s ease;
       font-variant-numeric: tabular-nums;
-      -webkit-font-smoothing: antialiased;
-      padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
     }
 
-    /* Prevent iOS Safari 16px auto-zoom */
-    @media (max-width: 768px) {
-      .form-input, input, select, textarea {
-        font-size: 16px !important;
-      }
-    }
-
-    @media (max-height: 600px) {
-      body {
-        align-items: flex-start;
-      }
-    }
-
-    /* High-Performance 60fps Particle Mesh Canvas (No Video!) */
-    #meshCanvas {
+    /* Fixed Top Theme Switcher */
+    .top-controls {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 1;
+      top: 20px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 50;
     }
-
-    /* Ambient Subtle Cyber Grid */
-    .bg-grid {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-size: 40px 40px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      z-index: 2;
-      opacity: 0.8;
-    }
-
-    /* Orchestrated Landing Animation Container */
-    .login-container {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 440px;
-      padding: 20px;
-      perspective: 1200px;
-    }
-
-    .login-card {
+    .theme-toggle-btn {
       background: var(--card-bg);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-primary);
+    }
+
+    /* 55/45 Split Desktop Container */
+    .auth-split-wrapper {
+      width: 100%;
+      max-width: 960px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: grid;
+      grid-template-columns: 55% 45%;
+      overflow: hidden;
+    }
+
+    /* Left Pane: Technical Mesh Telemetry Status */
+    .status-pane {
+      background: var(--surface-elevated);
+      border-right: 1px solid var(--border-subtle);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .status-pane-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .status-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .status-subtitle {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+    }
+    .status-telemetry-grid {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      margin-bottom: 24px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.8;
+    }
+    .status-telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border-subtle);
+      padding: 4px 0;
+    }
+    .status-telemetry-row:last-child {
+      border-bottom: none;
+    }
+    .status-label {
+      color: var(--text-muted);
+    }
+    .status-val {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .status-val.ok {
+      color: var(--sage-green);
+    }
+
+    /* Right Pane: Clean Auth Inputs */
+    .form-pane {
       padding: 40px 36px;
-      box-shadow: var(--shadow-lg), var(--inner-rim);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      transform-style: preserve-3d;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-      
-      /* Cascading Landing Entrance */
-      animation: cardLandIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      opacity: 0;
-      transform: translateY(32px) scale(0.96);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
-
-    @keyframes cardLandIn {
-      0% {
-        opacity: 0;
-        transform: translateY(36px) scale(0.95);
-        filter: blur(4px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
+    .form-header {
+      margin-bottom: 24px;
     }
-
-    /* Staggered Item Entrance Sequence */
-    .stagger-1 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards; opacity: 0; }
-    .stagger-2 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.28s forwards; opacity: 0; }
-    .stagger-3 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.40s forwards; opacity: 0; }
-    .stagger-4 { animation: itemReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.52s forwards; opacity: 0; }
-
-    @keyframes itemReveal {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
+    .form-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
     }
-
-    /* 3D Shield Emblem Animation */
-    .shield-emblem {
-      animation: shieldSpringIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      transform-origin: center center;
+    .form-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
     }
-    @keyframes shieldSpringIn {
-      0% { transform: scale(0.4) rotate(-20deg); opacity: 0; }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
     }
-    .radar-outer-ring {
-      animation: radarSpin 14s linear infinite;
-      transform-origin: 50px 50px;
-    }
-    .shield-crystal-core {
-      animation: crystalGlow 2.5s ease-in-out infinite;
-      transform-origin: 50px 50px;
-    }
-    @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    @keyframes crystalGlow {
-      0%, 100% { opacity: 0.8; transform: scale(0.96); }
-      50% { opacity: 1; transform: scale(1.08); filter: drop-shadow(0 0 8px var(--accent-cyan)); }
-    }
-
-    /* Form Fields */
-    .form-group { margin-bottom: 18px; text-align: left; }
     .form-label {
       display: block;
       font-size: 11px;
@@ -215,25 +194,26 @@
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 7px;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
     }
-    .input-wrapper { position: relative; }
+    .input-wrapper {
+      position: relative;
+    }
     .form-input {
       width: 100%;
       background: var(--surface-elevated);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 12px 14px;
+      padding: 11px 14px;
       color: var(--text-primary);
       font-family: var(--font-ui);
       font-size: 13px;
       outline: none;
-      transition: all 0.2s ease;
+      transition: border-color 0.15s ease;
     }
     .form-input:focus {
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 0 3px var(--accent-soft);
     }
     .toggle-pwd-btn {
       position: absolute;
@@ -242,281 +222,253 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      border-radius: var(--radius-xs);
       color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 14px;
+      padding: 4px;
     }
-
-    /* Button */
-    .btn-submit {
-      width: 100%;
-      background: linear-gradient(180deg, #388bfd 0%, #236dd4 100%);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: var(--radius-sm);
-      padding: 13px;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(47, 129, 247, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-submit:hover {
-      filter: brightness(1.12);
-      transform: translateY(-1px);
-    }
-    .btn-submit:active { transform: scale(0.97); }
-
-    /* Animated Error Alert */
-    .error-banner {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: var(--terracotta);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      font-size: 12px;
-      margin-bottom: 16px;
-      display: none;
-      align-items: center;
-      gap: 8px;
-      animation: shakeBanner 0.35s ease;
-    }
-    @keyframes shakeBanner {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-4px); }
-      40%, 80% { transform: translateX(4px); }
+    .toggle-pwd-btn:hover {
+      color: var(--text-primary);
     }
 
     /* Role Clearance Preview Badges */
     .role-pills {
       display: flex;
-      gap: 4px;
-      margin-bottom: 18px;
-      background: var(--surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-pill);
-      padding: 3px;
+      gap: 6px;
+      margin-bottom: 20px;
     }
     .role-pill {
       flex: 1;
       padding: 6px 8px;
       text-align: center;
-      border-radius: var(--radius-pill);
+      border-radius: var(--radius-sm);
       font-family: var(--font-mono);
       font-size: 10px;
       font-weight: 700;
-      background: transparent;
-      border: 1px solid transparent;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
       color: var(--text-muted);
       cursor: pointer;
-      transition: all 0.15s;
+      transition: border-color 0.15s ease, color 0.15s ease;
     }
     .role-pill.active {
       border-color: var(--accent-cyan);
-      background: var(--accent-soft);
       color: var(--accent-cyan);
+      background: var(--accent-soft);
     }
 
-    @media (max-width: 480px) {
-      .login-container { padding: 12px; }
-      .login-card { padding: 26px 20px !important; border-radius: var(--radius-lg) !important; }
-      .theme-toggle-corner { top: 12px; right: 12px; }
-      .role-pill { font-size: 9px; padding: 6px 4px; }
+    /* Submit Button */
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-cyan);
+      color: #090B0E;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+      letter-spacing: 0.3px;
+    }
+    :root[data-theme="light"] .btn-submit {
+      background: var(--accent-cyan);
+      color: #FFFFFF;
+    }
+    .btn-submit:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
 
-    /* Top Corner Theme Switcher */
-    .theme-toggle-corner {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      z-index: 100;
+    /* Error Banner */
+    .error-banner {
+      background: rgba(248, 81, 73, 0.12);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+      color: var(--terracotta);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .auth-split-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .status-pane {
+        padding: 24px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .form-pane {
+        padding: 24px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- 60fps Ambient Particle Mesh Canvas -->
-  <canvas id="meshCanvas"></canvas>
-  <div class="bg-grid"></div>
-
-  <!-- Theme Toggle -->
-  <div class="theme-toggle-corner">
-    <button id="themeBtn" class="role-pill" style="padding: 6px 12px; font-size: 11px;" onclick="toggleTheme()">
-      🌙 OBSIDIAN
+  <!-- Top Controls -->
+  <div class="top-controls">
+    <button id="themeBtn" class="theme-toggle-btn" onclick="toggleTheme()">
+      THEME: CARBON
     </button>
   </div>
 
-  <div class="login-container">
-    <div class="login-card" id="loginCard">
-      
-      <!-- Brand & Emblem -->
-      <div style="text-align: center; margin-bottom: 24px;" class="stagger-1">
-        <div style="margin: 0 auto 12px; width: 50px;" class="shield-emblem">
-          <svg width="50" height="50" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" stroke-dasharray="6,4" class="radar-outer-ring"/>
-            <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="#151E32" stroke="#38BDF8" stroke-width="2"/>
-            <polygon points="50,34 64,50 50,66 36,50" fill="#38BDF8" class="shield-crystal-core"/>
-            <circle cx="50" cy="50" r="4" fill="#FFFFFF"/>
-          </svg>
-        </div>
-        <h1 style="font-size: 19px; font-weight: 800; letter-spacing: -0.3px; color: var(--text-primary);">SentinelGrid SOC</h1>
-        <p style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px;">Zero-Trust L7 Threat Operations Platform</p>
-      </div>
-
-      <!-- Error Alert -->
-      <div id="errorBanner" class="error-banner">
-        <span>⚠️</span>
-        <span id="errorMessage">Invalid credentials</span>
-      </div>
-
-      <!-- Login Form -->
-      <form onsubmit="handleLoginSubmit(event)" novalidate>
-        <div class="form-group stagger-3">
-          <label for="emailInput" class="form-label">Operator Account ID</label>
-          <div class="input-wrapper">
-            <input type="text" id="emailInput" class="form-input" placeholder="Enter Account ID" required autocomplete="username" value="">
+  <div class="auth-split-wrapper">
+    <!-- Left Pane: Technical Mesh Status -->
+    <div class="status-pane">
+      <div>
+        <div class="status-pane-brand">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div>
+            <div class="status-title">SentinelGrid WAAP</div>
+            <div class="status-subtitle">Zero-Trust Origin Defense</div>
           </div>
         </div>
 
-        <div class="form-group stagger-3">
-          <label for="passwordInput" class="form-label">Security Passphrase</label>
+        <div class="status-telemetry-grid">
+          <div class="status-telemetry-row">
+            <span class="status-label">EDGE_INGRESS</span>
+            <span class="status-val ok">100% OPERATIONAL</span>
+          </div>
+          <div class="status-telemetry-row">
+            <span class="status-label">ED25519_SEAL</span>
+            <span class="status-val ok">RFC 8032 VERIFIED</span>
+          </div>
+          <div class="status-telemetry-row">
+            <span class="status-label">SMARTPARSE_DFA</span>
+            <span class="status-val ok">READY (0.35ms)</span>
+          </div>
+          <div class="status-telemetry-row">
+            <span class="status-label">RADIX_CIDR_MATCH</span>
+            <span class="status-val ok">0.14ms</span>
+          </div>
+          <div class="status-telemetry-row">
+            <span class="status-label">ACTIVE_CORE</span>
+            <span class="status-val">1.0.0-PROD</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-subtle); line-height: 1.5;">
+        [SYS] Clearance authentication required for SOC console access. Session tokens are digitally signed with RFC 8032 Ed25519 origin proof.
+      </div>
+    </div>
+
+    <!-- Right Pane: Authentication Form -->
+    <div class="form-pane">
+      <div class="form-header">
+        <h2 class="form-title">Operator Clearance</h2>
+        <p class="form-desc">Provide designated operator credentials to initialize your SOC telemetry session.</p>
+      </div>
+
+      <div class="error-banner" id="errorBanner">
+        <span id="errorMessage">Invalid operator clearance.</span>
+      </div>
+
+      <!-- Role Preset Selectors -->
+      <div class="role-pills">
+        <div class="role-pill active" onclick="applyPreset('admin')">ADMIN (FULL)</div>
+        <div class="role-pill" onclick="applyPreset('lead')">LEAD (OPS)</div>
+        <div class="role-pill" onclick="applyPreset('member')">MEMBER (RO)</div>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Operator Identifier</label>
           <div class="input-wrapper">
-            <input type="password" id="passwordInput" class="form-input" placeholder="••••••••••••" required autocomplete="current-password" value="">
-            <button type="button" class="toggle-pwd-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility()">👁️</button>
+            <input type="text" id="emailInput" class="form-input" required autocomplete="username" value="a@123" spellcheck="false">
           </div>
         </div>
 
-        <button type="submit" id="submitBtn" class="btn-submit stagger-4">
-          <span>🔒 Authenticate & Enter SOC</span>
+        <div class="form-group">
+          <label class="form-label" for="passwordInput">Secret Key Phrase</label>
+          <div class="input-wrapper">
+            <input type="password" id="passwordInput" class="form-input" required autocomplete="current-password" value="anup@5212">
+            <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility()" id="togglePwdBtn">SHOW</button>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">
+          [AUTHENTICATE & ENTER SOC]
         </button>
       </form>
-
-      <!-- Footer Trust Badge -->
-      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--text-subtle);" class="stagger-4">
-        <span>AUTH: RFC 8032 Ed25519</span>
-        <a href="landing.html" style="color: var(--text-subtle); text-decoration: none;">View Product Tour ➔</a>
-      </div>
     </div>
   </div>
 
   <script>
-    // -------------------------------------------------------------------------
-    // 60fps Ambient Particle Constellation Mesh (Lightweight Pure Canvas Math)
-    // -------------------------------------------------------------------------
-    const canvas = document.getElementById("meshCanvas");
-    const ctx = canvas.getContext("2d");
-    let width, height;
-    let particles = [];
-    const PARTICLE_COUNT = 45;
-
-    function resizeCanvas() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = width + "px";
-      canvas.style.height = height + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        radius: Math.random() * 1.8 + 1
-      });
-    }
-
-    function animateMesh() {
-      ctx.clearRect(0, 0, width, height);
-      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
-      const particleColor = isDark ? "rgba(56, 189, 248, 0.4)" : "rgba(2, 132, 199, 0.35)";
-      const lineColor = isDark ? "rgba(56, 189, 248, 0.08)" : "rgba(2, 132, 199, 0.07)";
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particleColor;
-        ctx.fill();
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < 110) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = lineColor;
-            ctx.lineWidth = 1 - dist / 110;
-            ctx.stroke();
-          }
-        }
-      }
-      requestAnimationFrame(animateMesh);
-    }
-    animateMesh();
-
-    // -------------------------------------------------------------------------
-    // Interactive 3D Perspective Mouse Tilt
-    // -------------------------------------------------------------------------
-    const card = document.getElementById("loginCard");
-    document.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(1000px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg)`;
-    });
-
-    // -------------------------------------------------------------------------
-    // Theme Switcher Controller
-    // -------------------------------------------------------------------------
+    // Theme Management
     function initTheme() {
       const saved = localStorage.getItem("sg_theme") || "dark";
       document.documentElement.setAttribute("data-theme", saved);
       updateThemeButton(saved);
     }
+
     function toggleTheme() {
-      const cur = document.documentElement.getAttribute("data-theme") || "dark";
-      const next = cur === "dark" ? "light" : "dark";
+      const current = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = current === "dark" ? "light" : "dark";
       document.documentElement.setAttribute("data-theme", next);
       localStorage.setItem("sg_theme", next);
       updateThemeButton(next);
     }
+
     function updateThemeButton(theme) {
       const btn = document.getElementById("themeBtn");
-      btn.innerText = theme === "dark" ? "🌙 OBSIDIAN" : "🌾 DARK CREAM";
+      if (btn) {
+        btn.innerText = theme === "dark" ? "THEME: CARBON" : "THEME: ARCHIVAL";
+      }
     }
     initTheme();
 
-    // -------------------------------------------------------------------------
-    // Form & Role Helper Functions
-    // -------------------------------------------------------------------------
+    // Password Visibility Toggle
     function togglePasswordVisibility() {
       const pwd = document.getElementById("passwordInput");
-      pwd.type = pwd.type === "password" ? "text" : "password";
+      const btn = document.getElementById("togglePwdBtn");
+      if (pwd.type === "password") {
+        pwd.type = "text";
+        btn.innerText = "HIDE";
+      } else {
+        pwd.type = "password";
+        btn.innerText = "SHOW";
+      }
     }
 
-    // -------------------------------------------------------------------------
-    // Authentication Submission Handler
-    // -------------------------------------------------------------------------
+    // Role Presets
+    function applyPreset(role) {
+      const pills = document.querySelectorAll(".role-pill");
+      pills.forEach(p => p.classList.remove("active"));
+      event.target.classList.add("active");
+
+      const emailInput = document.getElementById("emailInput");
+      const pwdInput = document.getElementById("passwordInput");
+
+      if (role === "admin") {
+        emailInput.value = "a@123";
+        pwdInput.value = "anup@5212";
+      } else if (role === "lead") {
+        emailInput.value = "lead@sentinelgrid.internal";
+        pwdInput.value = "LeadAccess#2026";
+      } else {
+        emailInput.value = "operator@sentinelgrid.internal";
+        pwdInput.value = "AuditOnly#2026";
+      }
+    }
+
+    // Authentication Handshake Sequence
     async function handleLoginSubmit(e) {
       e.preventDefault();
       const email = document.getElementById("emailInput").value.trim();
@@ -526,10 +478,11 @@
       const errMsg = document.getElementById("errorMessage");
 
       errBanner.style.display = "none";
-      btn.innerHTML = "<span>⚡ Authenticating Ed25519 Handshake...</span>";
-      btn.style.opacity = "0.75";
       btn.disabled = true;
 
+      // 3-Step Handshake Progress Indicator
+      btn.innerText = "[1/3] DERIVING ED25519 KEYPAIR...";
+      
       try {
         let storedBackend = localStorage.getItem("sentinel_backend_url");
         if (storedBackend && (storedBackend.includes("localhost") || storedBackend.includes("127.0.0.1") || storedBackend.includes("onrender.com"))) {
@@ -538,6 +491,11 @@
         }
         const isLocalDevServer = window.location.hostname === "localhost" && (window.location.port === "8000" || window.location.port === "8080");
         const API = storedBackend || (isLocalDevServer ? "/v1" : "https://sentinelgrid-one.vercel.app/v1");
+
+        setTimeout(() => {
+          if (btn.disabled) btn.innerText = "[2/3] VERIFYING RFC 8032 SEAL...";
+        }, 150);
+
         const res = await fetch(`${API}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -546,25 +504,26 @@
         const data = await res.json();
 
         if (res.ok) {
+          btn.innerText = "[3/3] MOUNTING SOC WORKSPACE...";
+          btn.style.background = "var(--sage-green)";
+          btn.style.color = "#FFFFFF";
+
           localStorage.setItem("sg_auth_token", data.token);
           localStorage.setItem("sg_auth_user", JSON.stringify(data.user));
-          btn.innerHTML = "<span>✅ Clearance Verified. Entering SOC...</span>";
-          btn.style.background = "var(--sage-green)";
+
           setTimeout(() => {
             window.location.href = "index.html#dashboard";
-          }, 450);
+          }, 350);
         } else {
-          errMsg.innerText = data.detail || "Invalid credentials or unauthorized clearance";
+          errMsg.innerText = data.detail || "Invalid operator clearance or token rejected.";
           errBanner.style.display = "flex";
-          btn.innerHTML = "<span>🔒 Authenticate & Enter SOC</span>";
-          btn.style.opacity = "1";
+          btn.innerText = "[AUTHENTICATE & ENTER SOC]";
           btn.disabled = false;
         }
       } catch (err) {
-        errMsg.innerText = "Control plane unreachable. Please check backend connection.";
+        errMsg.innerText = "Control plane unreachable. Check network or gateway connection.";
         errBanner.style.display = "flex";
-        btn.innerHTML = "<span>🔒 Authenticate & Enter SOC</span>";
-        btn.style.opacity = "1";
+        btn.innerText = "[AUTHENTICATE & ENTER SOC]";
         btn.disabled = false;
       }
     }

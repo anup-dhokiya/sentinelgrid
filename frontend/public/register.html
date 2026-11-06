@@ -3,15 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="refresh" content="0; url=login.html">
-  <script>window.location.replace("login.html");</script>
-  <title>SentinelGrid // Access Restricted</title>
+  <title>SentinelGrid // Zero-Trust Operator Provisioning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090B0E;
+      color: #F0F6FC;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 24px;
+    }
+    .gate-container {
+      max-width: 520px;
+      width: 100%;
+      background: #0F1217;
+      border: 1px solid #1E242E;
+      border-radius: 4px;
+      padding: 32px;
+    }
+    .gate-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #1E242E;
+      padding-bottom: 18px;
+      margin-bottom: 20px;
+    }
+    .gate-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: #F59E0B;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .gate-title { font-size: 16px; font-weight: 800; }
+    .gate-body { font-size: 13px; color: #8B949E; line-height: 1.6; margin-bottom: 24px; }
+    .terminal-box {
+      background: #141920;
+      border: 1px solid #1E242E;
+      border-radius: 2px;
+      padding: 14px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #38BDF8;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .btn-return {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 11px;
+      background: #38BDF8;
+      color: #090B0E;
+      font-weight: 700;
+      font-size: 12px;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: background 0.15s ease;
+    }
+    .btn-return:hover {
+      background: #0284C7;
+      color: #FFFFFF;
+    }
+  </style>
 </head>
-<body style="background:#0D1117; color:#E6EDF3; font-family:system-ui, -apple-system, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
-  <div style="text-align:center; padding:24px;">
-    <h2>Access Restricted</h2>
-    <p style="color:#8B949E;">Public operator registration is disabled. Only designated administrator accounts are permitted.</p>
-    <p>Redirecting to <a href="login.html" style="color:#58a6ff;">Operator Login</a>...</p>
+<body>
+  <div class="gate-container">
+    <div class="gate-header">
+      <span class="gate-tag">[ACCESS_RESTRICTED]</span>
+      <h1 class="gate-title">Zero-Trust Operator Provisioning</h1>
+    </div>
+    <div class="gate-body">
+      Public operator registration is permanently disabled. SentinelGrid enforces zero-trust identity; operator clearances and Ed25519 cryptographic tokens are issued exclusively by designated administrators via the control plane CLI.
+    </div>
+    <div class="terminal-box">
+      $ sentinelgrid operator provision \<br>
+      &nbsp;&nbsp;--role=MEMBER \<br>
+      &nbsp;&nbsp;--scope=read-only \<br>
+      &nbsp;&nbsp;--expires=24h
+    </div>
+    <a href="login.html" class="btn-return">Return to Operator Authentication</a>
   </div>
 </body>
 </html>

