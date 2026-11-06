@@ -663,12 +663,28 @@
       function resizePipelineCanvas() {
         const rect = canvas.getBoundingClientRect();
         if (rect.width > 0) {
-          canvas.width = rect.width;
-          canvas.height = 220;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const displayWidth = rect.width;
+          const displayHeight = Math.max(160, Math.min(260, Math.round(rect.width * 0.22)));
+          canvas.style.height = `${displayHeight}px`;
+          canvas.width = Math.round(displayWidth * dpr);
+          canvas.height = Math.round(displayHeight * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
       }
-      window.addEventListener("resize", resizePipelineCanvas);
-      window.addEventListener("orientationchange", () => setTimeout(resizePipelineCanvas, 150));
+
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.contentRect && entry.contentRect.width > 0) {
+              window.requestAnimationFrame(resizePipelineCanvas);
+            }
+          }
+        });
+        ro.observe(card);
+      } else {
+        window.addEventListener("resize", resizePipelineCanvas, { passive: true });
+      }
       resizePipelineCanvas();
 
       // Touch inspection support for mobile screens
@@ -695,21 +711,24 @@
       card.addEventListener("mouseleave", () => {
         if (hud) hud.style.display = "none";
       });
-      // Mouse Hover HUD on Canvas Nodes
+
+      // Mouse Hover HUD on Canvas Nodes (Dynamic 1:1 Hit Testing)
       canvas.addEventListener("mousemove", (e) => {
         if (!hud) return;
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const mouseX = (e.clientX - rect.left) * scaleX;
-        const mouseY = (e.clientY - rect.top) * scaleY;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const W = rect.width;
+        const H = rect.height;
+        const radiusScale = Math.min(1.2, Math.max(0.7, W / 1000));
 
         let hovered = null;
         for (const n of PIPELINE_NODES) {
-          const nx = n.xRatio * canvas.width;
-          const ny = n.yRatio * canvas.height;
+          const nx = n.xRatio * W;
+          const ny = n.yRatio * H;
+          const currentRadius = n.radius * radiusScale;
           const dist = Math.hypot(mouseX - nx, mouseY - ny);
-          if (dist <= n.radius + 8) {
+          if (dist <= currentRadius + 8) {
             hovered = n;
             break;
           }
@@ -795,6 +814,7 @@
         for (const n of PIPELINE_NODES) {
           nodes[n.id] = {
             ...n,
+            radius: n.radius * radiusScale,
             x: n.xRatio * W,
             y: n.yRatio * H
           };
@@ -1835,8 +1855,14 @@
     // -------------------------------------------------------------------------
     // Visual SVG Traffic Histogram & OWASP Spectrum Generators
     // -------------------------------------------------------------------------
+    let cachedTrafficTimeline = [];
+
     function renderTrafficHistogram(timeline) {
+      if (timeline && timeline.length > 0) {
+        cachedTrafficTimeline = timeline;
+      }
       const container = document.getElementById("traffic-histogram-container");
+      if (!container) return;
       if (!timeline || timeline.length === 0) {
         container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 35px 0; font-size: 11px;">Waiting for traffic time slices...</div>`;
         return;
@@ -2949,3 +2975,15 @@
     setupAutoRefreshEngine();
     initLiveTrafficSSE();
   
+
+    // Real-Time SVG Histogram Resize Observer (60fps lossless window drag)
+    if (window.ResizeObserver) {
+      const histEl = document.getElementById("traffic-histogram-container");
+      if (histEl) {
+        new ResizeObserver(() => {
+          if (cachedTrafficTimeline && cachedTrafficTimeline.length > 0) {
+            window.requestAnimationFrame(() => renderTrafficHistogram(cachedTrafficTimeline));
+          }
+        }).observe(histEl);
+      }
+    }

@@ -126,19 +126,20 @@
           </div>
         </div>
 
-        <!-- Live Precision System Clock -->
-        <div id="topbar-system-clock" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 5px 14px; border-radius: var(--radius-pill); border: 1px solid var(--stone-border);">
-          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--sage-green); box-shadow: 0 0 6px var(--sage-green);"></span>
-          <span id="clock-date-str" style="color: var(--text-muted); font-weight: 600;">--</span>
-          <span style="color: var(--stone-border);">|</span>
-          <span id="clock-time-str" style="color: var(--text-charcoal); font-weight: 700; letter-spacing: 0.5px;">--:--:--</span>
-          <span id="clock-tz-badge" style="font-size: 9px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--card-white); border: 1px solid var(--stone-border); color: var(--deep-indigo); font-weight: 800;">IST</span>
-        </div>
+        <!-- Live Telemetry Strip (Two-Tier Command Ribbon on <= 1024px) -->
+        <div class="topbar-telemetry-strip" id="topbar-telemetry-strip">
+          <div id="topbar-system-clock" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; background: var(--sand-warm); padding: 5px 12px; border-radius: var(--radius-sm); border: 1px solid var(--stone-border);">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--sage-green); box-shadow: 0 0 6px var(--sage-green);"></span>
+            <span id="clock-date-str" style="color: var(--text-muted); font-weight: 600;">--</span>
+            <span style="color: var(--stone-border);">|</span>
+            <span id="clock-time-str" style="color: var(--text-charcoal); font-weight: 700; letter-spacing: 0.5px;">--:--:--</span>
+            <span id="clock-tz-badge" style="font-size: 9px; padding: 2px 6px; border-radius: 2px; background: var(--card-white); border: 1px solid var(--stone-border); color: var(--deep-indigo); font-weight: 800;">IST</span>
+          </div>
 
-        <!-- Live Cloud Engine Status Pill -->
-        <div id="topbar-cloud-status" style="display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); padding: 5px 12px; border-radius: var(--radius-pill); color: var(--sage-green); font-weight: 700;">
-          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e;"></span>
-          <span id="cloud-status-text">CLOUD CORE: VERCEL EDGE &bull; ONLINE (&lt;1ms)</span>
+          <div id="topbar-cloud-status" style="display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; background: var(--sage-soft); border: 1px solid var(--sage-border); padding: 5px 10px; border-radius: var(--radius-sm); color: var(--sage-green); font-weight: 700;">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e;"></span>
+            <span id="cloud-status-text">CLOUD CORE: VERCEL EDGE &bull; ONLINE (&lt;1ms)</span>
+          </div>
         </div>
 
         <!-- Controls & User Badge -->
@@ -220,7 +221,7 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span>ACTIVE SITE SCOPE:</span>
           </span>
-          <select id="scope-website-select" class="form-input" style="width: 280px; margin: 0; font-weight: 700; background: var(--sand-warm); cursor: pointer;" onchange="handleDomainScopeChange()">
+          <select id="scope-website-select" class="form-input" style="width: clamp(180px, 25vw, 320px); flex: 1 1 200px; max-width: 100%; margin: 0; font-weight: 700; background: var(--sand-warm); cursor: pointer;" onchange="handleDomainScopeChange()">
             <option value="ALL">All Protected Domains (Global Fleet View)</option>
           </select>
           <span id="scope-badge" class="badge badge-online">GLOBAL FLEET</span>
@@ -257,8 +258,10 @@
         </div>
       </div>
 
-      <!-- ===================================================================== -->
-      <!-- 3D ISOMETRIC SECURITY PIPELINE TOPOLOGY & INTERACTIVE PARTICLE ENGINE -->
+      <div class="dashboard-ultrawide-container">
+        <div class="dashboard-ultrawide-left">
+          <!-- ===================================================================== -->
+          <!-- 3D ISOMETRIC SECURITY PIPELINE TOPOLOGY & INTERACTIVE PARTICLE ENGINE -->
       <!-- ===================================================================== -->
       <div class="panel topology-card" id="topology3dCard" style="margin-bottom: 22px; padding: 20px 24px; position: relative; overflow: hidden; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); transform-style: preserve-3d; transition: transform 0.15s ease;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
@@ -360,7 +363,9 @@
         </div>
       </div>
 
-      <!-- Real-Time Security Events & Persistent Incident Container Table -->
+        </div>
+        <div class="dashboard-ultrawide-right">
+          <!-- Real-Time Security Events & Persistent Incident Container Table -->
       <div class="panel" style="margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
         <div class="panel-header" style="padding: 18px 24px; flex-wrap: wrap; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
@@ -398,7 +403,7 @@
             </select>
 
             <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: 6px;">Quick Search:</span>
-            <input type="text" id="event-search-query" class="form-input" style="min-width: 260px; flex: 1; max-width: 440px; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule... (Hotkey: /)" oninput="applyEventFilter()">
+            <input type="text" id="event-search-query" class="form-input" style="width: clamp(180px, 25vw, 440px); flex: 1 1 200px; max-width: 100%; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule... (Hotkey: /)" oninput="applyEventFilter()">
 
             <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
               <span class="badge badge-allow" style="font-size: 10px;" title="Persistent storage in browser IndexedDB + cloud ledger. Live stream clears after 12h, blocked IPs kept permanently.">12h Live Window &bull; Blocked IPs Preserved</span>
@@ -406,7 +411,7 @@
           </div>
         </div>
 
-        <div class="table-responsive" style="min-height: 520px; max-height: 720px; overflow-y: auto; position: relative;">
+        <div class="table-responsive" style="height: clamp(320px, calc(100dvh - 380px), 85dvh); min-height: 320px; max-height: 85dvh; overflow-y: auto; position: relative;">
           <table class="table-clean" style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead style="position: sticky; top: 0; background: var(--card-white); z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
               <tr>
@@ -424,6 +429,8 @@
               <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">Connecting to SentinelGrid WAAP Telemetry stream...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
         </div>
       </div>
     </section>
@@ -467,7 +474,7 @@
       </div>
 
       <div class="panel" style="padding: 0; overflow: hidden; margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
-        <div class="table-responsive" style="min-height: 560px; max-height: 82vh; overflow-y: auto; position: relative;">
+        <div class="table-responsive" style="height: clamp(320px, calc(100dvh - 280px), 88dvh); min-height: 320px; max-height: 88dvh; overflow-y: auto; position: relative;">
           <table class="table-clean" style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead style="position: sticky; top: 0; background: var(--card-white); z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
               <tr>
@@ -484,7 +491,7 @@
             <tbody id="livetraffic-table-body">
               <tr>
                 <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">
-                  <div style="font-size: 24px; margin-bottom: 8px;">⚡</div>
+                  <div style="margin-bottom: 8px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--deep-indigo);"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                   Connecting to SentinelGrid Server-Sent Events (SSE) telemetry pipeline...
                 </td>
               </tr>
@@ -803,7 +810,7 @@
             SentinelGrid inspects incoming requests in-line with a sub-millisecond latency budget (p99 &lt; 0.4ms). All verified requests receive an unforgeable <strong>RFC 8032 Ed25519 origin seal</strong>, guaranteeing upstream backends that traffic traversed security inspection.
           </p>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; margin-bottom: 24px;">
             <!-- Option A: Vercel / Next.js Edge -->
             <div style="background: var(--sand-warm); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--stone-border);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -1138,10 +1145,10 @@ app.use(async (req, res, next) =&gt; {
   <!-- MODAL 4: OPERATOR KEYBOARD SHORTCUTS CHEAT SHEET -->
   <!-- ======================================================================= -->
   <div id="shortcuts-modal-backdrop" class="drawer-backdrop" onclick="closeShortcutsModal()"></div>
-  <div id="shortcuts-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 480px; background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
+  <div id="shortcuts-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card-white); border: 1px solid var(--stone-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1002; padding: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--stone-border); padding-bottom: 12px; margin-bottom: 18px;">
       <h3 id="shortcuts-modal-title" style="font-size: 15px; font-weight: 800; color: var(--text-charcoal); display: flex; align-items: center; gap: 8px;">
-        <span>⌨️</span> Operator Keyboard Shortcuts
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="10" y1="12" x2="10.01" y2="12"/><line x1="14" y1="12" x2="14.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg> Operator Keyboard Shortcuts
       </h3>
       <button class="btn btn-subtle" style="padding: 3px 8px; font-size: 13px;" onclick="closeShortcutsModal()">✕</button>
     </div>
