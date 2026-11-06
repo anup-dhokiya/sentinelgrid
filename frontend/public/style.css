@@ -443,15 +443,22 @@
 
     /* Mobile Off-Canvas Drawer & Backdrop */
     .sidebar-backdrop {
-      display: none;
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       z-index: 290;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .sidebar-backdrop.active {
       display: block;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
     /* Global Viewport & Base Protection */
@@ -546,7 +553,24 @@
       max-height: 90dvh !important;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch !important;
+      animation: modalEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
+    @keyframes modalEnter {
+      from {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 12px)) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    .modal-dialog > *:not(:first-child) {
+      animation: cascadeBlockIn 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .modal-dialog > *:nth-child(2) { animation-delay: 40ms; }
+    .modal-dialog > *:nth-child(3) { animation-delay: 80ms; }
+    .modal-dialog > *:nth-child(4) { animation-delay: 120ms; }
 
     /* Topbar Layout & Compact Mode */
     .topbar-left {
@@ -653,6 +677,8 @@
     /* Mobile Drawer & Sidebar Slide Overrides (<= 900px) */
     @media (max-width: 900px) {
       .app-sidebar {
+        width: min(280px, 80vw) !important;
+        min-width: unset !important;
         position: fixed;
         left: 0;
         top: 0;
@@ -663,6 +689,20 @@
       }
       .app-sidebar.mobile-open {
         transform: translateX(0);
+      }
+      .app-sidebar.collapsed .sidebar-brand-text,
+      .app-sidebar.collapsed .sidebar-section-title,
+      .app-sidebar.collapsed .sidebar-label,
+      .app-sidebar.collapsed .sidebar-user-meta {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        width: auto !important;
+      }
+      .content-wrapper, .app-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
       }
       .chart-overview-grid {
         grid-template-columns: 1fr !important;
@@ -1176,7 +1216,7 @@
 
     /* High-Precision Active Press States */
     .btn, .form-input, select.form-input {
-      transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), border-color 120ms ease, background-color 120ms ease;
+      transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, background-color 160ms ease;
     }
     .btn:active, .form-input:active, select.form-input:active {
       transform: scale(0.98) !important;
@@ -1222,9 +1262,17 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .drawer-backdrop.active { display: block; }
+    .drawer-backdrop.active {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
 
     /* Forensics Side Drawer: 320ms Smooth Slide */
     .drawer-panel {
@@ -1352,19 +1400,7 @@
       display: inline-block;
     }
 
-    /* Universal Choreographed Animation Flow System */
-    @keyframes viewEnterTransition {
-      0% {
-        opacity: 0;
-        transform: translateY(10px) scale(0.995);
-        filter: blur(2px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-    }
+
 
 
 
@@ -1447,9 +1483,10 @@
 
 /* Hardware-Precision Anti-Slop Motion Tokens */
 :root {
-  --motion-snap: 100ms cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-swift: 140ms cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-structural: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-snap: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-swift: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-structural: 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-drawer: 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Hairline Grid for KPIs */
@@ -1510,4 +1547,113 @@
 }
 .reticle-locked {
   animation: reticleLockFlash 250ms ease-out;
+}
+
+/* =========================================================================
+   LOGO APPEARANCE BOOT SEQUENCE (#logoAnimation)
+   Total Timeline: 1,200ms with cubic-bezier(0.16, 1, 0.3, 1)
+   Phase 1: 0ms–400ms (0%–33.3%)   -> Primary brand letters & emblem fade in crisp large scale
+   Phase 2: 400ms–1,000ms (33.3%–83.3%) -> Monospace tagline reveals via clipping mask
+   Phase 3: 1,000ms–1,200ms (83.3%–100%) -> Container lifts 8px & fades out to reveal dashboard
+   ========================================================================= */
+.boot-splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--canvas-bg);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: bootContainerSequence 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.boot-splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.boot-splash-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: bootBrandPhase 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.boot-splash-brand-text {
+  font-family: var(--font-ui);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--text-charcoal);
+}
+
+.boot-splash-tagline {
+  overflow: hidden;
+}
+
+.boot-splash-tagline-text {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--deep-indigo);
+  animation: bootTaglinePhase 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bootContainerSequence {
+  0%, 83.33% {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+    visibility: hidden;
+  }
+}
+
+@keyframes bootBrandPhase {
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+    filter: blur(4px);
+  }
+  33.33% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  83.33% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes bootTaglinePhase {
+  0%, 33.33% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-6px);
+  }
+  41.67% {
+    opacity: 1;
+  }
+  83.33% {
+    opacity: 1;
+    clip-path: inset(0 0% 0 0);
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0% 0 0);
+  }
 }

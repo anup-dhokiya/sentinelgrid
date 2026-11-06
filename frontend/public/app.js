@@ -2860,6 +2860,18 @@
     initLiveTrafficSSE();
   
 
+    // Boot Sequence Controller (#logoAnimation 1,200ms sequence cleanup)
+    function initBootSequence() {
+      const splash = document.getElementById("logoAnimation");
+      if (!splash) return;
+      setTimeout(() => {
+        if (splash && splash.parentNode) {
+          splash.parentNode.removeChild(splash);
+        }
+      }, 1250);
+    }
+    initBootSequence();
+
     // Real-Time SVG Histogram Resize Observer (60fps lossless window drag)
     if (window.ResizeObserver) {
       const histEl = document.getElementById("traffic-histogram-container");
