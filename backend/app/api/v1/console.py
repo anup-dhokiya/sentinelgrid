@@ -164,17 +164,17 @@ async def get_overview(website_id: Optional[str] = None):
         where_site = "WHERE website_id = ?" if (website_id and website_id != "ALL") else "WHERE 1=1"
         site_params = [website_id] if (website_id and website_id != "ALL") else []
 
-        # 24-Hour Rolling Retention Policy:
-        # Prunes routine clean requests older than 24 hours.
-        # PERMANENTLY preserves ALL BLOCK events, attack incidents, and quarantined/blocked IPs.
+        # 12-Hour Rolling Retention Policy:
+        # Prunes routine clean requests older than 12 hours to prevent storage bloat.
+        # PERMANENTLY preserves ALL BLOCK, CHALLENGE, SINKHOLE events, attack incidents, and quarantined/blocked IPs.
         try:
-            twenty_four_hours_ago = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+            twelve_hours_ago = (datetime.now(timezone.utc) - timedelta(hours=12)).isoformat()
             conn.execute(
-                "DELETE FROM security_events WHERE action != 'BLOCK' AND timestamp < ?",
-                (twenty_four_hours_ago,)
+                "DELETE FROM security_events WHERE action NOT IN ('BLOCK', 'CHALLENGE', 'SINKHOLE') AND risk_score < 40 AND (rule_triggered IS NULL OR rule_triggered = '' OR rule_triggered = 'CLEAN-TRAFFIC') AND timestamp < ?",
+                (twelve_hours_ago,)
             )
         except Exception as e:
-            logger.warning(f"24-hour retention prune error: {e}")
+            logger.warning(f"12-hour retention prune error: {e}")
 
         if website_id and website_id != "ALL":
             endpoints_count = conn.execute("SELECT COUNT(*) FROM api_endpoints WHERE website_id = ?", (website_id,)).fetchone()[0]

@@ -78,6 +78,7 @@
           await SentinelEventStore.clear();
         }
       } catch (_) {}
+      localStorage.removeItem("sg_stored_threat_ledger");
       localStorage.removeItem("sg_stored_events_24h");
       localStorage.removeItem("sg_auth_token");
       localStorage.removeItem("sg_auth_user");
@@ -94,24 +95,48 @@
       if (!sidebar) return;
 
       if (window.innerWidth <= 900) {
+        sidebar.classList.remove("collapsed");
         const isOpen = sidebar.classList.toggle("mobile-open");
         if (backdrop) backdrop.classList.toggle("active", isOpen);
+        document.body.style.overflow = isOpen ? "hidden" : "";
       } else {
+        sidebar.classList.remove("mobile-open");
+        if (backdrop) backdrop.classList.remove("active");
+        document.body.style.overflow = "";
         const isCollapsed = sidebar.classList.toggle("collapsed");
         localStorage.setItem("sg_sidebar_collapsed", isCollapsed ? "true" : "false");
         if (arrowIcon) {
           arrowIcon.innerText = isCollapsed ? "▶" : "◀";
+          arrowIcon.style.transform = isCollapsed ? "rotate(180deg)" : "rotate(0deg)";
         }
       }
     }
 
     function initSidebarState() {
-      const savedCollapsed = localStorage.getItem("sg_sidebar_collapsed") === "true";
       const sidebar = document.getElementById("appSidebar");
       const arrowIcon = document.getElementById("collapse-arrow-icon");
-      if (sidebar && savedCollapsed && window.innerWidth > 900) {
-        sidebar.classList.add("collapsed");
-        if (arrowIcon) arrowIcon.innerText = "▶";
+      if (!sidebar) return;
+      if (window.innerWidth > 900) {
+        const savedCollapsed = localStorage.getItem("sg_sidebar_collapsed") === "true";
+        if (savedCollapsed) {
+          sidebar.classList.add("collapsed");
+          if (arrowIcon) {
+            arrowIcon.innerText = "▶";
+            arrowIcon.style.transform = "rotate(180deg)";
+          }
+        } else {
+          sidebar.classList.remove("collapsed");
+          if (arrowIcon) {
+            arrowIcon.innerText = "◀";
+            arrowIcon.style.transform = "rotate(0deg)";
+          }
+        }
+      } else {
+        sidebar.classList.remove("collapsed");
+        sidebar.classList.remove("mobile-open");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        if (backdrop) backdrop.classList.remove("active");
+        document.body.style.overflow = "";
       }
     }
 
@@ -358,26 +383,13 @@
 
     async function loadInitialLiveTraffic() {
       try {
-        if (typeof SentinelEventStore !== "undefined") {
-          const stored = await SentinelEventStore.getAll();
-          if (stored && stored.length > 0) {
-            liveTrafficBuffer = [...stored];
-            renderLiveTrafficTable();
-          }
+        if (liveTrafficBuffer && liveTrafficBuffer.length > 0) {
+          renderLiveTrafficTable();
+          return;
         }
-        const res = await fetch(`${API}/overview`);
-        if (res.ok) {
-          const data = await res.json();
-          const events = data.recent_events || [];
-          if (events.length > 0 && typeof SentinelEventStore !== "undefined") {
-            await SentinelEventStore.putBatch(events);
-            const merged = await SentinelEventStore.getAll();
-            liveTrafficBuffer = [...merged];
-            renderLiveTrafficTable();
-          }
-        }
+        renderLiveTrafficTable();
       } catch (err) {
-        console.error("Failed to load initial live traffic:", err);
+        console.error("Live traffic stream initial render notice:", err);
       }
     }
 
@@ -390,6 +402,17 @@
           : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg><span>Wide View</span><kbd style="font-size: 9px; opacity: 0.6; padding: 1px 4px; border: 1px solid var(--stone-border); border-radius: 3px; font-family: var(--font-mono);">W</kbd>`;
       }
       localStorage.setItem("sg_livetraffic_wide", isWide ? "true" : "false");
+      if (window.innerWidth > 900) {
+        const sidebar = document.getElementById("appSidebar");
+        const arrowIcon = document.getElementById("collapse-arrow-icon");
+        if (sidebar && isWide) {
+          sidebar.classList.add("collapsed");
+          if (arrowIcon) {
+            arrowIcon.innerText = "▶";
+            arrowIcon.style.transform = "rotate(180deg)";
+          }
+        }
+      }
     }
 
     function toggleLiveTrafficStream() {
@@ -403,10 +426,9 @@
     }
 
     function clearLiveTrafficBuffer() {
-      if (confirm("Clear in-memory view buffer? Stored 24h events remain safe in local container until explicit logout.")) {
-        liveTrafficBuffer = [];
-        renderLiveTrafficTable();
-      }
+      liveTrafficBuffer = [];
+      renderLiveTrafficTable();
+      showThreatToast("Live Stream Cleared", "Transient live traffic stream buffer reset.");
     }
 
     function applyLiveTrafficFilter() {
@@ -417,12 +439,14 @@
 
     function prependLiveTrafficEvent(ev) {
       if (!ev || !ev.id) return;
-      if (typeof SentinelEventStore !== "undefined") {
+      if (typeof SentinelEventStore !== "undefined" && SentinelEventStore.isSecurityRelevant(ev)) {
         SentinelEventStore.putBatch([ev]);
       }
-      if (!allRecentEvents.some(e => e.id === ev.id)) {
-        allRecentEvents.unshift(ev);
-        updateContainerBadge(allRecentEvents.length);
+      if (typeof SentinelEventStore !== "undefined" && SentinelEventStore.isSecurityRelevant(ev)) {
+        if (!allRecentEvents.some(e => e.id === ev.id)) {
+          allRecentEvents.unshift(ev);
+          updateContainerBadge(allRecentEvents.length);
+        }
       }
       if (!liveTrafficBuffer.some(e => e.id === ev.id)) {
         liveTrafficBuffer.unshift(ev);
@@ -931,26 +955,49 @@
     // -------------------------------------------------------------------------
     const SentinelEventStore = {
       dbName: "SentinelGridDB",
-      storeName: "events_24h",
+      storeName: "threat_ledger_v2",
+      legacyStoreName: "events_24h",
       db: null,
+
+      isSecurityRelevant(ev) {
+        if (!ev) return false;
+        const action = String(ev.action || "").toUpperCase();
+        const score = Number(ev.risk_score) || 0;
+        const rule = String(ev.rule_triggered || "");
+        const status = Number(ev.status_code) || 0;
+        return action === "BLOCK" || 
+               action === "CHALLENGE" || 
+               action === "SINKHOLE" || 
+               score >= 40 || 
+               status === 403 || 
+               status === 401 || 
+               status === 429 || 
+               rule === "ALREADY-BLOCKED-REACH-ATTEMPT" ||
+               rule === "IP-BLOCK-LIST" ||
+               (rule && rule !== "CLEAN-TRAFFIC" && rule !== "ALLOW-DEFAULT");
+      },
 
       async init() {
         return new Promise((resolve) => {
           if (!window.indexedDB) return resolve(null);
           try {
-            const req = indexedDB.open(this.dbName, 1);
+            const req = indexedDB.open(this.dbName, 2);
             req.onupgradeneeded = (e) => {
               const db = e.target.result;
+              if (db.objectStoreNames.contains(this.legacyStoreName)) {
+                try { db.deleteObjectStore(this.legacyStoreName); } catch (_) {}
+              }
               if (!db.objectStoreNames.contains(this.storeName)) {
                 const store = db.createObjectStore(this.storeName, { keyPath: "id" });
                 store.createIndex("timestamp", "timestamp", { unique: false });
                 store.createIndex("action", "action", { unique: false });
+                store.createIndex("client_ip", "client_ip", { unique: false });
               }
             };
             req.onsuccess = (e) => {
               this.db = e.target.result;
               this.pruneExpired();
-              // Periodic background prune every 15 minutes
+              // Background 12h prune cycle every 15 minutes
               setInterval(() => this.pruneExpired(), 15 * 60 * 1000);
               resolve(this.db);
             };
@@ -963,18 +1010,22 @@
 
       sanitizeEvent(ev) {
         if (!ev || !ev.id) return null;
+        const method = String(ev.method || "GET").toUpperCase();
+        const path = String(ev.path || "/");
         return {
           id: String(ev.id),
           website_id: ev.website_id || "",
           client_ip: ev.client_ip || "127.0.0.1",
-          method: ev.method || "GET",
-          path: ev.path || "/",
+          method: method,
+          path: path,
+          api_hit: `${method} ${path}`,
           timestamp: ev.timestamp || new Date().toISOString(),
-          action: ev.action || "ALLOW",
-          status_code: ev.status_code || 200,
+          action: String(ev.action || "ALLOW").toUpperCase(),
+          status_code: Number(ev.status_code) || (ev.action === "BLOCK" ? 403 : (ev.action === "CHALLENGE" ? 401 : 200)),
           risk_score: Number(ev.risk_score) || 0,
           rule_triggered: ev.rule_triggered || "",
-          details: ev.details ? String(ev.details).substring(0, 500) : "",
+          owasp_category: ev.owasp_category || "",
+          details: ev.details ? String(ev.details).substring(0, 1000) : "",
           headers: ev.headers ? String(ev.headers).substring(0, 1000) : "",
           payload_sample: ev.payload_sample ? String(ev.payload_sample).substring(0, 1000) : ""
         };
@@ -982,23 +1033,33 @@
 
       async putBatch(events) {
         if (!events || !events.length) return;
-        const sanitized = events.map(e => this.sanitizeEvent(e)).filter(Boolean);
+        // Strict Two-Tier Storage: Only persist security threats, blocks, and audits to prevent container bloat
+        const threatsOnly = events
+          .filter(e => this.isSecurityRelevant(e))
+          .map(e => this.sanitizeEvent(e))
+          .filter(Boolean);
+
+        if (!threatsOnly.length) return;
+
         if (!this.db) {
           try {
-            const cur = JSON.parse(localStorage.getItem("sg_stored_events_24h") || "[]");
+            const cur = JSON.parse(localStorage.getItem("sg_stored_threat_ledger") || "[]");
             const map = new Map();
             cur.forEach(e => map.set(e.id, e));
-            sanitized.forEach(e => { if (e && e.id) map.set(e.id, e); });
-            const merged = Array.from(map.values()).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-            localStorage.setItem("sg_stored_events_24h", JSON.stringify(merged.slice(0, 1000)));
+            threatsOnly.forEach(e => { if (e && e.id) map.set(e.id, e); });
+            const merged = Array.from(map.values())
+              .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp))
+              .slice(0, 2000);
+            localStorage.setItem("sg_stored_threat_ledger", JSON.stringify(merged));
           } catch (_) {}
           return;
         }
+
         return new Promise((resolve) => {
           try {
             const tx = this.db.transaction(this.storeName, "readwrite");
             const store = tx.objectStore(this.storeName);
-            sanitized.forEach(ev => {
+            threatsOnly.forEach(ev => {
               if (ev && ev.id) store.put(ev);
             });
             tx.oncomplete = () => resolve();
@@ -1012,7 +1073,7 @@
       async getAll() {
         if (!this.db) {
           try {
-            const raw = localStorage.getItem("sg_stored_events_24h");
+            const raw = localStorage.getItem("sg_stored_threat_ledger");
             return raw ? JSON.parse(raw) : [];
           } catch (_) { return []; }
         }
@@ -1035,7 +1096,7 @@
       async pruneExpired() {
         if (!this.db) return;
         try {
-          // 12-Hour threshold: clear live stream non-threat traffic older than 12 hours
+          // 12-Hour Telemetry Pruning: Purge non-threat data older than 12h
           const cutoff12h = new Date(Date.now() - 12 * 3600 * 1000).toISOString();
           const tx = this.db.transaction(this.storeName, "readwrite");
           const store = tx.objectStore(this.storeName);
@@ -1046,14 +1107,13 @@
             const cursor = e.target.result;
             if (cursor) {
               const val = cursor.value;
-              // Preserve blocked IPs, challenges, high-risk attacks, and quarantine events permanently in the threat ledger
-              const isCriticalThreat = val.action === "BLOCK" || 
-                                       val.action === "CHALLENGE" || 
-                                       (val.risk_score && val.risk_score >= 50) || 
-                                       val.rule_triggered === "ALREADY-BLOCKED-REACH-ATTEMPT" || 
-                                       val.rule_triggered === "IP-BLOCK-LIST";
-              if (!isCriticalThreat) {
-                // Delete routine benign requests older than 12 hours to prevent container bloat
+              const isPermanentThreat = val.action === "BLOCK" || 
+                                        val.action === "CHALLENGE" || 
+                                        val.action === "SINKHOLE" || 
+                                        (val.risk_score && val.risk_score >= 40) || 
+                                        val.rule_triggered === "ALREADY-BLOCKED-REACH-ATTEMPT" || 
+                                        val.rule_triggered === "IP-BLOCK-LIST";
+              if (!isPermanentThreat) {
                 cursor.delete();
               }
               cursor.continue();
@@ -1064,7 +1124,10 @@
 
       async clear() {
         if (!this.db) {
-          try { localStorage.removeItem("sg_stored_events_24h"); } catch (_) {}
+          try { 
+            localStorage.removeItem("sg_stored_threat_ledger"); 
+            localStorage.removeItem("sg_stored_events_24h");
+          } catch (_) {}
           return;
         }
         return new Promise((resolve) => {
@@ -1073,7 +1136,10 @@
             const store = tx.objectStore(this.storeName);
             store.clear();
             tx.oncomplete = () => {
-              try { localStorage.removeItem("sg_stored_events_24h"); } catch (_) {}
+              try { 
+                localStorage.removeItem("sg_stored_threat_ledger"); 
+                localStorage.removeItem("sg_stored_events_24h");
+              } catch (_) {}
               resolve();
             };
             tx.onerror = () => resolve();
@@ -1091,7 +1157,7 @@
 
     async function sync24hHistory() {
       const btn = document.getElementById("sync-24h-btn");
-      if (btn) btn.innerHTML = "⏳ Syncing 24h...";
+      if (btn) btn.innerHTML = "SYNCING THREAT LEDGER...";
       try {
         const res = await fetch(`${API}/events/history-24h`);
         if (res.ok) {
@@ -1099,17 +1165,15 @@
           if (data.events && data.events.length) {
             await SentinelEventStore.putBatch(data.events);
             allRecentEvents = await SentinelEventStore.getAll();
-            liveTrafficBuffer = [...allRecentEvents];
             applyEventFilter();
-            renderLiveTrafficTable();
             updateContainerBadge(allRecentEvents.length);
-            showThreatToast("24H Ledger Synchronized", `Stored ${data.events.length} events in local container.`);
+            showThreatToast("Threat Ledger Synchronized", `Stored ${allRecentEvents.length} threat events in local container.`);
           }
         }
       } catch (err) {
-        console.error("24h history sync error:", err);
+        console.error("Threat history sync error:", err);
       } finally {
-        if (btn) btn.innerHTML = "💾 Sync 24H History";
+        if (btn) btn.innerHTML = "SYNC THREAT LEDGER";
       }
     }
 
@@ -1119,10 +1183,8 @@
         const stored = await SentinelEventStore.getAll();
         if (stored && stored.length > 0) {
           allRecentEvents = stored;
-          liveTrafficBuffer = [...stored];
           updateContainerBadge(allRecentEvents.length);
           applyEventFilter();
-          renderLiveTrafficTable();
         }
       } catch (err) {
         console.warn("Bootstrap event store warning:", err);
@@ -1616,12 +1678,10 @@
           await SentinelEventStore.putBatch(incomingEvents);
         }
 
-        // Retrieve full 24h container events
+        // Retrieve threat container events for SOC analytics & ledger
         const storedEvents = await SentinelEventStore.getAll();
-        allRecentEvents = storedEvents.length > 0 ? storedEvents : incomingEvents;
-        liveTrafficBuffer = [...allRecentEvents];
+        allRecentEvents = storedEvents.length > 0 ? storedEvents : incomingEvents.filter(e => SentinelEventStore.isSecurityRelevant(e));
         updateContainerBadge(allRecentEvents.length);
-        renderLiveTrafficTable();
 
         // Check for newly intercepted threats & feed 3D pipeline visualizer
         if (knownEventIds.size > 0) {
@@ -2004,7 +2064,7 @@
     }
 
     function openEventForensics(eventId) {
-      const ev = allRecentEvents.find(e => e.id === eventId);
+      const ev = (liveTrafficBuffer && liveTrafficBuffer.find(e => e.id === eventId)) || allRecentEvents.find(e => e.id === eventId);
       if (!ev) return;
       activeDrawerEvent = ev;
 
@@ -2883,3 +2943,15 @@
         }).observe(histEl);
       }
     }
+
+    // Responsive Sidebar Resize Watcher (Clean Mobile/Desktop Boundary Sync)
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) {
+        const sidebar = document.getElementById("appSidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        if (sidebar) sidebar.classList.remove("mobile-open");
+        if (backdrop) backdrop.classList.remove("active");
+        document.body.style.overflow = "";
+        initSidebarState();
+      }
+    });
