@@ -210,40 +210,7 @@
       }
     }
 
-    /* Mobile Off-Canvas Drawer (<= 900px) */
-    @media (max-width: 900px) {
-      .app-sidebar {
-        width: 260px !important;
-        min-width: 260px !important;
-        max-width: 82vw !important;
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        height: 100dvh;
-        transform: translateX(-105%);
-        z-index: 300;
-        pointer-events: none;
-        box-shadow: var(--shadow-lg);
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .app-sidebar.mobile-open {
-        transform: translateX(0);
-        pointer-events: auto;
-      }
-      .app-sidebar.collapsed {
-        width: 260px !important;
-        min-width: 260px !important;
-      }
-      .content-wrapper, .app-main {
-        margin-left: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      #sidebarCollapseBtn {
-        display: none !important;
-      }
-    }
+
 
     .sidebar-header {
       padding: 16px 14px;
@@ -705,108 +672,7 @@
       }
     }
 
-    /* Mobile Drawer & Sidebar Slide Overrides (<= 900px) */
-    @media (max-width: 900px) {
-      .app-sidebar {
-        width: 260px !important;
-        min-width: 260px !important;
-        max-width: 82vw !important;
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        height: 100dvh;
-        transform: translateX(-105%);
-        box-shadow: var(--shadow-lg);
-        z-index: 300;
-        pointer-events: none;
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .app-sidebar.mobile-open {
-        transform: translateX(0);
-        pointer-events: auto;
-      }
-      .app-sidebar.collapsed {
-        width: 260px !important;
-        min-width: 260px !important;
-      }
-      .app-sidebar .sidebar-brand-text,
-      .app-sidebar .sidebar-section-title,
-      .app-sidebar .sidebar-label,
-      .app-sidebar .sidebar-user-meta,
-      .app-sidebar.collapsed .sidebar-brand-text,
-      .app-sidebar.collapsed .sidebar-section-title,
-      .app-sidebar.collapsed .sidebar-label,
-      .app-sidebar.collapsed .sidebar-user-meta {
-        opacity: 1 !important;
-        max-width: 200px !important;
-        display: block !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-      }
-      .app-sidebar.collapsed .sidebar-item { padding: 9px 16px !important; justify-content: flex-start !important; gap: 12px !important; }
-      .app-sidebar.collapsed .sidebar-header { padding: 16px 14px !important; justify-content: space-between !important; }
-      .app-sidebar.collapsed .sidebar-brand { justify-content: flex-start !important; gap: 10px !important; }
-      .app-sidebar.collapsed .sidebar-footer { padding: 12px 14px !important; justify-content: space-between !important; }
-      .content-wrapper, .app-main {
-        margin-left: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      #sidebarCollapseBtn {
-        display: none !important;
-      }
-      .chart-overview-grid {
-        grid-template-columns: 1fr !important;
-      }
-      .integration-grid {
-        grid-template-columns: 1fr !important;
-      }
-      .sandbox-workbench-grid {
-        grid-template-columns: 1fr !important;
-      }
-    }
 
-    /* Mobile Form Fields & Scope Bar Controls (<= 768px) */
-    @media (max-width: 768px) {
-      .scope-bar-group,
-      .scope-bar-controls {
-        flex-wrap: wrap !important;
-        width: 100% !important;
-      }
-      #scope-website-select {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      #auto-refresh-rate {
-        flex: 1 1 auto;
-        width: auto !important;
-      }
-      .panel-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .filter-bar select,
-      .filter-bar input {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      .responsive-filter-grid {
-        grid-template-columns: 1fr !important;
-        gap: 10px !important;
-      }
-      .modal-stats-kpi-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-      }
-      .modal-stats-charts-grid {
-        grid-template-columns: 1fr !important;
-      }
-    }
 
     /* Container Queries on .main-workspace */
     @container main-workspace (max-width: 1100px) {
@@ -895,7 +761,6 @@
     }
 
     /* Hardware Composite GPU Layer Promotion */
-    .app-sidebar,
     .app-topbar,
     .drawer-panel,
     .shortcuts-floating-pill,
@@ -1678,5 +1543,247 @@
   100% {
     opacity: 0;
     clip-path: inset(0 0% 0 0);
+  }
+}
+
+/* =========================================================================
+   MASTER RESPONSIVE & MOBILE ARCHITECTURE (EOF DEFINITIVE PRIORITY)
+   Strictly placed at the very bottom of the stylesheet so no root rules can override it.
+   ========================================================================= */
+
+@media (max-width: 900px) {
+  /* 1. Prevent Flex Squishing: Full-bleed block layout for content */
+  .app-layout {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 2. Content wrapper starts at x=0 with full width */
+  .content-wrapper,
+  .app-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 12px 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. Mobile Off-Canvas Sidebar Drawer: STRICTLY CLOSED by default */
+  .app-sidebar,
+  .app-sidebar:not(.mobile-open) {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100dvh !important;
+    width: 260px !important;
+    min-width: 0 !important;
+    max-width: 82vw !important;
+    transform: translateX(-105%) !important;
+    z-index: 300 !important;
+    pointer-events: none !important;
+    box-shadow: none !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* 4. Mobile Off-Canvas Sidebar Drawer: OPEN State */
+  .app-sidebar.mobile-open {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100dvh !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 82vw !important;
+    transform: translateX(0) !important;
+    z-index: 300 !important;
+    pointer-events: auto !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45) !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* 5. Mobile Close Button inside .sidebar-header: ALWAYS VISIBLE */
+  #sidebarCollapseBtn {
+    display: inline-flex !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--sand-warm) !important;
+    border: 1px solid var(--stone-border) !important;
+    color: var(--text-charcoal) !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    z-index: 310 !important;
+    transition: background 0.16s ease !important;
+  }
+  #sidebarCollapseBtn:hover,
+  #sidebarCollapseBtn:active {
+    background: var(--stone-border) !important;
+  }
+
+  /* 6. Text label visibility in mobile drawer */
+  .app-sidebar .sidebar-brand-text,
+  .app-sidebar .sidebar-section-title,
+  .app-sidebar .sidebar-label,
+  .app-sidebar .sidebar-user-meta,
+  .app-sidebar.collapsed .sidebar-brand-text,
+  .app-sidebar.collapsed .sidebar-section-title,
+  .app-sidebar.collapsed .sidebar-label,
+  .app-sidebar.collapsed .sidebar-user-meta {
+    opacity: 1 !important;
+    max-width: 200px !important;
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .app-sidebar .sidebar-item,
+  .app-sidebar.collapsed .sidebar-item {
+    padding: 9px 16px !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .app-sidebar .sidebar-header,
+  .app-sidebar.collapsed .sidebar-header {
+    padding: 16px 14px !important;
+    justify-content: space-between !important;
+  }
+
+  .app-sidebar .sidebar-brand,
+  .app-sidebar.collapsed .sidebar-brand {
+    justify-content: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .app-sidebar .sidebar-footer,
+  .app-sidebar.collapsed .sidebar-footer {
+    padding: 12px 14px !important;
+    justify-content: space-between !important;
+  }
+
+  /* 7. Grid Column Flattening on Mobile */
+  .chart-overview-grid,
+  .integration-grid,
+  .sandbox-workbench-grid,
+  .dashboard-ultrawide-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Scope Bar Controls */
+  .scope-bar-group,
+  .scope-bar-controls {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+  #scope-website-select {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #auto-refresh-rate {
+    flex: 1 1 auto;
+    width: auto !important;
+  }
+
+  /* Responsive Panel Header and Action Button Group */
+  .panel-header {
+    padding: 12px 14px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .panel-header > div:first-child {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .panel-header > div:last-child {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  .panel-header > div:last-child .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 6px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Panel Body and Filter Bar Overflow Prevention */
+  .panel-body {
+    padding: 12px 14px !important;
+  }
+
+  .filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  #event-search-query,
+  #event-filter-action,
+  .filter-bar select,
+  .filter-bar input {
+    flex: 0 0 auto !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .filter-bar > span {
+    margin-left: 0 !important;
+    margin-top: 4px !important;
+    font-size: 11px !important;
+  }
+
+  .filter-bar .filter-badge-wrap,
+  .filter-bar > div:last-child {
+    margin-left: 0 !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .filter-bar .badge {
+    white-space: normal !important;
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 6px 10px !important;
+    display: block !important;
+    line-height: 1.4 !important;
+  }
+
+  .responsive-filter-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .modal-stats-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .modal-stats-charts-grid {
+    grid-template-columns: 1fr !important;
   }
 }

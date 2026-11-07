@@ -99,6 +99,10 @@
         const isOpen = sidebar.classList.toggle("mobile-open");
         if (backdrop) backdrop.classList.toggle("active", isOpen);
         document.body.style.overflow = isOpen ? "hidden" : "";
+        if (arrowIcon) {
+          arrowIcon.innerText = isOpen ? "✕" : "◀";
+          arrowIcon.style.transform = "rotate(0deg)";
+        }
       } else {
         sidebar.classList.remove("mobile-open");
         if (backdrop) backdrop.classList.remove("active");
@@ -137,6 +141,10 @@
         const backdrop = document.getElementById("sidebarBackdrop");
         if (backdrop) backdrop.classList.remove("active");
         document.body.style.overflow = "";
+        if (arrowIcon) {
+          arrowIcon.innerText = "◀";
+          arrowIcon.style.transform = "rotate(0deg)";
+        }
       }
     }
 
@@ -1491,8 +1499,14 @@
       if (window.innerWidth <= 900) {
         const sidebar = document.getElementById("appSidebar");
         const backdrop = document.getElementById("sidebarBackdrop");
+        const arrowIcon = document.getElementById("collapse-arrow-icon");
         if (sidebar) sidebar.classList.remove("mobile-open");
         if (backdrop) backdrop.classList.remove("active");
+        if (arrowIcon) {
+          arrowIcon.innerText = "◀";
+          arrowIcon.style.transform = "rotate(0deg)";
+        }
+        document.body.style.overflow = "";
       }
 
       document.querySelectorAll(".view-section").forEach(el => el.classList.remove("active"));

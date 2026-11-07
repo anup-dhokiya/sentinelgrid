@@ -431,9 +431,9 @@
             </select>
 
             <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: 6px;">Quick Search:</span>
-            <input type="text" id="event-search-query" class="form-input" style="width: clamp(180px, 25vw, 440px); flex: 1 1 200px; max-width: 100%; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule... (Hotkey: /)" oninput="applyEventFilter()">
+            <input type="text" id="event-search-query" class="form-input" style="max-width: 440px; margin: 0; padding: 7px 12px;" placeholder="Search IP, endpoint path, query, rule... (Hotkey: /)" oninput="applyEventFilter()">
 
-            <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+            <div class="filter-badge-wrap" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
               <span class="badge badge-allow" style="font-size: 10px;" title="Persistent storage in browser IndexedDB + cloud ledger. Live stream clears after 12h, blocked IPs kept permanently.">12h Live Window &bull; Blocked IPs Preserved</span>
             </div>
           </div>
