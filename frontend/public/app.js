@@ -1196,6 +1196,7 @@
         });
       }
     };
+    window.SentinelEventStore = SentinelEventStore;
 
     function updateContainerBadge(count) {
       const b = document.getElementById("container-24h-badge");
@@ -1561,6 +1562,7 @@
       const viewTitles = {
         dashboard: "Live SOC Telemetry",
         livetraffic: "Live Traffic Stream & SSE Telemetry",
+        analytics: "Real-Time Threat & Traffic Analytics Console",
         domains: "Domain & Site Mesh",
         inventory: "Discovered API Routes",
         iprules: "IP Access Control",
@@ -1583,6 +1585,9 @@
       if (tabId === "livetraffic") {
         renderLiveTrafficTable();
         initLiveTrafficSSE();
+      }
+      if (tabId === "analytics") {
+        if (window.initReactAnalytics) window.initReactAnalytics();
       }
       if (tabId === "domains") loadDomains();
       if (tabId === "inventory") loadEndpoints();
@@ -2909,7 +2914,7 @@
     // Restore Active Tab from URL Hash or localStorage (Prevents unwanted reset on refresh)
     const initialHash = window.location.hash.replace("#", "").trim();
     const savedTab = localStorage.getItem("sg_active_tab");
-    const validTabs = ["dashboard", "livetraffic", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
+    const validTabs = ["dashboard", "livetraffic", "analytics", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
     const targetTab = validTabs.includes(initialHash) ? initialHash : (validTabs.includes(savedTab) ? savedTab : "dashboard");
     switchTab(targetTab, false);
 
@@ -2951,7 +2956,7 @@
         const searchInput = document.getElementById("event-search-query");
         if (searchInput) searchInput.focus();
       } else if (e.key >= "1" && e.key <= "9") {
-        const tabKeys = ["dashboard", "livetraffic", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
+        const tabKeys = ["dashboard", "livetraffic", "analytics", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
         const idx = parseInt(e.key, 10) - 1;
         if (tabKeys[idx]) switchTab(tabKeys[idx]);
       } else if (e.key === "Escape") {

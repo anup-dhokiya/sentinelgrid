@@ -64,6 +64,13 @@
           <span class="sidebar-label">Live Traffic</span>
           <span class="badge badge-online" style="margin-left: auto; font-size: 8px; padding: 1px 5px;">LIVE</span>
         </div>
+        <div class="sidebar-item nav-item" onclick="switchTab('analytics')" role="button" tabindex="0">
+          <span class="sidebar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          </span>
+          <span class="sidebar-label">Modern Analytics</span>
+          <span class="badge" style="margin-left: auto; font-size: 8px; padding: 1px 5px; background: rgba(56, 189, 248, 0.15); color: var(--deep-indigo); border: 1px solid rgba(56, 189, 248, 0.3);">REACT 18</span>
+        </div>
         <div class="sidebar-item nav-item" onclick="switchTab('domains')" role="button" tabindex="0">
           <span class="sidebar-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -527,6 +534,13 @@
           </table>
         </div>
       </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB: REAL-TIME THREAT & TRAFFIC ANALYTICS (REACT 18) -->
+    <!-- ===================================================================== -->
+    <section id="view-analytics" class="view-section">
+      <div id="react-analytics-root"></div>
     </section>
 
     <!-- ===================================================================== -->
@@ -1226,6 +1240,15 @@ app.use(async (req, res, next) =&gt; {
       <div style="font-size: 12px; color: #E2E8F0;" id="toast-body">Details...</div>
     </div>
   </div>
+
+  <!-- React 18 Production Runtime & UMD Fallback -->
+  <script src="vendor/react.production.min.js"></script>
+  <script>window.React || document.write('<script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>')</script>
+  <script src="vendor/react-dom.production.min.js"></script>
+  <script>window.ReactDOM || document.write('<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>')</script>
+
+  <!-- SentinelGrid React 18 Analytics Hub -->
+  <script src="react-analytics.js"></script>
 
   <!-- Interactive Modular JavaScript Controller -->
   <script src="app.js"></script>

