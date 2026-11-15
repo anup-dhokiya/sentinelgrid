@@ -271,6 +271,10 @@
     .app-sidebar.collapsed .sidebar-user { justify-content: center; }
     .app-sidebar.collapsed .sidebar-icon { margin: 0; }
 
+    .mobile-sidebar-close-btn {
+      display: none;
+    }
+
     .sidebar-toggle-btn {
       background: var(--sand-warm);
       border: 1px solid var(--stone-border);
@@ -1553,6 +1557,15 @@
    ========================================================================= */
 
 @media (max-width: 900px) {
+  /* 0. Mobile Sticky Topbar: Stays docked at top with reachable toggle */
+  .app-topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   /* 1. Prevent Flex Squishing: Full-bleed block layout for content */
   .app-layout {
     display: block !important;
@@ -1607,7 +1620,7 @@
   }
 
   /* 5. Mobile Close Button inside .sidebar-header: ALWAYS VISIBLE */
-  #sidebarCollapseBtn {
+  .mobile-sidebar-close-btn {
     display: inline-flex !important;
     width: 32px !important;
     height: 32px !important;
@@ -1616,17 +1629,23 @@
     justify-content: center !important;
     cursor: pointer !important;
     border-radius: var(--radius-sm) !important;
-    background: var(--sand-warm) !important;
-    border: 1px solid var(--stone-border) !important;
-    color: var(--text-charcoal) !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
+    background: rgba(248, 81, 73, 0.15) !important;
+    border: 1px solid rgba(248, 81, 73, 0.35) !important;
+    color: #F85149 !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
     z-index: 310 !important;
-    transition: background 0.16s ease !important;
+    margin-left: auto !important;
+    transition: all 0.16s ease !important;
   }
-  #sidebarCollapseBtn:hover,
-  #sidebarCollapseBtn:active {
-    background: var(--stone-border) !important;
+  .mobile-sidebar-close-btn:hover,
+  .mobile-sidebar-close-btn:active {
+    background: rgba(248, 81, 73, 0.3) !important;
+    color: #ffffff !important;
+  }
+
+  #sidebarCollapseBtn {
+    display: none !important;
   }
 
   /* 6. Text label visibility in mobile drawer */
@@ -2937,3 +2956,346 @@
   border-color: rgba(207, 191, 171, 0.7);
   color: #1B365D;
 }
+
+/* =============================================================================
+   STATE-OF-THE-ART REAL-TIME TELEMETRY CARDS & REDIRECTION HUD
+   ============================================================================= */
+.sg-cards-stream-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .sg-cards-stream-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* Individual Glassmorphic Telemetry Card */
+.sg-telemetry-card {
+  background: var(--card-white);
+  border: 1px solid var(--stone-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s ease;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sg-telemetry-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-accent);
+}
+
+.sg-telemetry-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--stone-border);
+}
+
+.sg-telemetry-card.card-block::before {
+  background: linear-gradient(90deg, #F85149, #FF7B72);
+  box-shadow: 0 0 10px rgba(248, 81, 73, 0.5);
+}
+
+.sg-telemetry-card.card-allow::before {
+  background: linear-gradient(90deg, #2EA043, #3FB950);
+  box-shadow: 0 0 10px rgba(46, 160, 67, 0.5);
+}
+
+.sg-telemetry-card.card-challenge::before {
+  background: linear-gradient(90deg, #D29922, #E3B341);
+  box-shadow: 0 0 10px rgba(210, 153, 34, 0.5);
+}
+
+/* Card Header */
+.sg-card-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sg-card-top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sg-card-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sg-latency-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--sand-warm);
+  color: var(--text-charcoal);
+  border: 1px solid var(--stone-border);
+}
+
+/* Dedicated Redirection and Destination HUD */
+.sg-routing-banner {
+  background: var(--sand-warm);
+  border: 1px solid var(--stone-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11.5px;
+}
+
+.sg-routing-path-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+}
+
+.sg-method-pill {
+  font-weight: 800;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.sg-method-pill.get { background: rgba(56, 189, 248, 0.15); color: #0284c7; }
+.sg-method-pill.post { background: rgba(34, 197, 94, 0.15); color: #16a34a; }
+.sg-method-pill.put { background: rgba(234, 179, 8, 0.15); color: #ca8a04; }
+.sg-method-pill.delete { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+
+:root[data-theme="light"] .sg-method-pill.get { color: #0369a1; }
+:root[data-theme="light"] .sg-method-pill.post { color: #15803d; }
+
+.sg-routing-dest-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+
+.sg-routing-dest-box.dest-allow {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #15803d;
+}
+
+:root[data-theme="dark"] .sg-routing-dest-box.dest-allow {
+  color: #4ade80;
+}
+
+.sg-routing-dest-box.dest-block {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #dc2626;
+}
+
+:root[data-theme="dark"] .sg-routing-dest-box.dest-block {
+  color: #f87171;
+}
+
+.sg-routing-dest-box.dest-challenge {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #b45309;
+}
+
+:root[data-theme="dark"] .sg-routing-dest-box.dest-challenge {
+  color: #fbbf24;
+}
+
+.sg-redirect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--card-white);
+  border: 1px solid var(--stone-border);
+  border-radius: 5px;
+  color: var(--deep-indigo);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.sg-redirect-btn:hover {
+  background: var(--sand-warm);
+  border-color: var(--deep-indigo);
+  transform: translateY(-1px);
+}
+
+/* Threat Forensics Section */
+.sg-card-forensics {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sg-forensics-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.sg-risk-meter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sg-risk-meter-bar {
+  width: 50px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sg-risk-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.sg-payload-preview-box {
+  background: #06080B;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: #E6EDF3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-theme="light"] .sg-payload-preview-box {
+  background: #F4EFE6;
+  border-color: rgba(207, 191, 171, 0.6);
+  color: #1F2328;
+}
+
+/* Card Actions Footer */
+.sg-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--stone-border-light);
+  flex-wrap: wrap;
+}
+
+.sg-card-footer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Real-Time Honest Standby Card */
+.sg-empty-standby-card {
+  background: var(--card-white);
+  border: 1px dashed var(--stone-border);
+  border-radius: var(--radius-lg);
+  padding: 42px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+}
+
+.sg-empty-standby-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--deep-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+}
+
+.sg-view-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  background: var(--sand-warm);
+  border: 1px solid var(--stone-border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.sg-view-toggle-btn {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.sg-view-toggle-btn.active {
+  background: var(--card-white);
+  color: var(--text-charcoal);
+  box-shadow: var(--shadow-xs);
+}
+

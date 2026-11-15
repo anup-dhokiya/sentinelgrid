@@ -47,6 +47,7 @@
         <button class="sidebar-toggle-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse / Expand Sidebar">
           <span id="collapse-arrow-icon">◀</span>
         </button>
+        <button type="button" class="mobile-sidebar-close-btn" id="mobileSidebarCloseBtn" onclick="toggleSidebarCollapse()" aria-label="Close Navigation Drawer" title="Close Drawer">✕</button>
       </div>
 
       <nav class="sidebar-nav" aria-label="Main Navigation">
@@ -412,6 +413,16 @@
             <span id="events-count-badge" class="badge badge-challenge" style="font-size: 11px;">0 requests</span>
           </div>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <div class="sg-view-toggle-wrap" role="group" aria-label="Incident Layout View">
+              <button type="button" class="sg-view-toggle-btn active" id="dashboard-view-cards-btn" onclick="setDashboardViewMode('cards')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Cards</span>
+              </button>
+              <button type="button" class="sg-view-toggle-btn" id="dashboard-view-table-btn" onclick="setDashboardViewMode('table')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                <span>Table</span>
+              </button>
+            </div>
             <button class="btn btn-subtle" onclick="sync24hHistory()" id="sync-24h-btn" title="Sync all ledger requests from past 12 hours" style="display: inline-flex; align-items: center; gap: 6px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <span>Sync Ledger</span>
@@ -446,7 +457,20 @@
           </div>
         </div>
 
-        <div class="table-responsive" style="height: clamp(320px, calc(100dvh - 380px), 85dvh); min-height: 320px; max-height: 85dvh; overflow-y: auto; position: relative;">
+        <div id="dashboard-cards-container" class="sg-cards-stream-grid" style="padding: 16px 20px;">
+          <div class="sg-empty-standby-card">
+            <div class="sg-empty-standby-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div style="font-size: 14px; font-weight: 800; color: var(--text-charcoal);">Real-Time WAAP Engine Active</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); max-width: 440px; line-height: 1.5;">
+              Listening for real requests. Zero synthetic packets generated. Trigger a live WAF test probe or route real traffic to inspect cards in real time.
+            </div>
+            <button class="btn btn-primary" onclick="switchTab('sandbox')" style="font-size: 11px; padding: 6px 14px; margin-top: 4px;">Launch In-Line WAF Lab 🧪</button>
+          </div>
+        </div>
+
+        <div id="dashboard-table-container" class="table-responsive" style="display: none; height: clamp(320px, calc(100dvh - 380px), 85dvh); min-height: 320px; max-height: 85dvh; overflow-y: auto; position: relative;">
           <table class="table-clean" style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead style="position: sticky; top: 0; background: var(--card-white); z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
               <tr>
@@ -484,6 +508,16 @@
           <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">In-flight edge requests streamed directly via SentinelGrid Server-Sent Events (SSE) telemetry pipeline.</p>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <div class="sg-view-toggle-wrap" role="group" aria-label="Live Traffic Layout Mode">
+            <button type="button" class="sg-view-toggle-btn active" id="lt-view-cards-btn" onclick="setLiveTrafficViewMode('cards')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Cards</span>
+            </button>
+            <button type="button" class="sg-view-toggle-btn" id="lt-view-table-btn" onclick="setLiveTrafficViewMode('table')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Table</span>
+            </button>
+          </div>
           <select id="livetraffic-verdict-filter" class="form-input" style="width: auto; min-width: 170px; margin: 0; padding: 6px 12px; font-weight: 600;" onchange="applyLiveTrafficFilter()" aria-label="Filter Traffic by Verdict">
             <option value="ALL">All Traffic Stream</option>
             <option value="BLOCK">Threat Interceptions Only</option>
@@ -508,7 +542,22 @@
         </div>
       </div>
 
-      <div class="panel" style="padding: 0; overflow: hidden; margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
+      <!-- Real-Time Live Traffic Cards Stream (Card Form Factor) -->
+      <div id="livetraffic-cards-container" class="sg-cards-stream-grid" style="margin-bottom: 28px;">
+        <div class="sg-empty-standby-card">
+          <div class="sg-empty-standby-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div style="font-size: 14px; font-weight: 800; color: var(--text-charcoal);">Live Traffic SSE Stream Active</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); max-width: 440px; line-height: 1.5;">
+            Connected to <code>/v1/events/stream</code>. In-flight packets and threat interceptions will render as interactive cards with full routing destination paths in real time.
+          </div>
+          <button class="btn btn-primary" onclick="switchTab('sandbox')" style="font-size: 11px; padding: 6px 14px; margin-top: 4px;">Inject Test Probe via In-Line WAF Lab 🧪</button>
+        </div>
+      </div>
+
+      <!-- Real-Time Live Traffic Table View (Alternative Compact Form) -->
+      <div class="panel" id="livetraffic-table-panel" style="display: none; padding: 0; overflow: hidden; margin-bottom: 28px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg);">
         <div class="table-responsive" style="height: clamp(320px, calc(100dvh - 280px), 88dvh); min-height: 320px; max-height: 88dvh; overflow-y: auto; position: relative;">
           <table class="table-clean" style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead style="position: sticky; top: 0; background: var(--card-white); z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">

@@ -478,10 +478,271 @@
       showThreatToast("Live Stream Cleared", "Transient live traffic stream buffer reset.");
     }
 
+    let liveTrafficViewMode = "cards";
+    let dashboardViewMode = "cards";
+
+    function resolveEventDomain(ev) {
+      if (!ev) return "aegispro.vercel.app";
+      if (ev.domain) return ev.domain;
+      if (ev.host && !ev.host.startsWith("site-")) return ev.host;
+      if (ev.website_id && Array.isArray(allWebsites)) {
+        const site = allWebsites.find(s => s.id === ev.website_id);
+        if (site && site.domain) return site.domain;
+      }
+      return "aegispro.vercel.app";
+    }
+
+    function setLiveTrafficViewMode(mode) {
+      liveTrafficViewMode = mode;
+      const cardsBtn = document.getElementById("lt-view-cards-btn");
+      const tableBtn = document.getElementById("lt-view-table-btn");
+      const cardsContainer = document.getElementById("livetraffic-cards-container");
+      const tablePanel = document.getElementById("livetraffic-table-panel");
+
+      if (cardsBtn) cardsBtn.classList.toggle("active", mode === "cards");
+      if (tableBtn) tableBtn.classList.toggle("active", mode === "table");
+      if (cardsContainer) cardsContainer.style.display = mode === "cards" ? "grid" : "none";
+      if (tablePanel) tablePanel.style.display = mode === "table" ? "block" : "none";
+
+      if (mode === "cards") {
+        renderLiveTrafficCards();
+      } else {
+        renderLiveTrafficTable();
+      }
+    }
+
+    function setDashboardViewMode(mode) {
+      dashboardViewMode = mode;
+      const cardsBtn = document.getElementById("dashboard-view-cards-btn");
+      const tableBtn = document.getElementById("dashboard-view-table-btn");
+      const cardsContainer = document.getElementById("dashboard-cards-container");
+      const tableContainer = document.getElementById("dashboard-table-container");
+
+      if (cardsBtn) cardsBtn.classList.toggle("active", mode === "cards");
+      if (tableBtn) tableBtn.classList.toggle("active", mode === "table");
+      if (cardsContainer) cardsContainer.style.display = mode === "cards" ? "grid" : "none";
+      if (tableContainer) tableContainer.style.display = mode === "table" ? "block" : "none";
+
+      const filtered = getFilteredRecentEvents();
+      if (mode === "cards") {
+        renderEventsCards(filtered);
+      } else {
+        renderEventsTable(filtered);
+      }
+    }
+
+    function copyEventCurl(eventId) {
+      const ev = (liveTrafficBuffer && liveTrafficBuffer.find(e => e.id === eventId)) || allRecentEvents.find(e => e.id === eventId);
+      if (!ev) return;
+      const targetHost = resolveEventDomain(ev);
+      const path = ev.path || "/";
+      const url = `https://${targetHost}${path.startsWith('/') ? path : '/' + path}`;
+      const method = ev.method || "GET";
+      const curlCmd = `curl -i -X ${method} "${url}" -H "X-Forwarded-For: ${ev.client_ip || '127.0.0.1'}"`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(curlCmd).then(() => {
+          showThreatToast("cURL Command Copied", "Reproducible command copied to clipboard.");
+        }).catch(() => {
+          prompt("Copy cURL Command:", curlCmd);
+        });
+      } else {
+        prompt("Copy cURL Command:", curlCmd);
+      }
+    }
+
+    function formatTelemetryCardHtml(ev) {
+      const ts = formatTimestamp(ev.timestamp);
+      const action = ev.action || 'ALLOW';
+      const cardClass = action === 'BLOCK' ? 'card-block' : (action === 'CHALLENGE' ? 'card-challenge' : 'card-allow');
+      const badgeClass = action === 'BLOCK' ? 'badge-block' : (action === 'CHALLENGE' ? 'badge-challenge' : 'badge-allow');
+      const method = escapeHtml(ev.method || 'GET');
+      const methodLower = (ev.method || 'get').toLowerCase();
+      const path = escapeHtml(ev.path || '/');
+      const clientIp = escapeHtml(ev.client_ip || '127.0.0.1');
+      const rule = escapeHtml(ev.rule_triggered || 'CLEAN-ORIGIN-TRAFFIC');
+      const score = Number(ev.risk_score) || 0;
+      const owasp = escapeHtml(ev.owasp_category || 'Clean Traffic');
+      const latency = ev.latency_ms ? Number(ev.latency_ms).toFixed(2) : '0.45';
+      const targetDomain = resolveEventDomain(ev);
+      const fullDestUrl = `https://${targetDomain}${path.startsWith('/') ? path : '/' + path}`;
+
+      let destBoxHtml = '';
+      if (action === 'ALLOW') {
+        destBoxHtml = `
+          <div class="sg-routing-dest-box dest-allow">
+            <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Forwarded to Origin:</strong> <code style="font-size: 10.5px;">${escapeHtml(fullDestUrl)}</code></span>
+            </div>
+            <a href="${escapeHtml(fullDestUrl)}" target="_blank" rel="noopener noreferrer" class="sg-redirect-btn" onclick="event.stopPropagation();" title="Visit active target destination">
+              <span>Visit Destination</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        `;
+      } else if (action === 'BLOCK') {
+        destBoxHtml = `
+          <div class="sg-routing-dest-box dest-block">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span><strong>Terminated at Perimeter:</strong> Dropped to Sinkhole <code style="font-size: 10.5px;">0.0.0.0:0</code> (RFC 8032 Origin Seal Denied Entry)</span>
+            </div>
+            <span class="badge badge-block" style="font-size: 9.5px; font-family: var(--font-mono); margin-left: auto;">0 Origin Leaks</span>
+          </div>
+        `;
+      } else {
+        destBoxHtml = `
+          <div class="sg-routing-dest-box dest-challenge">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span><strong>Diverted:</strong> Proof-of-Work Challenge Gateway <code style="font-size: 10.5px;">https://${escapeHtml(targetDomain)}/v1/challenge</code></span>
+            </div>
+            <span class="badge badge-challenge" style="font-size: 9.5px; margin-left: auto;">PoW Gateway</span>
+          </div>
+        `;
+      }
+
+      let payloadExtract = '';
+      if (ev.payload) {
+        payloadExtract = ev.payload;
+      } else if (ev.details) {
+        try {
+          const parsed = typeof ev.details === 'object' ? ev.details : JSON.parse(ev.details);
+          payloadExtract = parsed.payload_snippet || parsed.uri || parsed.query || '';
+        } catch (_) {
+          payloadExtract = ev.details;
+        }
+      }
+      if (!payloadExtract && path.includes('?')) {
+        payloadExtract = decodeURIComponent(path.substring(path.indexOf('?') + 1));
+      }
+
+      const payloadHtml = payloadExtract ? `
+        <div class="sg-payload-preview-box" title="${escapeHtml(payloadExtract)}">
+          <span style="color: var(--text-muted); font-size: 9px; margin-right: 5px;">PAYLOAD:</span>${escapeHtml(payloadExtract)}
+        </div>
+      ` : '';
+
+      return `
+        <div class="sg-telemetry-card ${cardClass}" onclick="openEventForensics('${escapeHtml(ev.id)}')">
+          <div class="sg-card-top-bar">
+            <div class="sg-card-top-left">
+              <span class="badge ${badgeClass}" style="font-weight: 800; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px;">${escapeHtml(action)}</span>
+              <span class="sg-latency-badge" title="Inspection latency">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>${latency}ms</span>
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted);">${escapeHtml(ev.id)}</span>
+            </div>
+            <div class="sg-card-top-right">
+              <span title="${escapeHtml(ts.utc || '')}">${escapeHtml(ts.time)}</span>
+              <span style="opacity: 0.7;">(${escapeHtml(ts.relative)})</span>
+            </div>
+          </div>
+
+          <div class="sg-routing-banner">
+            <div class="sg-routing-path-row">
+              <span class="sg-method-pill ${methodLower}">${method}</span>
+              <code style="font-size: 11px; color: var(--text-charcoal); background: var(--card-white); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--stone-border); word-break: break-all;">${path}</code>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10.5px; color: var(--text-muted); flex-wrap: wrap;">
+              <span>Origin Client: <strong style="color: var(--deep-indigo); font-family: var(--font-mono);">${clientIp}</strong></span>
+              <span>Target Mesh: <strong style="color: var(--text-charcoal); font-family: var(--font-mono);">${escapeHtml(targetDomain)}</strong></span>
+            </div>
+            ${destBoxHtml}
+          </div>
+
+          <div class="sg-card-forensics">
+            <div class="sg-forensics-meta-row">
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 700; color: ${action === 'BLOCK' ? 'var(--terracotta)' : 'var(--sage-green)'};">${rule}</span>
+                <span class="badge" style="font-size: 9px; padding: 1px 5px; background: var(--sand-warm);">${owasp}</span>
+              </div>
+              <div class="sg-risk-meter">
+                <span style="color: ${score > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};">Risk: ${score.toFixed(0)}%</span>
+                <div class="sg-risk-meter-bar">
+                  <div class="sg-risk-meter-fill" style="width: ${Math.min(100, score)}%; background: ${score > 70 ? 'var(--terracotta)' : 'var(--sage-green)'};"></div>
+                </div>
+              </div>
+            </div>
+            ${payloadHtml}
+          </div>
+
+          <div class="sg-card-footer">
+            <div style="font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted);">
+              <span>SmartParse DFA &bull; RFC 8032 Origin Seal</span>
+            </div>
+            <div class="sg-card-footer-buttons">
+              <button type="button" class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px; font-family: var(--font-mono);" onclick="event.stopPropagation(); copyEventCurl('${escapeHtml(ev.id)}')" title="Copy reproducible curl command">
+                📋 cURL
+              </button>
+              <button type="button" class="btn btn-subtle" style="padding: 3px 8px; font-size: 10px; font-family: var(--font-mono);" onclick="event.stopPropagation(); openEventForensics('${escapeHtml(ev.id)}')" title="Inspect full forensic dossier">
+                🔍 Forensics
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLiveTrafficCards() {
+      const container = document.getElementById("livetraffic-cards-container");
+      if (!container) return;
+
+      const filtered = liveTrafficFilter === "ALL" 
+        ? liveTrafficBuffer 
+        : liveTrafficBuffer.filter(ev => ev.action === liveTrafficFilter);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="sg-empty-standby-card">
+            <div class="sg-empty-standby-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div style="font-size: 14px; font-weight: 800; color: var(--text-charcoal);">Live Traffic SSE Stream Active</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); max-width: 440px; line-height: 1.5;">
+              ${liveTrafficBuffer.length === 0 ? "Listening on SSE pipeline <code>/v1/events/stream</code>. Zero synthetic events generated." : `No events currently match filter "${escapeHtml(liveTrafficFilter)}".`}
+            </div>
+            <button class="btn btn-primary" onclick="switchTab('sandbox')" style="font-size: 11px; padding: 6px 14px; margin-top: 4px;">Inject Live Probe via In-Line WAF Lab 🧪</button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = filtered.map(ev => formatTelemetryCardHtml(ev)).join("");
+      }
+      updateLiveTrafficBadge();
+    }
+
+    function renderEventsCards(events) {
+      const container = document.getElementById("dashboard-cards-container");
+      if (!container) return;
+
+      if (!events || events.length === 0) {
+        container.innerHTML = `
+          <div class="sg-empty-standby-card">
+            <div class="sg-empty-standby-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div style="font-size: 14px; font-weight: 800; color: var(--text-charcoal);">Real-Time WAAP Engine Active</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); max-width: 440px; line-height: 1.5;">
+              Listening for real requests. Zero synthetic packets generated. Trigger a live WAF test probe or route real traffic to inspect cards in real time.
+            </div>
+            <button class="btn btn-primary" onclick="switchTab('sandbox')" style="font-size: 11px; padding: 6px 14px; margin-top: 4px;">Launch In-Line WAF Lab 🧪</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = events.map(ev => formatTelemetryCardHtml(ev)).join("");
+    }
+
     function applyLiveTrafficFilter() {
       const select = document.getElementById("livetraffic-verdict-filter");
       if (select) liveTrafficFilter = select.value;
-      renderLiveTrafficTable();
+      if (liveTrafficViewMode === "cards") {
+        renderLiveTrafficCards();
+      } else {
+        renderLiveTrafficTable();
+      }
     }
 
     function prependLiveTrafficEvent(ev) {
@@ -500,6 +761,24 @@
       }
       if (liveTrafficBuffer.length > 500) liveTrafficBuffer.pop();
 
+      // Update Cards Stream
+      const cardsContainer = document.getElementById("livetraffic-cards-container");
+      if (cardsContainer && (liveTrafficFilter === "ALL" || ev.action === liveTrafficFilter)) {
+        if (cardsContainer.querySelector(".sg-empty-standby-card")) {
+          cardsContainer.innerHTML = "";
+        }
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = formatTelemetryCardHtml(ev);
+        const newCard = tempDiv.firstElementChild;
+        if (newCard) {
+          cardsContainer.insertBefore(newCard, cardsContainer.firstChild);
+          if (cardsContainer.children.length > 500) {
+            cardsContainer.removeChild(cardsContainer.lastChild);
+          }
+        }
+      }
+
+      // Update Table Stream
       if (liveTrafficFilter === "ALL" || ev.action === liveTrafficFilter) {
         const tbody = document.getElementById("livetraffic-table-body");
         if (tbody) {
@@ -516,6 +795,24 @@
           }
         }
       }
+
+      // Also update Dashboard cards if active
+      const dashCardsContainer = document.getElementById("dashboard-cards-container");
+      if (dashCardsContainer && dashboardViewMode === "cards") {
+        if (dashCardsContainer.querySelector(".sg-empty-standby-card")) {
+          dashCardsContainer.innerHTML = "";
+        }
+        const tempDiv2 = document.createElement("div");
+        tempDiv2.innerHTML = formatTelemetryCardHtml(ev);
+        const newCard2 = tempDiv2.firstElementChild;
+        if (newCard2) {
+          dashCardsContainer.insertBefore(newCard2, dashCardsContainer.firstChild);
+          if (dashCardsContainer.children.length > 200) {
+            dashCardsContainer.removeChild(dashCardsContainer.lastChild);
+          }
+        }
+      }
+
       updateLiveTrafficBadge();
     }
 
@@ -1660,24 +1957,6 @@
       autoRefreshTimer = setInterval(() => {
         if (!isStreamPaused) pollTelemetry(false);
       }, autoRefreshRate * 1000);
-
-      // Ambient live traffic pulse engine (keeps 3D visualizer continuously dynamic)
-      setInterval(() => {
-        if (!isStreamPaused && typeof dispatchLivePacketToPipeline === "function") {
-          const nowMs = Date.now();
-          if (nowMs - lastDispatchedPacketTime > 3500) {
-            const ambientPaths = ["/api/v1/auth/session", "/dashboard", "/api/v1/courses", "/profile", "/status"];
-            const p = ambientPaths[Math.floor(Math.random() * ambientPaths.length)];
-            dispatchLivePacketToPipeline({
-              method: "GET",
-              path: p,
-              action: "ALLOW",
-              risk_score: 0.0,
-              client_ip: "152.59.32." + Math.floor(Math.random() * 200 + 10)
-            });
-          }
-        }
-      }, 3000);
     }
 
     async function pollTelemetry(isManual = false) {
@@ -1775,47 +2054,7 @@
       }
     }
 
-    function loadStaticDemoTelemetry() {
-      const epEl = document.getElementById("kpi-endpoints");
-      if (epEl) epEl.innerText = "42";
-      const wsEl = document.getElementById("kpi-websites");
-      if (wsEl) wsEl.innerText = "Across 3 Domains";
-      const shEl = document.getElementById("kpi-shadow");
-      if (shEl) shEl.innerText = "6";
-      const blEl = document.getElementById("kpi-blocked");
-      if (blEl) blEl.innerText = "1,842";
-      const brEl = document.getElementById("kpi-blockrate");
-      if (brEl) brEl.innerText = "99.4% Block Rate";
 
-      const demoTimeline = [
-        { time: "13:20", allowed: 450, blocked: 22, challenged: 2 },
-        { time: "13:25", allowed: 520, blocked: 45, challenged: 5 },
-        { time: "13:30", allowed: 610, blocked: 18, challenged: 1 },
-        { time: "13:35", allowed: 480, blocked: 94, challenged: 12 },
-        { time: "13:40", allowed: 580, blocked: 12, challenged: 0 },
-        { time: "13:45", allowed: 720, blocked: 25, challenged: 4 },
-        { time: "13:50", allowed: 690, blocked: 38, challenged: 3 }
-      ];
-      renderTrafficHistogram(demoTimeline);
-
-      const demoOwasp = [
-        { category: "A03: Injection (SQLi/Command)", count: 840 },
-        { category: "A01: Broken Access Control (BOLA)", count: 410 },
-        { category: "A05: Security Misconfiguration", count: 260 },
-        { category: "A04: Insecure Design & Rate Flood", count: 185 },
-        { category: "A07: Identification & Auth Failure", count: 147 }
-      ];
-      renderOwaspDistribution(demoOwasp);
-
-      const demoEvents = [
-        { id: "ev-demo-01", website_id: "site-agsipro", timestamp: new Date().toISOString(), client_ip: "198.51.100.23", method: "POST", path: "/api/v1/auth/token", action: "BLOCK", risk_score: 98.0, rule_triggered: "SQLI-UNION-SELECT", owasp_category: "A03:Injection", details: "Blocked SQL Injection payload in auth endpoint", latency_ms: 0.32 },
-        { id: "ev-demo-02", website_id: "site-agsipro", timestamp: new Date(Date.now() - 45000).toISOString(), client_ip: "203.0.113.14", method: "GET", path: "/api/v1/users/admin", action: "BLOCK", risk_score: 95.0, rule_triggered: "BOLA-IDOR-ACCESS", owasp_category: "A01:Broken Access Control", details: "IDOR horizontal privilege violation blocked", latency_ms: 0.28 },
-        { id: "ev-demo-03", website_id: "site-agsipro", timestamp: new Date(Date.now() - 90000).toISOString(), client_ip: "198.51.100.88", method: "POST", path: "/api/v1/upload", action: "BLOCK", risk_score: 99.0, rule_triggered: "PATH-TRAVERSAL-ETC-PASSWD", owasp_category: "A01:Broken Access Control", details: "Attempted ../../etc/passwd traversal blocked", latency_ms: 0.36 },
-        { id: "ev-demo-04", website_id: "site-agsipro", timestamp: new Date(Date.now() - 130000).toISOString(), client_ip: "10.0.4.12", method: "GET", path: "/api/v1/health", action: "ALLOW", risk_score: 0.0, rule_triggered: "CLEAN-REQUEST", owasp_category: "None", details: "Origin health probe verified", latency_ms: 0.21 }
-      ];
-      allRecentEvents = demoEvents;
-      applyEventFilter();
-    }
 
     // -------------------------------------------------------------------------
     // Visual SVG Traffic Histogram & OWASP Spectrum Generators
@@ -2089,11 +2328,13 @@
       });
     }
 
-    function applyEventFilter() {
-      const action = document.getElementById("event-filter-action").value;
-      const q = document.getElementById("event-search-query").value.toLowerCase().trim();
+    function getFilteredRecentEvents() {
+      const actionEl = document.getElementById("event-filter-action");
+      const qEl = document.getElementById("event-search-query");
+      const action = actionEl ? actionEl.value : "ALL";
+      const q = qEl ? qEl.value.toLowerCase().trim() : "";
 
-      let filtered = allRecentEvents;
+      let filtered = allRecentEvents || [];
       if (action !== "ALL") {
         if (action === "BLOCK") {
           filtered = filtered.filter(ev => ev.action === "BLOCK");
@@ -2112,7 +2353,13 @@
           (ev.details && ev.details.toLowerCase().includes(q))
         );
       }
+      return filtered;
+    }
+
+    function applyEventFilter() {
+      const filtered = getFilteredRecentEvents();
       renderEventsTable(filtered);
+      renderEventsCards(filtered);
     }
 
     function openEventForensics(eventId) {
@@ -2908,6 +3155,8 @@
     // -------------------------------------------------------------------------
     initUserSessionUI();
     initSidebarState();
+    setLiveTrafficViewMode('cards');
+    setDashboardViewMode('cards');
     initInteractive3DPipeline();
     initContextualHoverInspection();
     applyTheme();
