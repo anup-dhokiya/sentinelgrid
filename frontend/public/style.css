@@ -2671,3 +2671,269 @@
   color: var(--deep-indigo);
 }
 
+
+/* =============================================================================
+   EXTENDED ANIMATIONS, RADAR ENGINE, & CRAFT VISUAL EFFECTS
+   ============================================================================= */
+
+/* Live Radar Scanner Widget */
+.sg-radar-container {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, rgba(15, 18, 23, 0.8) 70%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.15), 0 0 16px rgba(56, 189, 248, 0.1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sg-radar-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg at 50% 50%, rgba(56, 189, 248, 0.4) 0deg, transparent 65deg, transparent 360deg);
+  animation: sgRadarSpin 3.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes sgRadarSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sg-radar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed rgba(56, 189, 248, 0.25);
+  pointer-events: none;
+}
+
+.sg-radar-blip {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  box-shadow: 0 0 8px var(--terracotta);
+  animation: sgBlipFade 2s infinite ease-out;
+}
+
+@keyframes sgBlipFade {
+  0% { transform: scale(0.6); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.8; }
+  100% { transform: scale(0.6); opacity: 0.3; }
+}
+
+/* Sub-Tab Navigation Bar in React Analytics */
+.sg-subnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--stone-border);
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.sg-subnav-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sg-subnav-btn:hover {
+  background: var(--sand-warm);
+  color: var(--text-charcoal);
+}
+
+.sg-subnav-btn.active {
+  background: var(--sand-warm);
+  color: var(--deep-indigo);
+  border: 1px solid var(--indigo-border);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+}
+
+/* Active Threat Wave Banner */
+.sg-threat-wave-banner {
+  background: linear-gradient(90deg, rgba(248, 81, 73, 0.2) 0%, rgba(245, 158, 11, 0.15) 50%, rgba(248, 81, 73, 0.2) 100%);
+  border: 1px solid rgba(248, 81, 73, 0.5);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  animation: sgPulseBanner 1.8s infinite ease-in-out;
+  box-shadow: 0 4px 20px rgba(248, 81, 73, 0.25);
+}
+
+@keyframes sgPulseBanner {
+  0% { border-color: rgba(248, 81, 73, 0.4); box-shadow: 0 0 12px rgba(248, 81, 73, 0.15); }
+  50% { border-color: rgba(248, 81, 73, 0.8); box-shadow: 0 0 24px rgba(248, 81, 73, 0.4); }
+  100% { border-color: rgba(248, 81, 73, 0.4); box-shadow: 0 0 12px rgba(248, 81, 73, 0.15); }
+}
+
+/* Defense Matrix Interactive Switches */
+.sg-defense-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.sg-defense-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sg-defense-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.sg-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.sg-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sg-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--sand-warm);
+  border: 1px solid var(--stone-border);
+  transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 20px;
+}
+
+.sg-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-muted);
+  transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+}
+
+.sg-switch input:checked + .sg-switch-slider {
+  background-color: var(--sage-soft);
+  border-color: var(--sage-border);
+}
+
+.sg-switch input:checked + .sg-switch-slider:before {
+  transform: translateX(18px);
+  background-color: var(--sage-green);
+  box-shadow: 0 0 8px var(--sage-green);
+}
+
+/* Edge Nodes Status Grid */
+.sg-edge-nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.sg-edge-node-card {
+  padding: 12px 14px;
+  background: var(--sand-warm);
+  border: 1px solid var(--stone-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.sg-edge-node-card:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-1px);
+}
+
+/* DFA Tokenizer Pipeline Step Visualizer */
+.sg-dfa-pipeline-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 14px 6px;
+}
+
+.sg-dfa-step {
+  padding: 10px 14px;
+  background: var(--sand-warm);
+  border: 1px solid var(--stone-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 110px;
+  text-align: center;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sg-dfa-step.active {
+  border-color: var(--deep-indigo);
+  background: rgba(56, 189, 248, 0.12);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+  transform: scale(1.03);
+}
+
+.sg-dfa-arrow {
+  color: var(--deep-indigo);
+  font-weight: 800;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Hex Packet Preview */
+.sg-hex-dump-box {
+  background: #06080B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #A5D6FF;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+:root[data-theme="light"] .sg-hex-dump-box {
+  background: #F4EFE6;
+  border-color: rgba(207, 191, 171, 0.7);
+  color: #1B365D;
+}

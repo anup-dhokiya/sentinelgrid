@@ -2275,10 +2275,15 @@
 
     function showThreatToast(title, body) {
       const toast = document.getElementById("threat-toast");
-      document.getElementById("toast-title").innerText = title;
-      document.getElementById("toast-body").innerText = body;
+      if (!toast) return;
+      const titleEl = document.getElementById("toast-title");
+      const bodyEl = document.getElementById("toast-body");
+      if (titleEl) titleEl.innerText = title;
+      if (bodyEl) bodyEl.innerText = body;
       toast.style.display = "flex";
-      setTimeout(() => { toast.style.display = "none"; }, 5000);
+      setTimeout(() => { 
+        if (toast) toast.style.display = "none"; 
+      }, 5000);
     }
 
     // -------------------------------------------------------------------------
@@ -2955,9 +2960,16 @@
         e.preventDefault();
         const searchInput = document.getElementById("event-search-query");
         if (searchInput) searchInput.focus();
-      } else if (e.key >= "1" && e.key <= "9") {
+      } else if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        if (window.triggerReactThreatWave) {
+          window.triggerReactThreatWave();
+        } else if (typeof triggerSimulatedThreatWave === "function") {
+          triggerSimulatedThreatWave();
+        }
+      } else if ((e.key >= "1" && e.key <= "9") || e.key === "0") {
         const tabKeys = ["dashboard", "livetraffic", "analytics", "domains", "inventory", "iprules", "connectors", "sandbox", "simulation", "onboarding"];
-        const idx = parseInt(e.key, 10) - 1;
+        const idx = e.key === "0" ? 9 : parseInt(e.key, 10) - 1;
         if (tabKeys[idx]) switchTab(tabKeys[idx]);
       } else if (e.key === "Escape") {
         closeEventForensics();
