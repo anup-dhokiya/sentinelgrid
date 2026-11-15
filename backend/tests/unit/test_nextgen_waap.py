@@ -11,7 +11,9 @@ import sys
 from pathlib import Path
 
 # Add backend directory to sys.path
-sys.path.insert(0, "/run/media/anup/D/sentinelgrid/backend")
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
 
 from app.security_engine.smart_parse import SmartParse, TokenType
 from app.security_engine.threat_intel import RadixIpTrie, ThreatIntelEngine

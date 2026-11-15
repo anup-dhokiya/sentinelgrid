@@ -16,12 +16,10 @@ import os
 import tempfile
 from pathlib import Path
 
-# Dynamic DB resolution: uses DATA_DIR if set, D-drive if mounted, or relative to backend root
+# Dynamic DB resolution: uses DATA_DIR if set, repo backend root if writable, or temporary directory
 _env_dir = os.getenv("DATA_DIR")
 if _env_dir:
     DB_PATH = Path(_env_dir) / "sentinelgrid.db"
-elif Path("/run/media/anup/D/sentinelgrid/backend").is_dir():
-    DB_PATH = Path("/run/media/anup/D/sentinelgrid/backend/sentinelgrid.db")
 else:
     _base_dir = Path(__file__).resolve().parent.parent.parent
     DB_PATH = _base_dir / "sentinelgrid.db" if os.access(_base_dir, os.W_OK) else Path(tempfile.gettempdir()) / "sentinelgrid.db"
@@ -184,10 +182,10 @@ def init_database():
         except Exception:
             pass
 
-        # Ensure single master administrator exists with 'manager' role and 'anup@5212' password (PBKDF2-HMAC-SHA256 salted)
+        # Ensure single master administrator exists with 'manager' role and 'Admin#2026' password (PBKDF2-HMAC-SHA256 salted)
         cur = conn.cursor()
         now = datetime.now(timezone.utc).isoformat()
-        admin_pwd_hash = "pbkdf2:sha256:100000$9f7d2e8b4c1a5e3f20d6b8a1c9e4f7a2$eb9a17bb4c72d2e3d2cc4ee2b74bad838234766b9627033b15d6ba93e3e73398"
+        admin_pwd_hash = "pbkdf2:sha256:100000$240ef9edb2ade7713df18bed01dd5758$ca2d5de0c9773dcb15000033d1921e6a57763a11365ee6309a0916e4512e0668"
         cur.execute("SELECT count(*) FROM users WHERE email = 'a@123'")
         if cur.fetchone()[0] == 0:
             cur.execute("""

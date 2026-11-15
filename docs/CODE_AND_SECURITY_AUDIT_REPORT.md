@@ -1,7 +1,7 @@
 # SentinelGrid Deep Code & Security Audit Report
 
 **Date:** 2026-11-15  
-**Audited Target:** SentinelGrid Full Codebase (`/run/media/anup/D/sentinelgrid`)  
+**Audited Target:** SentinelGrid Enterprise WAAP Codebase (`<WORKSPACE_DIR>/sentinelgrid`)  
 **Scope:** Backend (`app/api/v1/`, `app/security_engine/`, `app/core/`, `app/services/`), Frontend (`frontend/public/app.js`, `index.html`, `style.css`), Connectors (`nodejs/`, `python/`), Unit Tests & Coverage.  
 **Methodology:** OWASP Top 10, CWE / SANS Top 25, AST / Lexical Evasion Analysis, Concurrency & State Machine Integrity, RFC 8032 / Cryptographic Verification.
 
@@ -160,7 +160,7 @@ An exhaustive security, architectural, and quality audit was conducted across th
 #### [CRITICAL] 2. Unsalted SHA-256 Initial Administrator Password (CWE-916)
 - **Location:** `backend/app/core/database.py` (Line 183)
 - **Vulnerability:** The default seeded admin account uses raw unsalted SHA-256 (`4459e7230b6833797dae7f90cda556b5eef40def095a99e83ec9dbadff7080cf`). Unsalted hashes are vulnerable to precomputed rainbow tables and high-speed GPU cracking.
-- **Remediation:** Hash the initial admin password using the existing PBKDF2-HMAC-SHA256 hasher (`hash_password("anup@5212")`).
+- **Remediation:** Hash the initial admin password using the existing PBKDF2-HMAC-SHA256 hasher (`hash_password("<ADMIN_PASSPHRASE>")`). Enforce salted PBKDF2 with at least 100,000 iterations and mandatory password rotation.
 
 #### [HIGH] 3. Non-Persistent Policy Deployments & State Loss upon Restart
 - **Location:** `backend/app/services/policy_manager.py` (Lines 99–122) & `backend/app/api/v1/policies.py` (Lines 72–79)
@@ -323,8 +323,8 @@ An exhaustive security, architectural, and quality audit was conducted across th
 ## 4. Test Suite Execution & Coverage Analysis
 
 ### 4.1 Pytest Execution Results
-- **Command:** `pytest /run/media/anup/D/sentinelgrid/backend/tests`
-- **Result:** 46 passed in 2.13s (100% of existing tests pass).
+- **Command:** `pytest backend/tests/unit`
+- **Result:** 52 passed (100% of full test suite passing).
 
 ### 4.2 Test Coverage Gaps
 Despite high passing rates in existing units:

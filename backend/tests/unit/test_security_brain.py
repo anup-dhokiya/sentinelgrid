@@ -9,7 +9,10 @@ import unittest
 from pathlib import Path
 
 # Add backend directory to sys.path
-sys.path.insert(0, "/run/media/anup/D/sentinelgrid/backend")
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+_SHARED_FIXTURES = _BACKEND_DIR.parent / "shared" / "test-fixtures"
 
 from app.security_engine.brain import SecurityBrain
 from app.security_engine.normalization.normalizer import RequestNormalizer
@@ -27,7 +30,7 @@ class TestSecurityBrainComprehensive(unittest.TestCase):
 
     def test_sqli_payload_fixtures(self):
         """Tests SQL injection sample fixtures."""
-        fixture_path = Path("/run/media/anup/D/sentinelgrid/shared/test-fixtures/sqli-samples.json")
+        fixture_path = _SHARED_FIXTURES / "sqli-samples.json"
         with open(fixture_path, "r") as f:
             data = json.load(f)
 
@@ -47,7 +50,7 @@ class TestSecurityBrainComprehensive(unittest.TestCase):
 
     def test_xss_payload_fixtures(self):
         """Tests Cross-Site Scripting sample fixtures."""
-        fixture_path = Path("/run/media/anup/D/sentinelgrid/shared/test-fixtures/xss-samples.json")
+        fixture_path = _SHARED_FIXTURES / "xss-samples.json"
         with open(fixture_path, "r") as f:
             data = json.load(f)
 
@@ -64,7 +67,7 @@ class TestSecurityBrainComprehensive(unittest.TestCase):
 
     def test_path_traversal_fixtures(self):
         """Tests Path Traversal and LFI sample fixtures."""
-        fixture_path = Path("/run/media/anup/D/sentinelgrid/shared/test-fixtures/traversal-samples.json")
+        fixture_path = _SHARED_FIXTURES / "traversal-samples.json"
         with open(fixture_path, "r") as f:
             data = json.load(f)
 
@@ -82,7 +85,7 @@ class TestSecurityBrainComprehensive(unittest.TestCase):
 
     def test_cve_and_rce_payload_fixtures(self):
         """Tests Log4Shell, Spring4Shell, SSRF, XXE, and RCE fixtures."""
-        fixture_path = Path("/run/media/anup/D/sentinelgrid/shared/test-fixtures/cve-rce-ssrf-samples.json")
+        fixture_path = _SHARED_FIXTURES / "cve-rce-ssrf-samples.json"
         with open(fixture_path, "r") as f:
             data = json.load(f)
 

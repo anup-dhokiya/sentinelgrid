@@ -30,7 +30,7 @@ ALLOWED_ORIGINS = [
     "https://sentinelgrid-one.vercel.app",
     "https://aegispro.vercel.app",
     "https://aegispro-murex.vercel.app",
-    "https://anup-dhokiya.github.io",
+    "https://sentinelgrid.github.io",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:8000",
@@ -40,7 +40,7 @@ ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"^https://(sentinelgrid-one|sentinelgrid-[a-z0-9-]+-anupdhokiya066-6071s-projects|aegispro|aegispro-murex)\.vercel\.app$",
+    allow_origin_regex=r"^https://(sentinelgrid-one|sentinelgrid-[a-z0-9-]+|aegispro|aegispro-murex)\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],

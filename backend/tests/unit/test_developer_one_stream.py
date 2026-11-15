@@ -7,8 +7,12 @@ import sys
 import os
 import unittest
 
+from pathlib import Path
+
 # Add backend directory to sys.path
-sys.path.insert(0, "/run/media/anup/D/sentinelgrid/backend")
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
 
 from app.core.crypto import Ed25519KeyManager, AsymmetricPolicySigner
 from app.services.simulation import (

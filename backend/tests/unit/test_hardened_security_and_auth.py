@@ -8,7 +8,10 @@ import sys
 import unittest
 from fastapi.testclient import TestClient
 
-sys.path.insert(0, "/run/media/anup/D/sentinelgrid/backend")
+from pathlib import Path
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
 
 from app.main import app
 from app.security_engine.rate_limiter import global_rate_limiter
@@ -28,7 +31,7 @@ class TestHardenedSecurityAndAuth(unittest.TestCase):
         """Verifies master admin authenticates with salted PBKDF2-HMAC-SHA256."""
         res = self.client.post("/v1/auth/login", json={
             "email": "a@123",
-            "password": "anup@5212"
+            "password": "Admin#2026"
         })
         self.assertEqual(res.status_code, 200)
         body = res.json()
