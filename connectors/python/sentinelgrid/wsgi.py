@@ -51,13 +51,17 @@ class SentinelGridWSGIMiddleware:
         path = environ.get("PATH_INFO", "/")
         query = environ.get("QUERY_STRING", "")
 
-        # 3. Buffer input stream and rewind
+        # 3. Buffer input stream and rewind (supports Content-Length and Transfer-Encoding: chunked)
         content_length = int(environ.get("CONTENT_LENGTH", 0) or 0)
+        is_chunked = "chunked" in environ.get("HTTP_TRANSFER_ENCODING", "").lower()
         body_str = ""
         if content_length > 0:
-            raw_body = environ["wsgi.input"].read(content_length)
-            body_str = raw_body[:65536].decode("utf-8", errors="replace")
-            # Rewind stream for downstream framework
+            raw_body = environ["wsgi.input"].read(min(content_length, 65536))
+            body_str = raw_body.decode("utf-8", errors="replace")
+            environ["wsgi.input"] = io.BytesIO(raw_body)
+        elif is_chunked and "wsgi.input" in environ:
+            raw_body = environ["wsgi.input"].read(65536)
+            body_str = raw_body.decode("utf-8", errors="replace")
             environ["wsgi.input"] = io.BytesIO(raw_body)
 
         # 4. Extract HTTP Headers
@@ -109,6 +113,13 @@ class SentinelGridWSGIMiddleware:
                         ("X-SentinelGrid-Rule", rule)
                     ])
                     return [block_body]
+            elif not self.fail_open:
+                err_msg = b"503 Service Unavailable: Security Inspection Failure"
+                start_response("503 Service Unavailable", [
+                    ("Content-Type", "text/plain"),
+                    ("Content-Length", str(len(err_msg)))
+                ])
+                return [err_msg]
         except Exception as exc:
             if not self.fail_open:
                 err_msg = b"503 Service Unavailable: Security Inspection Failure"

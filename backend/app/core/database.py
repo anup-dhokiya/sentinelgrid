@@ -127,6 +127,7 @@ def init_database():
             status TEXT NOT NULL DEFAULT 'active',
             signature TEXT,
             created_at TEXT NOT NULL,
+            rules_json TEXT,
             FOREIGN KEY (website_id) REFERENCES websites(id)
         );
 
@@ -177,10 +178,16 @@ def init_database():
         CREATE INDEX IF NOT EXISTS idx_connectors_site ON connectors(website_id);
         """)
 
-        # Ensure single master administrator exists with 'manager' role and 'anup@5212' password
+        # Safely ensure schema evolution columns exist in existing database files
+        try:
+            conn.execute("ALTER TABLE policies ADD COLUMN rules_json TEXT")
+        except Exception:
+            pass
+
+        # Ensure single master administrator exists with 'manager' role and 'anup@5212' password (PBKDF2-HMAC-SHA256 salted)
         cur = conn.cursor()
         now = datetime.now(timezone.utc).isoformat()
-        admin_pwd_hash = "4459e7230b6833797dae7f90cda556b5eef40def095a99e83ec9dbadff7080cf"  # SHA-256 of "anup@5212"
+        admin_pwd_hash = "pbkdf2:sha256:100000$9f7d2e8b4c1a5e3f20d6b8a1c9e4f7a2$eb9a17bb4c72d2e3d2cc4ee2b74bad838234766b9627033b15d6ba93e3e73398"
         cur.execute("SELECT count(*) FROM users WHERE email = 'a@123'")
         if cur.fetchone()[0] == 0:
             cur.execute("""

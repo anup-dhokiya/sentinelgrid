@@ -50,8 +50,20 @@ class SentinelGridASGIMiddleware(BaseHTTPMiddleware):
             or (request.client.host if request.client else "127.0.0.1")
         )
 
-        # 2. Buffer request body safely without exhausting stream
-        body_bytes = await request.body()
+        # 2. Buffer request body safely without exhausting stream or causing OOM
+        content_length = request.headers.get("content-length")
+        if content_length and content_length.isdigit() and int(content_length) > (self.max_body_bytes * 8):
+            # For massive payloads, stream up to max_body_bytes to prevent memory exhaustion
+            body_chunks = []
+            bytes_read = 0
+            async for chunk in request.stream():
+                body_chunks.append(chunk)
+                bytes_read += len(chunk)
+                if bytes_read >= self.max_body_bytes:
+                    break
+            body_bytes = b"".join(body_chunks)
+        else:
+            body_bytes = await request.body()
         body_sample = body_bytes[:self.max_body_bytes].decode("utf-8", errors="replace")
 
         # 3. Construct inspection payload
@@ -99,6 +111,9 @@ class SentinelGridASGIMiddleware(BaseHTTPMiddleware):
                             "X-SentinelGrid-Rule": rule
                         }
                     )
+            elif not self.fail_open:
+                logger.error("SentinelGrid returned non-200 (%s) with fail_open=False. Aborting.", resp.status_code)
+                return Response(content="503 Service Unavailable: Security Verification Failure", status_code=503)
         except Exception as exc:
             if not self.fail_open:
                 logger.error("SentinelGrid unreachable and fail_open=False. Aborting request: %s", exc)

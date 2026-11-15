@@ -35,8 +35,13 @@ class SlidingWindowLimiter:
         """Groups IPv6 by /64 prefix to prevent rotation bypass; keeps IPv4 as /32."""
         if not ip_str:
             return "unknown"
-        clean_ip = ip_str.split(":")[0] if ":" in ip_str and not ip_str.startswith("[") and ip_str.count(":") == 1 else ip_str
-        clean_ip = clean_ip.strip("[]")
+        ip_str = ip_str.strip()
+        if ip_str.startswith("[") and "]" in ip_str:
+            clean_ip = ip_str[1:ip_str.index("]")]
+        elif ":" in ip_str and ip_str.count(":") == 1:
+            clean_ip = ip_str.split(":")[0]
+        else:
+            clean_ip = ip_str.strip("[]")
         try:
             ip = ipaddress.ip_address(clean_ip)
             if ip.version == 6:

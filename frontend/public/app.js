@@ -1,4 +1,20 @@
 
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    function getAuthHeaders(extra = {}) {
+      const token = localStorage.getItem("sg_auth_token");
+      const headers = { ...extra };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      return headers;
+    }
+
     function customNotify(title, msg, severity = 'info') {
       const toast = document.getElementById('threat-toast');
       if (!toast) return;
@@ -14,8 +30,9 @@
       localStorage.removeItem("sentinel_backend_url");
       storedBackend = null;
     }
-    const isLocalDevServer = window.location.hostname === "localhost" && (window.location.port === "8000" || window.location.port === "8080");
-    const API = storedBackend || (isLocalDevServer ? "/v1" : "https://sentinelgrid-one.vercel.app/v1");
+    const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const isSameOriginVercel = window.location.origin.includes("vercel.app");
+    const API = storedBackend || ((isLocalHost || isSameOriginVercel) ? "/v1" : "https://sentinelgrid-one.vercel.app/v1");
 
     // -------------------------------------------------------------------------
     // Session Authentication Guard & RBAC Initializer
@@ -71,6 +88,16 @@
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` }
           });
+        }
+      } catch (_) {}
+      try {
+        if (liveTrafficEventSource) {
+          liveTrafficEventSource.close();
+          liveTrafficEventSource = null;
+        }
+        if (liveTrafficPollingInterval) {
+          clearInterval(liveTrafficPollingInterval);
+          liveTrafficPollingInterval = null;
         }
       } catch (_) {}
       try {
@@ -357,14 +384,24 @@
 
     function initLiveTrafficSSE() {
       loadInitialLiveTraffic();
-      startLiveTrafficPollingFallback();
 
       if (liveTrafficEventSource) return;
 
       try {
         liveTrafficEventSource = new EventSource(`${API}/events/stream`);
 
+        liveTrafficEventSource.onopen = () => {
+          if (liveTrafficPollingInterval) {
+            clearInterval(liveTrafficPollingInterval);
+            liveTrafficPollingInterval = null;
+          }
+        };
+
         liveTrafficEventSource.onmessage = (e) => {
+          if (liveTrafficPollingInterval) {
+            clearInterval(liveTrafficPollingInterval);
+            liveTrafficPollingInterval = null;
+          }
           if (isLiveTrafficPaused) return;
           try {
             const ev = JSON.parse(e.data);
@@ -383,9 +420,11 @@
 
         liveTrafficEventSource.onerror = () => {
           console.warn("SSE connection closed or suspended, dynamic polling fallback active.");
+          startLiveTrafficPollingFallback();
         };
       } catch (err) {
         console.warn("Failed to instantiate EventSource:", err);
+        startLiveTrafficPollingFallback();
       }
     }
 
@@ -1580,13 +1619,7 @@
       }
     }
 
-    // Keyboard shortcut: Spacebar toggles pause/resume when not focused on an input
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
-        e.preventDefault();
-        toggleStreamPause();
-      }
-    });
+
 
     function setupAutoRefreshEngine() {
       if (autoRefreshTimer) clearInterval(autoRefreshTimer);
@@ -2081,6 +2114,7 @@
       const ev = (liveTrafficBuffer && liveTrafficBuffer.find(e => e.id === eventId)) || allRecentEvents.find(e => e.id === eventId);
       if (!ev) return;
       activeDrawerEvent = ev;
+      const domainObj = allWebsites.find(w => w.id === ev.website_id);
 
       document.getElementById("drawer-event-id").innerText = ev.id;
       
@@ -2152,7 +2186,6 @@
       }
       document.getElementById("drawer-owasp").innerText = ev.owasp_category || "None";
       
-      const domainObj = allWebsites.find(w => w.id === ev.website_id);
       document.getElementById("drawer-site").innerText = domainObj ? `${domainObj.domain} (${domainObj.name})` : ev.website_id;
 
       document.getElementById("drawer-ip").innerText = ev.client_ip;
@@ -2271,14 +2304,18 @@
             ? (d.domain.startsWith("http") ? d.domain : `https://${d.domain}`) 
             : `http://127.0.0.1:8080`;
           const originPort = isAegis ? "Cloud Edge Middleware" : "Origin Target";
+          const safeName = escapeHtml(d.name);
+          const safeDomain = escapeHtml(d.domain);
+          const safeGatewayUrl = escapeHtml(gatewayUrl);
+          const safeId = escapeHtml(d.id);
 
           return `
             <div class="domain-card">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                   <div>
-                    <h3 style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);">${d.name}</h3>
-                    <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-top: 2px;">${d.domain}</div>
+                    <h3 style="font-size: 15px; font-weight: 800; color: var(--deep-indigo);">${safeName}</h3>
+                    <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-top: 2px;">${safeDomain}</div>
                   </div>
                   <span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">
                     ${d.status === 'active' ? 'ACTIVE ENFORCING' : 'MONITORING ONLY'}
@@ -2286,8 +2323,8 @@
                 </div>
 
                 <div style="background: var(--sand-warm); padding: 12px; border-radius: var(--radius-sm); margin: 10px 0; font-size: 11px; font-family: var(--font-mono);">
-                  <div>🌐 <strong>Gateway:</strong> <a href="${gatewayUrl}" target="_blank" style="color: var(--deep-indigo); text-decoration: underline;">${gatewayUrl}</a></div>
-                  <div style="margin-top: 3px;">🎯 <strong>Origin:</strong> ${originPort}</div>
+                  <div>🌐 <strong>Gateway:</strong> <a href="${safeGatewayUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--deep-indigo); text-decoration: underline;">${safeGatewayUrl}</a></div>
+                  <div style="margin-top: 3px;">🎯 <strong>Origin:</strong> ${escapeHtml(originPort)}</div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; margin: 12px 0;">
@@ -2315,10 +2352,10 @@
               </div>
 
               <div style="display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid var(--stone-border); padding-top: 12px; flex-wrap: wrap;">
-                <button class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;" onclick="openDomainStatsModal('${d.id}')">📊 Deep Profile</button>
-                <button class="btn btn-sage" style="padding: 5px 10px; font-size: 11px;" onclick="testDomainGatewayLive('${d.domain}', '${d.id}')">⚡ Test Attack Probe</button>
-                <button class="btn btn-subtle" style="padding: 5px 8px; font-size: 11px;" onclick="toggleDomainProtection('${d.id}')">🛡️ Toggle Mode</button>
-                <button class="btn btn-subtle" style="padding: 5px 8px; font-size: 11px; color: var(--terracotta); margin-left: auto;" onclick="deleteDomain('${d.id}')">Delete</button>
+                <button class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;" onclick="openDomainStatsModal('${safeId}')">📊 Deep Profile</button>
+                <button class="btn btn-sage" style="padding: 5px 10px; font-size: 11px;" onclick="testDomainGatewayLive('${safeDomain}', '${safeId}')">⚡ Test Attack Probe</button>
+                <button class="btn btn-subtle" style="padding: 5px 8px; font-size: 11px;" onclick="toggleDomainProtection('${safeId}')">🛡️ Toggle Mode</button>
+                <button class="btn btn-subtle" style="padding: 5px 8px; font-size: 11px; color: var(--terracotta); margin-left: auto;" onclick="deleteDomain('${safeId}')">Delete</button>
               </div>
             </div>
           `;
@@ -2326,18 +2363,21 @@
 
         tbody.innerHTML = list.map(d => {
           const tReg = formatTimestamp(d.created_at);
+          const safeDomain = escapeHtml(d.domain);
+          const safeName = escapeHtml(d.name);
+          const safeId = escapeHtml(d.id);
           return `
             <tr>
-              <td><span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">${d.status.toUpperCase()}</span></td>
-              <td><strong>${d.domain}</strong></td>
-              <td>${d.name}</td>
+              <td><span class="badge ${d.status === 'active' ? 'badge-online' : 'badge-offline'}">${escapeHtml(d.status.toUpperCase())}</span></td>
+              <td><strong>${safeDomain}</strong></td>
+              <td>${safeName}</td>
               <td><strong>${d.endpoint_count || 0}</strong> routes</td>
               <td><span style="color: ${(d.shadow_count || 0) > 0 ? 'var(--terracotta)' : 'inherit'}; font-weight: 700;">${d.shadow_count || 0}</span></td>
               <td>${d.event_count || 0}</td>
               <td title="${tReg.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">${tReg.time}</td>
               <td>
-                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px;" onclick="openDomainStatsModal('${d.id}')">Inspect</button>
-                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px; color: var(--terracotta);" onclick="deleteDomain('${d.id}')">Delete</button>
+                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px;" onclick="openDomainStatsModal('${safeId}')">Inspect</button>
+                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px; color: var(--terracotta);" onclick="deleteDomain('${safeId}')">Delete</button>
               </td>
             </tr>
           `;
@@ -2411,7 +2451,7 @@
 
           <div style="background: var(--sand-warm); padding: 14px; border-radius: var(--radius-md); font-size: 11px;">
             <div style="font-weight:700; margin-bottom:3px;">Asymmetric Cryptographic Verification</div>
-            <div style="font-family:var(--font-mono); color:var(--text-muted);">Policy: ${policy.name || 'Standard WAAP'} | Version: v${policy.version || 1} | Signature: ${policy.signature || 'RFC 8032 Verified'}</div>
+            <div style="font-family:var(--font-mono); color:var(--text-muted);">Policy: ${escapeHtml(policy.name || 'Standard WAAP')} | Version: v${escapeHtml(String(policy.version || 1))} | Signature: ${escapeHtml(policy.signature || 'RFC 8032 Verified')}</div>
           </div>
         `;
 
@@ -2575,9 +2615,9 @@
           return `
             <tr>
               <td>${badge}</td>
-              <td style="font-family: var(--font-mono); font-size: 11px;">${ep.website_id}</td>
-              <td><strong style="color: var(--deep-indigo);">${ep.method}</strong></td>
-              <td><code style="background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${ep.path}</code></td>
+              <td style="font-family: var(--font-mono); font-size: 11px;">${escapeHtml(ep.website_id)}</td>
+              <td><strong style="color: var(--deep-indigo);">${escapeHtml(ep.method)}</strong></td>
+              <td><code style="background: var(--sand-warm); padding: 3px 8px; border-radius: var(--radius-xs); font-size: 11px;">${escapeHtml(ep.path)}</code></td>
               <td>${riskBadge}</td>
               <td title="${tSeen.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
                 ${tSeen.time} (${tSeen.relative})
@@ -2609,17 +2649,20 @@
         }
         tbody.innerHTML = list.map(r => {
           const tCreated = formatTimestamp(r.created_at);
-          const ipAddr = r.ip_or_cidr || r.ip_cidr || "Unknown";
+          const ipAddr = escapeHtml(r.ip_or_cidr || r.ip_cidr || "Unknown");
+          const safeAction = escapeHtml(r.action);
+          const safeDesc = escapeHtml(r.description || 'N/A');
+          const safeId = escapeHtml(r.id);
           return `
             <tr>
-              <td><span class="badge ${r.action === 'BLOCK' ? 'badge-block' : 'badge-allow'}">${r.action}</span></td>
+              <td><span class="badge ${r.action === 'BLOCK' ? 'badge-block' : 'badge-allow'}">${safeAction}</span></td>
               <td><strong style="font-family: var(--font-mono); font-size: 12px;">${ipAddr}</strong></td>
-              <td>${r.description || 'N/A'}</td>
+              <td>${safeDesc}</td>
               <td title="${tCreated.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
                 ${tCreated.time} (${tCreated.relative})
               </td>
               <td>
-                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px; color: var(--terracotta);" onclick="deleteIpRule('${r.id}')">Delete</button>
+                <button class="btn btn-subtle" style="padding: 3px 7px; font-size: 10px; color: var(--terracotta);" onclick="deleteIpRule('${safeId}')">Delete</button>
               </td>
             </tr>
           `;
@@ -2682,14 +2725,17 @@
         }
         tbody.innerHTML = list.map(c => {
           const tBeat = formatTimestamp(c.last_heartbeat);
-          const cType = c.connector_type || c.type || "edge-waap-gateway";
+          const cType = escapeHtml(c.connector_type || c.type || "edge-waap-gateway");
+          const safeName = escapeHtml(c.name);
+          const safeStatus = escapeHtml(c.status);
+          const safeWebId = escapeHtml(c.website_id);
           return `
             <tr>
-              <td><span class="badge ${c.status === 'online' ? 'badge-online' : 'badge-offline'}">${c.status.toUpperCase()}</span></td>
-              <td><strong>${c.name}</strong></td>
+              <td><span class="badge ${c.status === 'online' ? 'badge-online' : 'badge-offline'}">${safeStatus.toUpperCase()}</span></td>
+              <td><strong>${safeName}</strong></td>
               <td><span class="badge badge-allow">${cType}</span></td>
-              <td style="font-family: var(--font-mono); font-size: 11px;">${c.website_id}</td>
-              <td style="font-family: var(--font-mono); font-weight: 700; color: var(--sage-green);">${c.latency_ms || 0.35} ms</td>
+              <td style="font-family: var(--font-mono); font-size: 11px;">${safeWebId}</td>
+              <td style="font-family: var(--font-mono); font-weight: 700; color: var(--sage-green);">${Number(c.latency_ms) || 0.35} ms</td>
               <td title="${tBeat.full}" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 11px;">
                 ${tBeat.time} (${tBeat.relative})
               </td>

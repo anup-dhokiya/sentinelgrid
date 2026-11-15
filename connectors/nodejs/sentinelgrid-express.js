@@ -5,6 +5,7 @@
  */
 
 const http = require('http');
+const https = require('https');
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -24,7 +25,10 @@ class SentinelGridExpress {
     this.failOpen = options.failOpen !== false;
 
     const parsed = new URL(this.sentinelgridUrl);
-    this.agent = new http.Agent({
+    const isHttps = parsed.protocol === 'https:';
+    this.transport = isHttps ? https : http;
+
+    this.agent = new this.transport.Agent({
       keepAlive: true,
       maxSockets: 100,
       maxFreeSockets: 20
@@ -32,7 +36,7 @@ class SentinelGridExpress {
     this.requestOptions = {
       protocol: parsed.protocol,
       hostname: parsed.hostname,
-      port: parsed.port || 8000,
+      port: parsed.port || (isHttps ? 443 : 8000),
       path: parsed.pathname,
       method: 'POST',
       agent: this.agent,
@@ -51,10 +55,16 @@ class SentinelGridExpress {
         '127.0.0.1'
       );
 
-      // 2. Format request body
+      // 2. Format request body safely supporting Buffer, String, and Object
       let bodyStr = '';
       if (req.body) {
-        bodyStr = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+        if (Buffer.isBuffer(req.body)) {
+          bodyStr = req.body.toString('utf-8');
+        } else if (typeof req.body === 'string') {
+          bodyStr = req.body;
+        } else {
+          bodyStr = JSON.stringify(req.body);
+        }
       }
 
       // 3. Assemble SentinelGrid payload
@@ -69,7 +79,7 @@ class SentinelGridExpress {
       });
 
       let finished = false;
-      const inspectReq = http.request(this.requestOptions, (inspectRes) => {
+      const inspectReq = this.transport.request(this.requestOptions, (inspectRes) => {
         let rawData = '';
         inspectRes.on('data', (chunk) => { rawData += chunk; });
         inspectRes.on('end', () => {
@@ -89,9 +99,15 @@ class SentinelGridExpress {
                    .send(`<h3>403 Forbidden: Blocked by SentinelGrid WAAP [${escapeHtml(eventId)}]</h3>`);
                 return;
               }
+            } else if (!this.failOpen) {
+              res.status(503).send('503 Service Unavailable: Security Inspection Failure');
+              return;
             }
           } catch (e) {
-            // Parse error: fall through to next()
+            if (!this.failOpen) {
+              res.status(503).send('503 Service Unavailable: Security Parsing Failure');
+              return;
+            }
           }
           next();
         });

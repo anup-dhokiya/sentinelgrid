@@ -66,14 +66,19 @@ class WafTestRequest(BaseModel):
     method: str
     path: str
     query_params: str = ""
+    query: Optional[str] = None
     body: str = ""
     headers: Dict[str, str] = Field(default_factory=dict)
     client_ip: str = "127.0.0.1"
 
 
 class SimulateRequest(BaseModel):
-    website_id: str
-    rule_name: str
+    website_id: Optional[str] = None
+    rule_name: Optional[str] = None
+    rule_id: Optional[str] = None
+    pattern: Optional[str] = None
+    target_field: Optional[str] = "user_agent"
+    action: Optional[str] = "BLOCK"
     criteria_ua: str = ""
     criteria_path: str = ""
 
@@ -714,7 +719,8 @@ async def inspect_live_request(req: WafTestRequest):
 
     # Clean and full request URI path resolution
     base_path = req.path or "/"
-    full_path = f"{base_path}?{req.query_params}" if req.query_params else base_path
+    query_str = req.query_params or req.query or ""
+    full_path = f"{base_path}?{query_str}" if query_str else base_path
 
     is_sandbox = (req.headers.get("X-SentinelGrid-Sandbox") == "true" or 
                   req.headers.get("x-sentinelgrid-sandbox") == "true" or
@@ -866,7 +872,7 @@ async def inspect_live_request(req: WafTestRequest):
     eval_result = SecurityBrain.evaluate(
         path=req.path,
         method=req.method,
-        query=req.query_params,
+        query=query_str,
         body=req.body,
         headers=req.headers,
         client_ip=client_ip
@@ -1237,8 +1243,8 @@ async def list_events(
     client_ip: Optional[str] = None,
     path: Optional[str] = None,
     action: Optional[str] = None,
-    limit: int = 50,
-    offset: int = 0
+    limit: int = Query(50, ge=1, le=1000),
+    offset: int = Query(0, ge=0)
 ):
     """Retrieves security telemetry events with multi-field filtering for the threat analytics console."""
     conn = get_db_connection()
@@ -1280,7 +1286,7 @@ async def export_events(
     path: Optional[str] = None,
     action: Optional[str] = None,
     format: str = Query("json", pattern="^(json|csv)$"),
-    limit: int = 1000
+    limit: int = Query(1000, ge=1, le=5000)
 ):
     """Exports structured security events as JSON or RFC 4180 CSV for external SIEM / SOAR pipelines."""
     import csv
@@ -1351,10 +1357,17 @@ async def simulate_policy_rule(sim_req: SimulateRequest):
     Returns false-positive prediction before live deployment.
     """
     conn = get_db_connection()
+    target_site = sim_req.website_id
     with conn:
+        if not target_site:
+            row = conn.execute("SELECT id FROM websites ORDER BY created_at ASC LIMIT 1").fetchone()
+            target_site = row[0] if row else "site-agispro"
+
         raw_events = conn.execute(
-            "SELECT * FROM security_events WHERE website_id = ?", (sim_req.website_id,)
+            "SELECT * FROM security_events WHERE website_id = ?", (target_site,)
         ).fetchall()
+        if not raw_events:
+            raw_events = conn.execute("SELECT * FROM security_events LIMIT 100").fetchall()
 
     corpus = []
     for ev in raw_events:
@@ -1369,22 +1382,40 @@ async def simulate_policy_rule(sim_req: SimulateRequest):
         ))
 
     criteria = {}
+    if sim_req.pattern:
+        if sim_req.target_field == "path":
+            criteria["path_prefix"] = sim_req.pattern
+        else:
+            criteria["user_agent_contains"] = sim_req.pattern
     if sim_req.criteria_ua:
         criteria["user_agent_contains"] = sim_req.criteria_ua
     if sim_req.criteria_path:
         criteria["path_prefix"] = sim_req.criteria_path
 
+    rule_name = sim_req.rule_name or sim_req.rule_id or "custom-rule"
     policy_payload = PolicyPayload(
         policy_id=str(uuid4()),
         version=99,
-        website_id=sim_req.website_id,
+        website_id=target_site,
         rules=[{
-            "rule_id": sim_req.rule_name.lower().replace(" ", "-"),
-            "action": "block",
+            "rule_id": rule_name.lower().replace(" ", "-"),
+            "action": (sim_req.action or "block").lower(),
             "criteria": criteria
         }],
         issued_at=datetime.now(timezone.utc).isoformat()
     )
 
     report = policy_service.simulate_policy(policy_payload, corpus)
-    return report
+    report_dict = report.model_dump()
+    eval_count = max(report.total_evaluated_requests, 1)
+    delta = round((report.projected_blocks / eval_count) * 100, 1)
+    risk_level = "LOW (0 False Positives)" if report.potential_false_positive_count == 0 else f"HIGH ({report.potential_false_positive_count} Crawlers Flagged)"
+
+    return {
+        **report_dict,
+        "sample_size_evaluated": report.total_evaluated_requests,
+        "candidate_rule_id": rule_name,
+        "predicted_blocks_count": report.projected_blocks,
+        "block_delta_percent": delta,
+        "collateral_risk_level": risk_level,
+    }

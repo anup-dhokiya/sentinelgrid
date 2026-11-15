@@ -118,6 +118,32 @@ class PolicyManagerService:
         self._policy_history[website_id].append(signed_envelope)
         self._active_policy_version[website_id] = candidate_policy.version
 
+        # Persist policy snapshot and rules to persistent SQLite database
+        try:
+            import json
+            from app.core.database import get_db
+            with get_db() as conn:
+                with conn:
+                    # Supersede older policies for this site
+                    conn.execute("UPDATE policies SET status = 'superseded' WHERE website_id = ?", (website_id,))
+                    rules_data = json.dumps([r.model_dump() if hasattr(r, "model_dump") else r for r in candidate_policy.rules])
+                    conn.execute("""
+                        INSERT OR REPLACE INTO policies (id, website_id, version, name, threshold_block, threshold_challenge, status, signature, created_at, rules_json)
+                        VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
+                    """, (
+                        candidate_policy.policy_id,
+                        website_id,
+                        candidate_policy.version,
+                        f"Policy v{candidate_policy.version}",
+                        candidate_policy.thresholds.get("block", 75) if isinstance(candidate_policy.thresholds, dict) else 75,
+                        candidate_policy.thresholds.get("challenge", 50) if isinstance(candidate_policy.thresholds, dict) else 50,
+                        signature_b64,
+                        candidate_policy.issued_at,
+                        rules_data
+                    ))
+        except Exception:
+            pass
+
         return signed_envelope
 
     def rollback_to_version(self, website_id: str, target_version: int) -> Optional[Dict[str, Any]]:

@@ -1146,10 +1146,10 @@ class SecurityBrain:
             "CVE-2022-22965-SPRING4SHELL": ("classloader", "class.module"),
             "SSRF-CLOUD-IMDS-AWS": ("169.254", "0xa9", "2852039166", "2130706433", "0251", "fd00", "latest", "meta-data", "instance-identity"),
             "SSRF-CLOUD-METADATA-GCP-AZURE": ("metadata.google", "metadata.goog", "computemetadata", "metadata.azure", "wireserver", "168.63", "192.0.0.192", "100.100.100.200", "rebind", "rbndr", "nip.io"),
-            "CVE-2024-4577-PHP-CGI-RCE": ("php-cgi", "auto_prepend_file", "cgi-bin"),
+            "CVE-2024-4577-PHP-CGI-RCE": ("php-cgi", "auto_prepend_file", "cgi-bin", "allow_url_include", "disable_functions", "%ad"),
             "CVE-2017-5638-STRUTS2-OGNL": ("#_memberaccess", "ognl", "%{"),
             "CVE-2022-42889-TEXT4SHELL": ("${script:", "${dns:", "${url:"),
-            "CVE-2020-14882-WEBLOGIC-CONSOLE-RCE": ("console.portal", "mbeantype"),
+            "CVE-2020-14882-WEBLOGIC-CONSOLE-RCE": ("/console/", "%252e%252e", "mvel", "filesystemxmlapplicationcontext", "mbeantype", "console.portal"),
             "CVE-2022-1388-F5-BIGIP-AUTH-BYPASS": ("/mgmt/tm/util/bash",),
             "WERKZEUG-DEBUGGER-CONSOLE": ("__debugger__", "console?__debugger__")
         }

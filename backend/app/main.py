@@ -40,9 +40,9 @@ ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|github\.io)$",
+    allow_origin_regex=r"^https://(sentinelgrid-one|sentinelgrid-[a-z0-9-]+-anupdhokiya066-6071s-projects|aegispro|aegispro-murex)\.vercel\.app$",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
